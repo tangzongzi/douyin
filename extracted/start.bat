@@ -1,3 +1,0 @@
-@echo off
-echo Starting Feishu Dashboard...
-npm run dev
