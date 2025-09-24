@@ -455,7 +455,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片1 - 硬性支出 */}
-          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col xs={24} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
               style={{ 
                 width: '100%', 
@@ -482,7 +482,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片2 - 千川投流 */}
-          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col xs={24} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
               style={{ 
                 width: '100%', 
@@ -509,7 +509,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片3 - 当月赔付申请 */}
-          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col xs={24} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
               style={{ 
                 width: '100%', 
