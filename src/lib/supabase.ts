@@ -214,7 +214,13 @@ export class SupabaseService {
 // 实时订阅功能
 export const subscribeToDataChanges = (
   table: 'daily_profits' | 'monthly_summary',
-  callback: (payload: any) => void
+  callback: (payload: { 
+    eventType: 'INSERT' | 'UPDATE' | 'DELETE';
+    new: Record<string, unknown>;
+    old: Record<string, unknown>;
+    schema: string;
+    table: string;
+  }) => void
 ) => {
   return supabase
     .channel(`${table}_changes`)
