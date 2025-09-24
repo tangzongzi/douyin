@@ -369,7 +369,7 @@ export default function Dashboard() {
         {/* 核心指标卡片区域 - 所有卡片在一行，统一高度 */}
         <Row gutter={[12, 16]} style={{ marginBottom: '24px', display: 'flex', alignItems: 'stretch' }}>
           {/* 大卡片1 - 月度每日利润汇总 */}
-          <Col xs={24} sm={12} md={12} lg={6} xl={6} style={{ display: 'flex', marginBottom: '16px' }}>
+          <Col xs={12} sm={12} md={24} lg={6} xl={6} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
             <StatisticCard
               style={{ width: '100%', minHeight: '120px' }}
               title="月度每日利润汇总"
@@ -404,7 +404,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 大卡片2 - 月净利润 */}
-          <Col xs={24} sm={12} md={12} lg={6} xl={6} style={{ display: 'flex', marginBottom: '16px' }}>
+          <Col xs={12} sm={12} md={24} lg={6} xl={6} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
             <StatisticCard
               style={{ width: '100%', minHeight: '120px' }}
               title="月净利润"
@@ -439,7 +439,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片1 - 硬性支出 */}
-          <Col xs={24} sm={24} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '16px' }}>
+          <Col xs={8} sm={8} md={24} lg={4} xl={4} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
             <StatisticCard
               style={{ width: '100%', minHeight: '120px' }}
               title="硬性支出"
@@ -462,7 +462,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片2 - 千川投流 */}
-          <Col xs={24} sm={24} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '16px' }}>
+          <Col xs={8} sm={8} md={24} lg={4} xl={4} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
             <StatisticCard
               style={{ width: '100%', minHeight: '120px' }}
               title="千川投流"
@@ -485,7 +485,7 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片3 - 当月赔付申请 */}
-          <Col xs={24} sm={24} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '16px' }}>
+          <Col xs={8} sm={8} md={24} lg={4} xl={4} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
             <StatisticCard
               style={{ width: '100%', minHeight: '120px' }}
               title="当月赔付申请"
