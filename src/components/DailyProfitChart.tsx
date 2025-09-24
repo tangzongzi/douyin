@@ -52,9 +52,21 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
     if (active && payload && payload.length) {
       const dataPoint = payload[0]?.payload; // 获取完整的数据点
       
+      // 检测是否为移动端
+      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+      
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ minWidth: '200px' }}>
-          <p className="font-medium" style={{ marginBottom: '8px', borderBottom: '1px solid #f0f0f0', paddingBottom: '4px' }}>
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ 
+          minWidth: isMobile ? '160px' : '200px',
+          maxWidth: isMobile ? '280px' : '400px',
+          fontSize: isMobile ? '12px' : '13px'
+        }}>
+          <p className="font-medium" style={{ 
+            marginBottom: '8px', 
+            borderBottom: '1px solid #f0f0f0', 
+            paddingBottom: '4px',
+            fontSize: isMobile ? '13px' : '14px'
+          }}>
             {`${label}`}
           </p>
           
@@ -116,23 +128,36 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
     );
   };
 
+  // 检测屏幕尺寸
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const chartHeight = isMobile ? '300px' : '400px';
+  const chartMargin = isMobile 
+    ? { top: 20, right: 10, left: 10, bottom: 10 }
+    : { top: 40, right: 30, left: 20, bottom: 20 };
+  const fontSize = isMobile ? 10 : 12;
+  const intervalStep = isMobile ? 4 : 2; // 手机端显示更少标签
+
   return (
-    <div style={{ height: '400px', position: 'relative' }}>
+    <div style={{ height: chartHeight, position: 'relative' }}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={processedData} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
+        <LineChart data={processedData} margin={chartMargin}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis 
             dataKey="dayLabel" 
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize }}
             tickLine={{ stroke: '#d9d9d9' }}
             axisLine={{ stroke: '#d9d9d9' }}
-            interval={2} // 每3天显示一个标签
+            interval={intervalStep}
+            angle={isMobile ? -45 : 0}
+            textAnchor={isMobile ? 'end' : 'middle'}
+            height={isMobile ? 60 : 30}
           />
           <YAxis 
-            tick={{ fontSize: 12 }}
+            tick={{ fontSize }}
             tickLine={{ stroke: '#d9d9d9' }}
             axisLine={{ stroke: '#d9d9d9' }}
-            tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}k`}
+            tickFormatter={(value) => isMobile ? `¥${(value / 1000).toFixed(0)}k` : `¥${(value / 1000).toFixed(0)}k`}
+            width={isMobile ? 50 : 60}
           />
           <Tooltip 
             content={<CustomTooltip />}
@@ -145,9 +170,9 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             type="monotone"
             dataKey="currentMonth"
             stroke="#1890ff"
-            strokeWidth={2}
-            dot={{ fill: '#1890ff', strokeWidth: 1, r: 3 }}
-            activeDot={{ r: 4, stroke: '#1890ff', strokeWidth: 1, fill: '#1890ff' }}
+            strokeWidth={isMobile ? 3 : 2}
+            dot={{ fill: '#1890ff', strokeWidth: 1, r: isMobile ? 4 : 3 }}
+            activeDot={{ r: isMobile ? 8 : 4, stroke: '#1890ff', strokeWidth: 1, fill: '#1890ff' }}
             name="本月"
             connectNulls={false} // 不连接空值，产生断点
           />
@@ -157,9 +182,9 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             type="monotone"
             dataKey="lastMonth"
             stroke="#52c41a"
-            strokeWidth={2}
-            dot={{ fill: '#52c41a', strokeWidth: 1, r: 3 }}
-            activeDot={{ r: 4, stroke: '#52c41a', strokeWidth: 1, fill: '#52c41a' }}
+            strokeWidth={isMobile ? 3 : 2}
+            dot={{ fill: '#52c41a', strokeWidth: 1, r: isMobile ? 4 : 3 }}
+            activeDot={{ r: isMobile ? 8 : 4, stroke: '#52c41a', strokeWidth: 1, fill: '#52c41a' }}
             name="上月"
             connectNulls={false} // 不连接空值，产生断点
           />
@@ -169,9 +194,9 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             type="monotone"
             dataKey="currentMonthAverage"
             stroke="#722ed1"
-            strokeWidth={2}
+            strokeWidth={isMobile ? 2 : 2}
             dot={false}
-            activeDot={{ r: 4, stroke: '#722ed1', strokeWidth: 1, fill: '#722ed1' }}
+            activeDot={{ r: isMobile ? 6 : 4, stroke: '#722ed1', strokeWidth: 1, fill: '#722ed1' }}
             name="当月平均"
             connectNulls={true} // 平均线保持连续
           />

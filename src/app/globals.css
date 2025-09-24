@@ -67,11 +67,88 @@ body {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+  /* 卡片样式 */
   .ant-card {
     margin-bottom: 16px;
+    border-radius: 12px;
   }
   
+  /* 统计卡片字体大小 */
   .ant-statistic-content {
-    font-size: 20px;
+    font-size: clamp(18px, 5vw, 22px) !important;
+  }
+  
+  .ant-statistic-title {
+    font-size: 13px !important;
+    line-height: 1.4;
+  }
+  
+  /* 页面内边距 */
+  .ant-layout-content {
+    padding: 16px !important;
+  }
+  
+  /* Pro组件优化 */
+  .ant-pro-card {
+    border-radius: 12px;
+  }
+  
+  .ant-pro-card-header-title {
+    font-size: 15px !important;
+    font-weight: 600;
+  }
+  
+  /* 按钮优化 */
+  .ant-btn {
+    min-height: 44px;
+    border-radius: 8px;
+    font-size: 15px;
+  }
+  
+  /* Modal优化 */
+  .ant-modal {
+    margin: 16px;
+    max-width: calc(100vw - 32px);
+  }
+  
+  .ant-modal-content {
+    border-radius: 12px;
+  }
+  
+  /* 表格优化 */
+  .ant-table-wrapper {
+    font-size: 13px;
+  }
+  
+  /* Tooltip优化 */
+  .ant-tooltip-inner {
+    font-size: 12px;
+    border-radius: 8px;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 480px) {
+  .ant-statistic-content {
+    font-size: clamp(16px, 6vw, 20px) !important;
+  }
+  
+  .ant-statistic-title {
+    font-size: 12px !important;
+  }
+  
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+  
+  /* 更紧凑的间距 */
+  .ant-row {
+    margin-left: -6px !important;
+    margin-right: -6px !important;
+  }
+  
+  .ant-col {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
   }
 }
