@@ -313,7 +313,7 @@ export default function Dashboard() {
 
   // 检测移动端
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  
+
   return (
     <div style={{ 
       background: '#f0f2f5', 
@@ -336,7 +336,7 @@ export default function Dashboard() {
           }}>
             <div>
               <h1 style={{ 
-                fontSize: isMobile ? 'clamp(20px, 6vw, 22px)' : '24px', 
+                fontSize: isMobile ? '18px' : '24px', 
                 fontWeight: '600', 
                 color: 'rgba(0,0,0,0.85)', 
                 marginBottom: '8px' 
@@ -378,7 +378,7 @@ export default function Dashboard() {
                 value: data.overviewData.dailyProfitSum || 0,
                 valueStyle: { 
                   color: '#3f8600', 
-                  fontSize: 'clamp(18px, 5vw, 24px)',
+                  fontSize: isMobile ? '16px' : '24px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -413,7 +413,7 @@ export default function Dashboard() {
                 value: data.overviewData.monthProfit || 0,
                 valueStyle: { 
                   color: '#1890ff', 
-                  fontSize: 'clamp(18px, 5vw, 24px)',
+                  fontSize: isMobile ? '16px' : '24px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -448,7 +448,7 @@ export default function Dashboard() {
                 value: data.overviewData.hardExpense || 0,
                 valueStyle: { 
                   color: '#722ed1', 
-                  fontSize: 'clamp(16px, 4vw, 18px)',
+                  fontSize: isMobile ? '14px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -471,7 +471,7 @@ export default function Dashboard() {
                 value: data.overviewData.qianchuan || 0,
                 valueStyle: { 
                   color: '#52c41a', 
-                  fontSize: 'clamp(16px, 4vw, 18px)',
+                  fontSize: isMobile ? '14px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -494,7 +494,7 @@ export default function Dashboard() {
                 value: data.overviewData.monthClaimAmount || 0,
                 valueStyle: { 
                   color: '#fa8c16', 
-                  fontSize: 'clamp(16px, 4vw, 18px)',
+                  fontSize: isMobile ? '14px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -522,7 +522,7 @@ export default function Dashboard() {
 
         {/* 累计数据区域 */}
         <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
             <StatisticCard
               style={{ width: '100%', minHeight: '100px' }}
               title="含保证金利润"
@@ -531,7 +531,7 @@ export default function Dashboard() {
                 value: data.overviewData.profitWithDeposit || 0,
                 valueStyle: { 
                   color: '#722ed1', 
-                  fontSize: 'clamp(18px, 5vw, 22px)',
+                  fontSize: isMobile ? '16px' : '20px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -543,7 +543,7 @@ export default function Dashboard() {
               }
             />
           </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
             <StatisticCard
               style={{ width: '100%', minHeight: '100px' }}
               title="不含保证金利润"
@@ -552,7 +552,7 @@ export default function Dashboard() {
                 value: data.overviewData.profitWithoutDeposit || 0,
                 valueStyle: { 
                   color: '#13c2c2', 
-                  fontSize: 'clamp(18px, 5vw, 22px)',
+                  fontSize: isMobile ? '16px' : '20px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),

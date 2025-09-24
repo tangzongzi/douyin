@@ -75,11 +75,11 @@ body {
   
   /* 统计卡片字体大小 */
   .ant-statistic-content {
-    font-size: clamp(18px, 5vw, 22px) !important;
+    font-size: 16px !important;
   }
   
   .ant-statistic-title {
-    font-size: 13px !important;
+    font-size: 12px !important;
     line-height: 1.4;
   }
   
@@ -130,11 +130,11 @@ body {
 /* 超小屏幕优化 */
 @media (max-width: 480px) {
   .ant-statistic-content {
-    font-size: clamp(16px, 6vw, 20px) !important;
+    font-size: 14px !important;
   }
   
   .ant-statistic-title {
-    font-size: 12px !important;
+    font-size: 11px !important;
   }
   
   .ant-layout-content {
