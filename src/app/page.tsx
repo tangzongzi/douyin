@@ -381,7 +381,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
+                minHeight: isMobile ? '90px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="月度总利润"
@@ -390,7 +390,7 @@ export default function Dashboard() {
                 value: data.overviewData.dailyProfitSum || 0,
                 valueStyle: { 
                   color: '#3f8600', 
-                  fontSize: isMobile ? '16px' : '24px',
+                  fontSize: isMobile ? '14px' : '24px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -420,7 +420,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
+                minHeight: isMobile ? '90px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="月净利润"
@@ -429,7 +429,7 @@ export default function Dashboard() {
                 value: data.overviewData.monthProfit || 0,
                 valueStyle: { 
                   color: '#1890ff', 
-                  fontSize: isMobile ? '16px' : '24px',
+                  fontSize: isMobile ? '14px' : '24px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -459,7 +459,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
+                minHeight: isMobile ? '90px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="硬性支出"
@@ -468,7 +468,7 @@ export default function Dashboard() {
                 value: data.overviewData.hardExpense || 0,
                 valueStyle: { 
                   color: '#722ed1', 
-                  fontSize: isMobile ? '14px' : '18px',
+                  fontSize: isMobile ? '12px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -486,7 +486,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
+                minHeight: isMobile ? '90px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="千川投流"
@@ -495,7 +495,7 @@ export default function Dashboard() {
                 value: data.overviewData.qianchuan || 0,
                 valueStyle: { 
                   color: '#52c41a', 
-                  fontSize: isMobile ? '14px' : '18px',
+                  fontSize: isMobile ? '12px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -513,7 +513,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
+                minHeight: isMobile ? '90px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="当月赔付"
@@ -522,7 +522,7 @@ export default function Dashboard() {
                 value: data.overviewData.monthClaimAmount || 0,
                 valueStyle: { 
                   color: '#fa8c16', 
-                  fontSize: isMobile ? '14px' : '18px',
+                  fontSize: isMobile ? '12px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -557,7 +557,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '80px' : '100px',
+                minHeight: isMobile ? '70px' : '100px',
                 fontSize: isMobile ? '11px' : '13px'
               }}
               title="含保证金利润"
@@ -566,7 +566,7 @@ export default function Dashboard() {
                 value: data.overviewData.profitWithDeposit || 0,
                 valueStyle: { 
                   color: '#722ed1', 
-                  fontSize: isMobile ? '16px' : '20px',
+                  fontSize: isMobile ? '14px' : '20px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -582,7 +582,7 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '80px' : '100px',
+                minHeight: isMobile ? '70px' : '100px',
                 fontSize: isMobile ? '11px' : '13px'
               }}
               title="不含保证金利润"
@@ -591,7 +591,7 @@ export default function Dashboard() {
                 value: data.overviewData.profitWithoutDeposit || 0,
                 valueStyle: { 
                   color: '#13c2c2', 
-                  fontSize: isMobile ? '16px' : '20px',
+                  fontSize: isMobile ? '14px' : '20px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
