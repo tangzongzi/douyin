@@ -373,6 +373,7 @@ export default function Dashboard() {
             marginBottom: isMobile ? '16px' : '24px', 
             display: 'flex', 
             alignItems: 'stretch' 
+         
           }}
         >
           {/* 大卡片1 - 月度每日利润汇总 */}
@@ -383,7 +384,7 @@ export default function Dashboard() {
                 minHeight: isMobile ? '100px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
-              title="月度每日利润汇总"
+              title="月度汇总"
               tooltip="当月每日利润汇总金额"
               statistic={{
                 value: data.overviewData.dailyProfitSum || 0,
@@ -515,7 +516,7 @@ export default function Dashboard() {
                 minHeight: isMobile ? '100px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
-              title="当月赔付申请"
+              title="当月赔付"
               tooltip="当月总赔付申请金额"
               statistic={{
                 value: data.overviewData.monthClaimAmount || 0,
