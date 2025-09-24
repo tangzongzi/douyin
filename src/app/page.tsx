@@ -112,21 +112,21 @@ export default function Dashboard() {
       // 处理Supabase数据为图表格式
       const processSupabaseData = () => {
         // 计算当月平均值（基于每日利润汇总数据）
-        const currentMonthData = dailyData.filter((item: any) => 
+        const currentMonthData = dailyData.filter((item: { date: string; profit_summary: number }) => 
           item.date >= '2025-09-01' && item.date <= '2025-09-30' && item.profit_summary > 0
         );
         
         const currentMonthSummaryAverage = currentMonthData.length > 0 
-          ? currentMonthData.reduce((sum: number, item: any) => sum + item.profit_summary, 0) / currentMonthData.length
+          ? currentMonthData.reduce((sum: number, item: { profit_summary: number }) => sum + item.profit_summary, 0) / currentMonthData.length
           : 3000;
         
         // 计算当月平均值（基于每日盈利数据，用于图表线条）
-        const currentMonthProfitData = dailyData.filter((item: any) => 
+        const currentMonthProfitData = dailyData.filter((item: { date: string; daily_profit: number }) => 
           item.date >= '2025-09-01' && item.date <= '2025-09-30' && item.daily_profit > 0
         );
         
         const currentMonthProfitAverage = currentMonthProfitData.length > 0 
-          ? currentMonthProfitData.reduce((sum: number, item: any) => sum + item.daily_profit, 0) / currentMonthProfitData.length
+          ? currentMonthProfitData.reduce((sum: number, item: { daily_profit: number }) => sum + item.daily_profit, 0) / currentMonthProfitData.length
           : 1800;
         
         console.log(`当月每日盈利平均值: ${currentMonthProfitAverage}`);
