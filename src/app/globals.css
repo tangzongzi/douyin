@@ -79,12 +79,13 @@ body {
   }
   
   .ant-statistic-title {
-    font-size: 10px !important;
-    line-height: 1.2;
-    font-weight: 500;
+    font-size: 6px !important;
+    line-height: 1.0;
+    font-weight: 600;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
+    letter-spacing: -0.5px;
   }
   
   /* 统计卡片标题优化 */
