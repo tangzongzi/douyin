@@ -459,7 +459,8 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '70px' : '120px',
+                minHeight: isMobile ? '100px' : '120px',
+                aspectRatio: isMobile ? '1' : 'auto',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="硬性支出"
@@ -468,13 +469,20 @@ export default function Dashboard() {
                 value: data.overviewData.hardExpense || 0,
                 valueStyle: { 
                   color: '#722ed1', 
-                  fontSize: isMobile ? '8px' : '18px',
+                  fontSize: isMobile ? '12px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
+                <div style={{ 
+                  height: isMobile ? '20px' : '40px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  fontSize: isMobile ? '9px' : '11px', 
+                  color: 'rgba(0,0,0,0.45)' 
+                }}>
                   <span>固定支出</span>
                 </div>
               }
@@ -486,7 +494,8 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '70px' : '120px',
+                minHeight: isMobile ? '100px' : '120px',
+                aspectRatio: isMobile ? '1' : 'auto',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="千川投流"
@@ -495,13 +504,20 @@ export default function Dashboard() {
                 value: data.overviewData.qianchuan || 0,
                 valueStyle: { 
                   color: '#52c41a', 
-                  fontSize: isMobile ? '8px' : '18px',
+                  fontSize: isMobile ? '12px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
+                <div style={{ 
+                  height: isMobile ? '20px' : '40px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  fontSize: isMobile ? '9px' : '11px', 
+                  color: 'rgba(0,0,0,0.45)' 
+                }}>
                   <span>投流支出</span>
                 </div>
               }
@@ -513,7 +529,8 @@ export default function Dashboard() {
             <StatisticCard
               style={{ 
                 width: '100%', 
-                minHeight: isMobile ? '70px' : '120px',
+                minHeight: isMobile ? '100px' : '120px',
+                aspectRatio: isMobile ? '1' : 'auto',
                 fontSize: isMobile ? '12px' : '14px'
               }}
               title="当月赔付"
@@ -522,7 +539,7 @@ export default function Dashboard() {
                 value: data.overviewData.monthClaimAmount || 0,
                 valueStyle: { 
                   color: '#fa8c16', 
-                  fontSize: isMobile ? '8px' : '18px',
+                  fontSize: isMobile ? '12px' : '18px',
                   fontWeight: 'bold'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
@@ -530,8 +547,15 @@ export default function Dashboard() {
                   (data.overviewData.monthClaimAmount || 0) > (data.overviewData.lastMonthClaimAmount || 0) ? 'up' : 'down' : undefined,
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
-                  {data.overviewData.lastMonthClaimAmount && (
+                <div style={{ 
+                  height: isMobile ? '20px' : '40px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  fontSize: isMobile ? '8px' : '11px', 
+                  color: 'rgba(0,0,0,0.45)' 
+                }}>
+                  {data.overviewData.lastMonthClaimAmount && !isMobile && (
                     <>
                       <span>较上月</span>
                       <span style={{ 
@@ -542,6 +566,7 @@ export default function Dashboard() {
                       </span>
                     </>
                   )}
+                  {isMobile && <span>赔付金额</span>}
                 </div>
               }
             />
