@@ -79,8 +79,15 @@ body {
   }
   
   .ant-statistic-title {
-    font-size: 12px !important;
-    line-height: 1.4;
+    font-size: 11px !important;
+    line-height: 1.3;
+    font-weight: 500;
+  }
+  
+  /* 统计卡片标题优化 */
+  .ant-pro-card-header-title {
+    font-size: 13px !important;
+    font-weight: 500;
   }
   
   /* 页面内边距 */

@@ -367,11 +367,22 @@ export default function Dashboard() {
         </div>
 
         {/* 核心指标卡片区域 - 所有卡片在一行，统一高度 */}
-        <Row gutter={[12, 16]} style={{ marginBottom: '24px', display: 'flex', alignItems: 'stretch' }}>
+        <Row 
+          gutter={isMobile ? [8, 12] : [12, 16]} 
+          style={{ 
+            marginBottom: isMobile ? '16px' : '24px', 
+            display: 'flex', 
+            alignItems: 'stretch' 
+          }}
+        >
           {/* 大卡片1 - 月度每日利润汇总 */}
-          <Col xs={12} sm={12} md={24} lg={6} xl={6} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
+          <Col xs={12} sm={12} md={12} lg={6} xl={6} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '100px' : '120px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
               title="月度每日利润汇总"
               tooltip="当月每日利润汇总金额"
               statistic={{
@@ -404,9 +415,13 @@ export default function Dashboard() {
           </Col>
           
           {/* 大卡片2 - 月净利润 */}
-          <Col xs={12} sm={12} md={24} lg={6} xl={6} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
+          <Col xs={12} sm={12} md={12} lg={6} xl={6} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '100px' : '120px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
               title="月净利润"
               tooltip="当月净利润金额"
               statistic={{
@@ -439,9 +454,13 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片1 - 硬性支出 */}
-          <Col xs={8} sm={8} md={24} lg={4} xl={4} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
+          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '100px' : '120px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
               title="硬性支出"
               tooltip="当月硬性支出金额"
               statistic={{
@@ -462,9 +481,13 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片2 - 千川投流 */}
-          <Col xs={8} sm={8} md={24} lg={4} xl={4} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
+          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '100px' : '120px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
               title="千川投流"
               tooltip="当月千川投流金额"
               statistic={{
@@ -485,9 +508,13 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片3 - 当月赔付申请 */}
-          <Col xs={8} sm={8} md={24} lg={4} xl={4} style={{ display: 'flex', marginBottom: isMobile ? '12px' : '0' }}>
+          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '100px' : '120px',
+                fontSize: isMobile ? '12px' : '14px'
+              }}
               title="当月赔付申请"
               tooltip="当月总赔付申请金额"
               statistic={{
@@ -521,10 +548,17 @@ export default function Dashboard() {
         </Row>
 
         {/* 累计数据区域 */}
-        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        <Row 
+          gutter={isMobile ? [8, 12] : [16, 16]} 
+          style={{ marginBottom: isMobile ? '16px' : '24px' }}
+        >
           <Col xs={12} sm={12} md={12} lg={12} xl={12}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '100px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '80px' : '100px',
+                fontSize: isMobile ? '11px' : '13px'
+              }}
               title="含保证金利润"
               tooltip="累计含保证金利润总额"
               statistic={{
@@ -545,7 +579,11 @@ export default function Dashboard() {
           </Col>
           <Col xs={12} sm={12} md={12} lg={12} xl={12}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '100px' }}
+              style={{ 
+                width: '100%', 
+                minHeight: isMobile ? '80px' : '100px',
+                fontSize: isMobile ? '11px' : '13px'
+              }}
               title="不含保证金利润"
               tooltip="累计不含保证金利润总额"
               statistic={{
