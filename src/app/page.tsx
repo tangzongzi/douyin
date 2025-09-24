@@ -384,7 +384,7 @@ export default function Dashboard() {
                 minHeight: isMobile ? '100px' : '120px',
                 fontSize: isMobile ? '12px' : '14px'
               }}
-              title="月度汇总"
+              title="月度总利润"
               tooltip="当月每日利润汇总金额"
               statistic={{
                 value: data.overviewData.dailyProfitSum || 0,
