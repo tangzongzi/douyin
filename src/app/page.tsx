@@ -41,6 +41,8 @@ interface OverviewData {
   lastMonthQianchuan?: number;
   monthClaimAmount?: number; // 当月赔付申请
   lastMonthClaimAmount?: number;
+  profitWithDeposit?: number; // 含保证金利润
+  profitWithoutDeposit?: number; // 不含保证金利润
 }
 
 interface ExpenseData {
