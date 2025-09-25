@@ -101,22 +101,13 @@ function getFieldValue(record: any, fieldKey: string): number {
   const fields = record.fields;
   const keys = Object.keys(fields);
   
-  // 精确匹配字段名
-  if (fields[fieldKey] !== undefined) {
-    return Number(fields[fieldKey]) || 0;
-  }
-  
-  // 模糊匹配字段名
+  // 查找匹配的字段名
   const matchedKey = keys.find(key => 
     key.includes(fieldKey) || 
-    fieldKey.includes(key) ||
-    key.includes(fieldKey.slice(0, Math.min(3, fieldKey.length)))
+    key.includes(fieldKey.slice(0, 3))
   );
   
-  const value = matchedKey ? fields[matchedKey] : 0;
-  console.log(`[Sync] 字段匹配: "${fieldKey}" -> "${matchedKey}" = ${value}`);
-  
-  return Number(value) || 0;
+  return matchedKey ? Number(fields[matchedKey]) || 0 : 0;
 }
 
 // 同步每日数据
@@ -153,9 +144,11 @@ export async function syncDailyData(): Promise<SyncLog> {
       }
       
       // 从飞书表格截图看到，数据是正序排列的（第1行是最新日期）
-      // 按照表格中实际的日期顺序来映射：9/24, 9/23, 9/22...
-      const currentDate = new Date('2025-09-24'); // 基准日期（2025年）
-      currentDate.setDate(currentDate.getDate() - index); // 往前推算
+      // 动态基准日期：使用当前日期作为第一行数据的日期
+      const today = new Date();
+      const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - index);
+      
+      console.log(`[Sync] 索引${index} -> 日期${currentDate.toISOString().split('T')[0]}`);
       
       const dailyProfit: DailyProfit = {
         date: currentDate.toISOString().split('T')[0],
@@ -302,7 +295,7 @@ export async function syncYearlyData(): Promise<SyncLog> {
     const accessToken = await getFeishuAccessToken();
     
     // 获取年度总利润数据
-    const feishuData = await getFeishuTableData(ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID, accessToken);
+    const feishuData = await getFeishuTableData(accessToken, ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID);
     console.log('[Sync] 年度数据原始数据:', JSON.stringify(feishuData, null, 2));
     
     if (!feishuData || feishuData.length === 0) {
@@ -312,22 +305,14 @@ export async function syncYearlyData(): Promise<SyncLog> {
     // 转换为年度利润数据
     const yearProfits: YearProfit[] = [];
     
-    feishuData.forEach((record, index) => {
-      console.log(`[Sync] 年度记录${index}的所有字段:`, Object.keys(record?.fields || {}));
-      
-      // 获取年份，如果没有年份字段，默认为2025
-      const yearValue = getFieldValue(record, '年份');
-      const year = yearValue > 0 ? yearValue.toString() : '2025';
-      
+    feishuData.forEach((record) => {
       const yearProfit: YearProfit = {
-        year: year,
+        year: getFieldValue(record, '年份') || '2025',
         profit_with_deposit: getFieldValue(record, '含保证金利润'),
         total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || getFieldValue(record, '含保证金利润'), // 备用映射
         profit_without_deposit: getFieldValue(record, '不含保证金利润'),
         net_profit_without_deposit: getFieldValue(record, '不含保证金余利润') || getFieldValue(record, '不含保证金利润'), // 备用映射
       };
-      
-      console.log(`[Sync] 年度数据记录${index}:`, yearProfit);
       yearProfits.push(yearProfit);
     });
     
