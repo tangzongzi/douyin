@@ -41,8 +41,7 @@ interface OverviewData {
   lastMonthQianchuan?: number;
   monthClaimAmount?: number; // 当月赔付申请
   lastMonthClaimAmount?: number;
-  profitWithDeposit?: number; // 含保证金利润
-  profitWithoutDeposit?: number; // 不含保证金利润
+  // 移除年度数据字段，恢复昨天的接口定义
 }
 
 interface ExpenseData {
@@ -497,43 +496,7 @@ export default function Dashboard() {
           </Col>
         </Row>
 
-        {/* 累计数据区域 */}
-        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-          <Col span={12}>
-            <StatisticCard
-              style={{ width: '100%', minHeight: '100px' }}
-              title="含保证金利润"
-              tooltip="累计含保证金利润总额"
-              statistic={{
-                value: data.overviewData.profitWithDeposit || 0,
-                valueStyle: { color: '#722ed1', fontSize: '20px' },
-                formatter: (value) => formatCurrency(Number(value)),
-              }}
-              chart={
-                <div style={{ height: '30px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
-                  <span>累计总额</span>
-                </div>
-              }
-            />
-          </Col>
-          <Col span={12}>
-            <StatisticCard
-              style={{ width: '100%', minHeight: '100px' }}
-              title="不含保证金利润"
-              tooltip="累计不含保证金利润总额"
-              statistic={{
-                value: data.overviewData.profitWithoutDeposit || 0,
-                valueStyle: { color: '#13c2c2', fontSize: '20px' },
-                formatter: (value) => formatCurrency(Number(value)),
-              }}
-              chart={
-                <div style={{ height: '30px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
-                  <span>累计总额</span>
-                </div>
-              }
-            />
-          </Col>
-        </Row>
+        {/* 移除年度数据区域，恢复昨天的简洁布局 */}
 
         {/* 主要图表区域 */}
         <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>

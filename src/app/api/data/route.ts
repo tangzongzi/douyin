@@ -36,9 +36,7 @@ export async function GET(request: NextRequest) {
         const currentMonth = monthlyData.find(item => item.month === '2025-09');
         const lastMonth = monthlyData.find(item => item.month === '2025-08');
         
-        // 获取年度数据
-        const yearlyData = await SupabaseService.getYearlyData('2025');
-        const currentYear = yearlyData && yearlyData.length > 0 ? yearlyData[0] : null;
+        // 移除年度数据调用，恢复昨天的简单逻辑
         
         data = {
           dailyProfitSum: currentMonth?.daily_profit_sum || 0, // 月度每日利润汇总（第一位）
@@ -51,9 +49,7 @@ export async function GET(request: NextRequest) {
           lastMonthQianchuan: Math.abs(lastMonth?.qianchuan || 0),
           monthClaimAmount: currentMonth?.claim_amount_sum || 0, // 当月赔付申请（第五位）
           lastMonthClaimAmount: lastMonth?.claim_amount_sum || 0,
-          // 年度累计数据
-          profitWithDeposit: currentYear?.profit_with_deposit || 0,
-          profitWithoutDeposit: currentYear?.profit_without_deposit || 0,
+          // 移除年度数据，恢复昨天的简单结构
         };
         break;
         
