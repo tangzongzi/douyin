@@ -712,6 +712,15 @@ export default function Dashboard() {
                   同步月度数据
                 </Button>
                 <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSync('yearly')}
+                  loading={syncing}
+                  size="middle"
+                  style={{ height: '36px' }}
+                >
+                  同步年度数据
+                </Button>
+                <Button 
                   href="/sync"
                   target="_blank"
                   size="middle"
