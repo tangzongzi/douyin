@@ -217,7 +217,7 @@ export async function syncDailyData(options?: {
       if (index < 3) {
         console.log(`[Sync] 记录${index}的所有字段:`, Object.keys(record?.fields || {}));
         console.log(`[Sync] 日期字段值:`, recordDate);
-        console.log(`[Sync] 每日利润汇总值:`, getFieldValue(record, '每日利润汇总'));
+        console.log(`[Sync] 每日利润汇总值:`, getFieldValue(record, '每日每日利润汇总'));
         console.log(`[Sync] 每日盈利值:`, getFieldValue(record, '每日盈利'));
       }
       
@@ -257,7 +257,7 @@ export async function syncDailyData(options?: {
       const dailyProfit: DailyProfit = {
         date: recordDateStr,
         daily_profit: getFieldValue(record, '每日盈利'), // 每日盈利字段
-        profit_summary: getFieldValue(record, '每日利润汇总'), // 每日利润汇总字段
+        profit_summary: getFieldValue(record, '每日每日利润汇总'), // 每日利润汇总字段（修正字段名）
         other_expense: getFieldValue(record, '其他支出'),
         payment_expense: getFieldValue(record, '货款支出'), // 保持原始负数值
         withdraw_amount: getFieldValue(record, '提现金额') || 0,
