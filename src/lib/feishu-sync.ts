@@ -143,12 +143,13 @@ export async function syncDailyData(): Promise<SyncLog> {
         console.log(`[Sync] 货款支出值:`, getFieldValue(record, '货款支出'));
       }
       
-      // 从飞书表格截图看到，数据是正序排列的（第1行是最新日期）
-      // 动态基准日期：使用当前日期作为第一行数据的日期
-      const today = new Date();
-      const currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() - index);
+      // 修正：飞书表格第1行是9/25，第2行是9/24，依此类推
+      // 正确的映射应该是：索引0=9/25，索引1=9/24，索引2=9/23...
+      const baseDate = new Date('2025-09-25'); // 第1行对应的日期
+      const currentDate = new Date(baseDate);
+      currentDate.setDate(baseDate.getDate() - index); // 从9/25开始往前推
       
-      console.log(`[Sync] 索引${index} -> 日期${currentDate.toISOString().split('T')[0]}`);
+      console.log(`[Sync] 飞书第${index + 1}行 -> 日期${currentDate.toISOString().split('T')[0]}`);
       
       const dailyProfit: DailyProfit = {
         date: currentDate.toISOString().split('T')[0],
