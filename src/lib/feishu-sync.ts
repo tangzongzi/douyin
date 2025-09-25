@@ -131,11 +131,8 @@ function getFieldValue(record: any, fieldKey: string): number {
   return Number(value) || 0;
 }
 
-// 智能同步每日数据（支持日期范围和增量同步）
-export async function syncDailyData(options?: {
-  dateRange?: 'recent' | '7days' | '15days' | '30days' | 'currentMonth' | 'all';
-  forceSync?: boolean; // 是否强制同步已存在的数据
-}): Promise<SyncLog> {
+// 同步每日数据（恢复简单有效的逻辑）
+export async function syncDailyData(): Promise<SyncLog> {
   const syncLog: SyncLog = {
     sync_type: 'daily',
     sync_status: 'failed',
@@ -144,120 +141,38 @@ export async function syncDailyData(options?: {
   };
   
   try {
-    const { dateRange = 'recent', forceSync = false } = options || {};
-    console.log(`[Sync] 开始同步每日数据，范围: ${dateRange}, 强制同步: ${forceSync}`);
+    console.log('[Sync] 开始同步每日数据...');
     
-    // 1. 计算同步的日期范围
-    const today = new Date();
-    let startDate: Date | null = null;
-    
-    switch (dateRange) {
-      case '7days':
-        startDate = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-        break;
-      case '15days':
-        startDate = new Date(today.getTime() - 15 * 24 * 60 * 60 * 1000);
-        break;
-      case '30days':
-        startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
-        break;
-      case 'currentMonth':
-        startDate = new Date(today.getFullYear(), today.getMonth(), 1);
-        break;
-      case 'recent':
-        startDate = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000); // 默认30天
-        break;
-      case 'all':
-      default:
-        startDate = null; // 同步所有数据
-        break;
-    }
-    
-    console.log(`[Sync] 同步日期范围: ${startDate ? startDate.toISOString().split('T')[0] : '全部'} 到 ${today.toISOString().split('T')[0]}`);
-    
-    // 2. 获取已存在的数据（用于增量同步）
-    let existingDates: string[] = [];
-    if (!forceSync) {
-      try {
-        const existingData = await SupabaseService.getDailyProfits(
-          startDate ? startDate.toISOString().split('T')[0] : undefined,
-          today.toISOString().split('T')[0]
-        );
-        existingDates = existingData.map(item => item.date);
-        console.log(`[Sync] 已存在的日期:`, existingDates);
-      } catch (error) {
-        console.warn('[Sync] 获取已存在数据失败，将进行完整同步:', error);
-      }
-    }
-    
-    // 3. 直接调用飞书API获取数据
+    // 1. 直接调用飞书API获取数据
     const accessToken = await getFeishuAccessToken();
     const feishuData = await getFeishuTableData(ENV_CONFIG.TABLE_BASE_DAILY, accessToken);
     
-    // 4. 转换数据格式
+    // 2. 转换数据格式
     const dailyProfits: DailyProfit[] = [];
     
     feishuData.forEach((record, index) => {
-      // 从飞书表格中直接读取日期字段，而不是基于索引推算
-      const dateValue = getFieldValue(record, '日期') || getFieldValue(record, '时间') || getFieldValue(record, 'date');
+      // 恢复昨天可用的简单逻辑：基于索引推算日期，但使用正确的字段名
+      const profitValue = getFieldValue(record, '每日每日利润汇总'); // 使用正确的字段名
       
-      // 如果没有日期字段，尝试从record中获取
-      let recordDate = null;
-      if (record?.fields) {
-        const dateFields = Object.keys(record.fields).filter(key => 
-          key.includes('日期') || key.includes('时间') || key.toLowerCase().includes('date')
-        );
-        if (dateFields.length > 0) {
-          const dateFieldValue = record.fields[dateFields[0]];
-          recordDate = dateFieldValue;
-        }
-      }
-      
-      // 调试：显示所有可用字段和日期信息
+      // 调试：显示所有可用字段和值
       if (index < 3) {
         console.log(`[Sync] 记录${index}的所有字段:`, Object.keys(record?.fields || {}));
-        console.log(`[Sync] 日期字段值:`, recordDate);
-        console.log(`[Sync] 每日利润汇总值:`, getFieldValue(record, '每日每日利润汇总'));
+        console.log(`[Sync] 每日利润汇总值:`, profitValue);
         console.log(`[Sync] 每日盈利值:`, getFieldValue(record, '每日盈利'));
+        console.log(`[Sync] 赔付申请金额值:`, getFieldValue(record, '赔付申请金额'));
+        console.log(`[Sync] 其他支出值:`, getFieldValue(record, '其他支出'));
+        console.log(`[Sync] 货款支出值:`, getFieldValue(record, '货款支出'));
       }
       
-      // 解析日期（支持多种格式）
-      let parsedDate = null;
-      if (recordDate) {
-        // 尝试解析各种日期格式
-        if (typeof recordDate === 'string') {
-          // 处理 "2025/09/25" 或 "2025-09-25" 格式
-          parsedDate = new Date(recordDate.replace(/\//g, '-'));
-        } else if (typeof recordDate === 'number') {
-          // 处理时间戳
-          parsedDate = new Date(recordDate);
-        }
-      }
-      
-      // 如果无法解析日期，跳过这条记录
-      if (!parsedDate || isNaN(parsedDate.getTime())) {
-        console.warn(`[Sync] 跳过无效日期记录 (索引${index}):`, recordDate);
-        return;
-      }
-      
-      const recordDateStr = parsedDate.toISOString().split('T')[0];
-      
-      // 检查日期范围过滤
-      if (startDate && parsedDate < startDate) {
-        console.log(`[Sync] 跳过超出范围的日期: ${recordDateStr}`);
-        return;
-      }
-      
-      // 检查增量同步（跳过已存在的数据）
-      if (!forceSync && existingDates.includes(recordDateStr)) {
-        console.log(`[Sync] 跳过已存在的日期: ${recordDateStr}`);
-        return;
-      }
+      // 恢复昨天的日期逻辑，但使用动态的今天作为基准
+      const today = new Date();
+      const currentDate = new Date(today);
+      currentDate.setDate(today.getDate() - index); // 从今天开始往前推
       
       const dailyProfit: DailyProfit = {
-        date: recordDateStr,
+        date: currentDate.toISOString().split('T')[0],
         daily_profit: getFieldValue(record, '每日盈利'), // 每日盈利字段
-        profit_summary: getFieldValue(record, '每日每日利润汇总'), // 每日利润汇总字段（修正字段名）
+        profit_summary: profitValue, // 每日利润汇总字段（使用正确字段名）
         other_expense: getFieldValue(record, '其他支出'),
         payment_expense: getFieldValue(record, '货款支出'), // 保持原始负数值
         withdraw_amount: getFieldValue(record, '提现金额') || 0,
@@ -265,7 +180,7 @@ export async function syncDailyData(options?: {
       };
       
       dailyProfits.push(dailyProfit);
-      console.log(`[Sync] ✅ 将同步: ${dailyProfit.date} = 利润¥${dailyProfit.daily_profit}, 汇总¥${dailyProfit.profit_summary} (飞书第${index + 1}行)`);
+      console.log(`[Sync] 处理每日数据: ${dailyProfit.date} = 利润¥${dailyProfit.daily_profit}, 汇总¥${dailyProfit.profit_summary} (索引${index})`);
     });
     
     // 3. 批量插入到Supabase

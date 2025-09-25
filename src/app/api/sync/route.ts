@@ -4,21 +4,15 @@ import { syncAllData, syncDailyData, syncDailyDataByRange, forceFullSync, syncMo
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type') || 'all';
-  const range = searchParams.get('range') as '7days' | '15days' | '30days' | 'currentMonth' | null;
-  const force = searchParams.get('force') === 'true';
   
   try {
-    console.log(`[API] 开始同步，类型: ${type}, 范围: ${range}, 强制: ${force}`);
+    console.log(`[API] 开始同步，类型: ${type}`);
     
     let result;
     
     switch (type) {
       case 'daily':
-        if (range) {
-          result = await syncDailyDataByRange(range);
-        } else {
-          result = await syncDailyData({ dateRange: 'recent', forceSync: force });
-        }
+        result = await syncDailyData();
         break;
       case 'monthly':
         result = await syncMonthlyData();
@@ -26,12 +20,9 @@ export async function POST(request: NextRequest) {
       case 'yearly':
         result = await syncYearlyData();
         break;
-      case 'force':
-        result = await forceFullSync();
-        break;
       case 'all':
       default:
-        result = await syncAllData({ forceSync: force });
+        result = await syncAllData();
         break;
     }
     
