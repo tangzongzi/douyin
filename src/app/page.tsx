@@ -311,36 +311,14 @@ export default function Dashboard() {
     return ((current - previous) / previous * 100).toFixed(1);
   };
 
-  // 检测移动端
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-
   return (
-    <div style={{ 
-      background: '#f0f2f5', 
-      minHeight: '100vh', 
-      padding: isMobile ? '16px 12px' : '24px' 
-    }}>
-      <div style={{ 
-        maxWidth: '1200px', 
-        margin: '0 auto',
-        width: '100%'
-      }}>
+    <div style={{ background: '#f0f2f5', minHeight: '100vh', padding: '24px' }}>
+      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         {/* 页面标题区域 */}
-        <div style={{ marginBottom: isMobile ? '16px' : '24px' }}>
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            flexWrap: isMobile ? 'wrap' : 'nowrap',
-            gap: isMobile ? '12px' : '0'
-          }}>
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h1 style={{ 
-                fontSize: isMobile ? '16px' : '24px', 
-                fontWeight: '600', 
-                color: 'rgba(0,0,0,0.85)', 
-                marginBottom: '8px' 
-              }}>
+              <h1 style={{ fontSize: '24px', fontWeight: '600', color: 'rgba(0,0,0,0.85)', marginBottom: '8px' }}>
                 抖音电商
                 {/* 隐藏式同步入口 */}
                 <SettingOutlined 
@@ -367,32 +345,16 @@ export default function Dashboard() {
         </div>
 
         {/* 核心指标卡片区域 - 所有卡片在一行，统一高度 */}
-        <Row 
-          gutter={isMobile ? [8, 12] : [12, 16]} 
-          style={{ 
-            marginBottom: isMobile ? '16px' : '24px', 
-            display: 'flex', 
-            alignItems: 'stretch' 
-         
-          }}
-        >
+        <Row gutter={[12, 16]} style={{ marginBottom: '24px', display: 'flex', alignItems: 'stretch' }}>
           {/* 大卡片1 - 月度每日利润汇总 */}
-          <Col xs={12} sm={12} md={12} lg={6} xl={6} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col span={6} style={{ display: 'flex' }}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '70px' : '120px',
-                fontSize: isMobile ? '12px' : '14px'
-              }}
-              title="月度总利润"
+              style={{ width: '100%', minHeight: '120px' }}
+              title="月度每日利润汇总"
               tooltip="当月每日利润汇总金额"
               statistic={{
                 value: data.overviewData.dailyProfitSum || 0,
-                valueStyle: { 
-                  color: '#3f8600', 
-                  fontSize: isMobile ? '12px' : '24px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#3f8600', fontSize: '24px' },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthDailyProfitSum ? 
                   (data.overviewData.dailyProfitSum || 0) > (data.overviewData.lastMonthDailyProfitSum || 0) ? 'up' : 'down' : undefined,
@@ -416,22 +378,14 @@ export default function Dashboard() {
           </Col>
           
           {/* 大卡片2 - 月净利润 */}
-          <Col xs={12} sm={12} md={12} lg={6} xl={6} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col span={6} style={{ display: 'flex' }}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '70px' : '120px',
-                fontSize: isMobile ? '12px' : '14px'
-              }}
+              style={{ width: '100%', minHeight: '120px' }}
               title="月净利润"
               tooltip="当月净利润金额"
               statistic={{
                 value: data.overviewData.monthProfit || 0,
-                valueStyle: { 
-                  color: '#1890ff', 
-                  fontSize: isMobile ? '12px' : '24px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#1890ff', fontSize: '24px' },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthProfit ? 
                   (data.overviewData.monthProfit || 0) > (data.overviewData.lastMonthProfit || 0) ? 'up' : 'down' : undefined,
@@ -455,34 +409,18 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片1 - 硬性支出 */}
-          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col span={4} style={{ display: 'flex' }}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
-                aspectRatio: isMobile ? '1' : 'auto',
-                fontSize: isMobile ? '12px' : '14px'
-              }}
+              style={{ width: '100%', minHeight: '120px' }}
               title="硬性支出"
               tooltip="当月硬性支出金额"
               statistic={{
                 value: data.overviewData.hardExpense || 0,
-                valueStyle: { 
-                  color: '#722ed1', 
-                  fontSize: isMobile ? '10px' : '18px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#722ed1', fontSize: '18px' },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
-                <div style={{ 
-                  height: isMobile ? '20px' : '40px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: isMobile ? '9px' : '11px', 
-                  color: 'rgba(0,0,0,0.45)' 
-                }}>
+                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
                   <span>固定支出</span>
                 </div>
               }
@@ -490,34 +428,18 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片2 - 千川投流 */}
-          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col span={4} style={{ display: 'flex' }}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
-                aspectRatio: isMobile ? '1' : 'auto',
-                fontSize: isMobile ? '12px' : '14px'
-              }}
+              style={{ width: '100%', minHeight: '120px' }}
               title="千川投流"
               tooltip="当月千川投流金额"
               statistic={{
                 value: data.overviewData.qianchuan || 0,
-                valueStyle: { 
-                  color: '#52c41a', 
-                  fontSize: isMobile ? '10px' : '18px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#52c41a', fontSize: '18px' },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
-                <div style={{ 
-                  height: isMobile ? '20px' : '40px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: isMobile ? '9px' : '11px', 
-                  color: 'rgba(0,0,0,0.45)' 
-                }}>
+                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
                   <span>投流支出</span>
                 </div>
               }
@@ -525,37 +447,21 @@ export default function Dashboard() {
           </Col>
           
           {/* 小卡片3 - 当月赔付申请 */}
-          <Col xs={8} sm={8} md={8} lg={4} xl={4} style={{ display: 'flex', marginBottom: '12px' }}>
+          <Col span={4} style={{ display: 'flex' }}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '100px' : '120px',
-                aspectRatio: isMobile ? '1' : 'auto',
-                fontSize: isMobile ? '12px' : '14px'
-              }}
-              title="当月赔付"
+              style={{ width: '100%', minHeight: '120px' }}
+              title="当月赔付申请"
               tooltip="当月总赔付申请金额"
               statistic={{
                 value: data.overviewData.monthClaimAmount || 0,
-                valueStyle: { 
-                  color: '#fa8c16', 
-                  fontSize: isMobile ? '10px' : '18px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#fa8c16', fontSize: '18px' },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthClaimAmount ? 
                   (data.overviewData.monthClaimAmount || 0) > (data.overviewData.lastMonthClaimAmount || 0) ? 'up' : 'down' : undefined,
               }}
               chart={
-                <div style={{ 
-                  height: isMobile ? '20px' : '40px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  fontSize: isMobile ? '8px' : '11px', 
-                  color: 'rgba(0,0,0,0.45)' 
-                }}>
-                  {data.overviewData.lastMonthClaimAmount && !isMobile && (
+                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
+                  {data.overviewData.lastMonthClaimAmount && (
                     <>
                       <span>较上月</span>
                       <span style={{ 
@@ -566,7 +472,6 @@ export default function Dashboard() {
                       </span>
                     </>
                   )}
-                  {isMobile && <span>赔付金额</span>}
                 </div>
               }
             />
@@ -574,26 +479,15 @@ export default function Dashboard() {
         </Row>
 
         {/* 累计数据区域 */}
-        <Row 
-          gutter={isMobile ? [8, 12] : [16, 16]} 
-          style={{ marginBottom: isMobile ? '16px' : '24px' }}
-        >
-          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+          <Col span={12}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '60px' : '100px',
-                fontSize: isMobile ? '11px' : '13px'
-              }}
+              style={{ width: '100%', minHeight: '100px' }}
               title="含保证金利润"
               tooltip="累计含保证金利润总额"
               statistic={{
                 value: data.overviewData.profitWithDeposit || 0,
-                valueStyle: { 
-                  color: '#722ed1', 
-                  fontSize: isMobile ? '12px' : '20px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#722ed1', fontSize: '20px' },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
@@ -603,22 +497,14 @@ export default function Dashboard() {
               }
             />
           </Col>
-          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+          <Col span={12}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: isMobile ? '60px' : '100px',
-                fontSize: isMobile ? '11px' : '13px'
-              }}
+              style={{ width: '100%', minHeight: '100px' }}
               title="不含保证金利润"
               tooltip="累计不含保证金利润总额"
               statistic={{
                 value: data.overviewData.profitWithoutDeposit || 0,
-                valueStyle: { 
-                  color: '#13c2c2', 
-                  fontSize: isMobile ? '12px' : '20px',
-                  fontWeight: 'bold'
-                },
+                valueStyle: { color: '#13c2c2', fontSize: '20px' },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
@@ -710,15 +596,6 @@ export default function Dashboard() {
                   style={{ height: '36px' }}
                 >
                   同步月度数据
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSync('yearly')}
-                  loading={syncing}
-                  size="middle"
-                  style={{ height: '36px' }}
-                >
-                  同步年度数据
                 </Button>
                 <Button 
                   href="/sync"

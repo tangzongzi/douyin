@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { syncAllData, syncDailyData, syncMonthlyData, syncYearlyData, validateDataSync } from '@/lib/feishu-sync';
+import { syncAllData, syncDailyData, syncDailyDataByRange, forceFullSync, syncMonthlyData, syncYearlyData, validateDataSync } from '@/lib/feishu-sync';
 
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type') || 'all';
+  const range = searchParams.get('range') as '7days' | '15days' | '30days' | 'currentMonth' | null;
+  const force = searchParams.get('force') === 'true';
   
   try {
-    console.log(`[API] 开始同步，类型: ${type}`);
+    console.log(`[API] 开始同步，类型: ${type}, 范围: ${range}, 强制: ${force}`);
     
     let result;
     
     switch (type) {
       case 'daily':
-        result = await syncDailyData();
+        if (range) {
+          result = await syncDailyDataByRange(range);
+        } else {
+          result = await syncDailyData({ dateRange: 'recent', forceSync: force });
+        }
         break;
       case 'monthly':
         result = await syncMonthlyData();
@@ -20,9 +26,12 @@ export async function POST(request: NextRequest) {
       case 'yearly':
         result = await syncYearlyData();
         break;
+      case 'force':
+        result = await forceFullSync();
+        break;
       case 'all':
       default:
-        result = await syncAllData();
+        result = await syncAllData({ forceSync: force });
         break;
     }
     

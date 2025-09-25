@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { Card, Spin } from 'antd';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatCurrency } from '@/lib/feishu-api';
@@ -22,13 +21,6 @@ interface DailyProfitChartProps {
 }
 
 export default function DailyProfitChart({ data, loading = false }: DailyProfitChartProps) {
-  // 控制线条显示状态
-  const [visibleLines, setVisibleLines] = useState({
-    currentMonth: true,
-    lastMonth: true,
-    currentMonthAverage: false, // 默认隐藏当月平均线
-  });
-
   if (loading) {
     return (
       <div style={{ height: '300px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -60,21 +52,9 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
     if (active && payload && payload.length) {
       const dataPoint = payload[0]?.payload; // 获取完整的数据点
       
-      // 检测是否为移动端
-      const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-      
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ 
-          minWidth: isMobile ? '160px' : '200px',
-          maxWidth: isMobile ? '280px' : '400px',
-          fontSize: isMobile ? '12px' : '13px'
-        }}>
-          <p className="font-medium" style={{ 
-            marginBottom: '8px', 
-            borderBottom: '1px solid #f0f0f0', 
-            paddingBottom: '4px',
-            fontSize: isMobile ? '13px' : '14px'
-          }}>
+        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ minWidth: '200px' }}>
+          <p className="font-medium" style={{ marginBottom: '8px', borderBottom: '1px solid #f0f0f0', paddingBottom: '4px' }}>
             {`${label}`}
           </p>
           
@@ -109,14 +89,9 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
     return null;
   };
 
-  // 自定义图例（可点击切换）
+  // 自定义图例
   const CustomLegend = (props: any) => {
-    const legendItems = [
-      { dataKey: 'currentMonth', name: '本月', color: '#1890ff' },
-      { dataKey: 'lastMonth', name: '上月', color: '#52c41a' },
-      { dataKey: 'currentMonthAverage', name: '当月平均', color: '#722ed1' },
-    ];
-    
+    const { payload } = props;
     return (
       <div style={{ 
         position: 'absolute', 
@@ -126,65 +101,38 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
         gap: '16px',
         zIndex: 10
       }}>
-        {legendItems.map((item, index) => (
-          <div 
-            key={index} 
-            style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '4px',
-              cursor: 'pointer',
-              opacity: visibleLines[item.dataKey as keyof typeof visibleLines] ? 1 : 0.3,
-              transition: 'opacity 0.3s'
-            }}
-            onClick={() => setVisibleLines(prev => ({
-              ...prev,
-              [item.dataKey]: !prev[item.dataKey as keyof typeof prev]
-            }))}
-          >
+        {payload.map((entry: any, index: number) => (
+          <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <div style={{
               width: '8px',
               height: '8px',
               borderRadius: '50%',
-              backgroundColor: item.color
+              backgroundColor: entry.color
             }} />
-            <span style={{ fontSize: '12px', color: '#666' }}>{item.name}</span>
+            <span style={{ fontSize: '12px', color: '#666' }}>{entry.value}</span>
           </div>
         ))}
       </div>
     );
   };
 
-  // 检测屏幕尺寸
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const chartHeight = isMobile ? '300px' : '400px';
-  const chartMargin = isMobile 
-    ? { top: 20, right: 10, left: 10, bottom: 10 }
-    : { top: 40, right: 30, left: 20, bottom: 20 };
-  const fontSize = isMobile ? 10 : 12;
-  const intervalStep = isMobile ? 4 : 2; // 手机端显示更少标签
-
   return (
-    <div style={{ height: chartHeight, position: 'relative' }}>
+    <div style={{ height: '400px', position: 'relative' }}>
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={processedData} margin={chartMargin}>
+        <LineChart data={processedData} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis 
             dataKey="dayLabel" 
-            tick={{ fontSize }}
+            tick={{ fontSize: 12 }}
             tickLine={{ stroke: '#d9d9d9' }}
             axisLine={{ stroke: '#d9d9d9' }}
-            interval={intervalStep}
-            angle={isMobile ? -45 : 0}
-            textAnchor={isMobile ? 'end' : 'middle'}
-            height={isMobile ? 60 : 30}
+            interval={2} // 每3天显示一个标签
           />
           <YAxis 
-            tick={{ fontSize }}
+            tick={{ fontSize: 12 }}
             tickLine={{ stroke: '#d9d9d9' }}
             axisLine={{ stroke: '#d9d9d9' }}
-            tickFormatter={(value) => isMobile ? `¥${(value / 1000).toFixed(0)}k` : `¥${(value / 1000).toFixed(0)}k`}
-            width={isMobile ? 50 : 60}
+            tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}k`}
           />
           <Tooltip 
             content={<CustomTooltip />}
@@ -193,46 +141,40 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
           <Legend content={<CustomLegend />} />
           
           {/* 本月数据线 */}
-          {visibleLines.currentMonth && (
-            <Line
-              type="monotone"
-              dataKey="currentMonth"
-              stroke="#1890ff"
-              strokeWidth={isMobile ? 3 : 2}
-              dot={{ fill: '#1890ff', strokeWidth: 1, r: isMobile ? 4 : 3 }}
-              activeDot={{ r: isMobile ? 8 : 4, stroke: '#1890ff', strokeWidth: 1, fill: '#1890ff' }}
-              name="本月"
-              connectNulls={false} // 不连接空值，产生断点
-            />
-          )}
+          <Line
+            type="monotone"
+            dataKey="currentMonth"
+            stroke="#1890ff"
+            strokeWidth={2}
+            dot={{ fill: '#1890ff', strokeWidth: 1, r: 3 }}
+            activeDot={{ r: 4, stroke: '#1890ff', strokeWidth: 1, fill: '#1890ff' }}
+            name="本月"
+            connectNulls={false} // 不连接空值，产生断点
+          />
           
           {/* 上月数据线 */}
-          {visibleLines.lastMonth && (
-            <Line
-              type="monotone"
-              dataKey="lastMonth"
-              stroke="#52c41a"
-              strokeWidth={isMobile ? 3 : 2}
-              dot={{ fill: '#52c41a', strokeWidth: 1, r: isMobile ? 4 : 3 }}
-              activeDot={{ r: isMobile ? 8 : 4, stroke: '#52c41a', strokeWidth: 1, fill: '#52c41a' }}
-              name="上月"
-              connectNulls={false} // 不连接空值，产生断点
-            />
-          )}
+          <Line
+            type="monotone"
+            dataKey="lastMonth"
+            stroke="#52c41a"
+            strokeWidth={2}
+            dot={{ fill: '#52c41a', strokeWidth: 1, r: 3 }}
+            activeDot={{ r: 4, stroke: '#52c41a', strokeWidth: 1, fill: '#52c41a' }}
+            name="上月"
+            connectNulls={false} // 不连接空值，产生断点
+          />
           
           {/* 当月平均线 */}
-          {visibleLines.currentMonthAverage && (
-            <Line
-              type="monotone"
-              dataKey="currentMonthAverage"
-              stroke="#722ed1"
-              strokeWidth={isMobile ? 2 : 2}
-              dot={false}
-              activeDot={{ r: isMobile ? 6 : 4, stroke: '#722ed1', strokeWidth: 1, fill: '#722ed1' }}
-              name="当月平均"
-              connectNulls={true} // 平均线保持连续
-            />
-          )}
+          <Line
+            type="monotone"
+            dataKey="currentMonthAverage"
+            stroke="#722ed1"
+            strokeWidth={2}
+            dot={false}
+            activeDot={{ r: 4, stroke: '#722ed1', strokeWidth: 1, fill: '#722ed1' }}
+            name="当月平均"
+            connectNulls={true} // 平均线保持连续
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
