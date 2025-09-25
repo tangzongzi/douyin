@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { SupabaseService } from '@/lib/supabase';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     console.log('[Test] 开始测试Supabase连接...');
     

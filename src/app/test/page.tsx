@@ -9,7 +9,7 @@ const { Title, Text, Paragraph } = Typography;
 interface TestResult {
   status: 'loading' | 'success' | 'error';
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
   timestamp?: string;
 }
 

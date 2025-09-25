@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Spin, message, Row, Col, Modal, Button, Progress } from 'antd';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import { SyncOutlined, SettingOutlined } from '@ant-design/icons';
@@ -17,6 +17,32 @@ interface DailyDataItem {
   currentMonthSummary: number; // 每日利润汇总
   lastMonthSummary: number;
   summaryAverage: number; // 每日利润汇总的平均值
+}
+
+interface SupabaseDailyRecord {
+  date: string;
+  profit_summary: number;
+  daily_profit: number;
+  [key: string]: string | number | null | undefined;
+}
+
+interface SupabaseMonthlyRecord {
+  month: string;
+  month_profit: number;
+  claim_amount_sum: number;
+  pdd_service_fee: number;
+  douyin_service_fee?: number | null;
+  payment_expense_sum: number;
+  other_expense_sum: number;
+  shipping_insurance?: number | null;
+  hard_expense?: number | null;
+  qianchuan?: number | null;
+}
+
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  error?: string;
 }
 
 interface MonthDataItem {
@@ -73,7 +99,6 @@ export default function Dashboard() {
     }
   });
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [syncModalVisible, setSyncModalVisible] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
@@ -81,7 +106,7 @@ export default function Dashboard() {
   // 移除chartDataType状态，直接显示daily_profit数据
 
   // 获取数据
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       console.log('开始获取Supabase数据...');
@@ -92,7 +117,11 @@ export default function Dashboard() {
         fetch('/api/data?type=monthly&limit=6')
       ]);
       
-      const [overviewResult, dailyResult, monthlyResult] = await Promise.all([
+      const [overviewResult, dailyResult, monthlyResult]: [
+        ApiResponse<OverviewData>,
+        ApiResponse<SupabaseDailyRecord[]>,
+        ApiResponse<SupabaseMonthlyRecord[]>
+      ] = await Promise.all([
         overviewResponse.json(),
         dailyResponse.json(),
         monthlyResponse.json()
@@ -102,8 +131,8 @@ export default function Dashboard() {
         throw new Error('获取数据失败');
       }
       
-      const dailyData = dailyResult.data || [];
-      const monthData = monthlyResult.data || [];
+      const dailyData: SupabaseDailyRecord[] = dailyResult.data || [];
+      const monthData: SupabaseMonthlyRecord[] = monthlyResult.data || [];
       const overviewData = overviewResult.data || {};
       
       console.log('获取到的Supabase每日数据:', dailyData);
@@ -113,7 +142,7 @@ export default function Dashboard() {
       // 处理Supabase数据为图表格式
       const processSupabaseData = () => {
         // 计算当月平均值（基于每日利润汇总数据）
-        const currentMonthData = dailyData.filter((item: { date: string; profit_summary: number }) => 
+        const currentMonthData = dailyData.filter((item) => 
           item.date >= '2025-09-01' && item.date <= '2025-09-30' && item.profit_summary > 0
         );
         
@@ -122,7 +151,7 @@ export default function Dashboard() {
           : 3000;
         
         // 计算当月平均值（基于每日盈利数据，用于图表线条）
-        const currentMonthProfitData = dailyData.filter((item: { date: string; daily_profit: number }) => 
+        const currentMonthProfitData = dailyData.filter((item) => 
           item.date >= '2025-09-01' && item.date <= '2025-09-30' && item.daily_profit > 0
         );
         
@@ -137,15 +166,14 @@ export default function Dashboard() {
         const chartData: DailyDataItem[] = [];
         
         // 获取当月每日数据
-        const currentMonth = 9; // 9月
         const daysInMonth = 30; // 9月有30天
         
         for (let day = 1; day <= daysInMonth; day++) {
           const currentDate = `2025-09-${String(day).padStart(2, '0')}`;
           const lastMonthDate = `2025-08-${String(day).padStart(2, '0')}`;
           
-          const currentDayRecord = dailyData.find((item: any) => item.date === currentDate);
-          const lastMonthRecord = dailyData.find((item: any) => item.date === lastMonthDate);
+        const currentDayRecord = dailyData.find((item) => item.date === currentDate);
+        const lastMonthRecord = dailyData.find((item) => item.date === lastMonthDate);
           
           // 调试信息
           if (day <= 3) {
@@ -156,7 +184,7 @@ export default function Dashboard() {
               daily_profit_last: lastMonthRecord?.daily_profit || 0,
               profit_summary_current: currentDayRecord?.profit_summary || 0,
               profit_summary_last: lastMonthRecord?.profit_summary || 0,
-              使用的线条数据: currentDayRecord?.daily_profit || 0
+              lineValue: currentDayRecord?.daily_profit || 0
             });
           }
           
@@ -184,11 +212,11 @@ export default function Dashboard() {
       const combinedDailyData = processSupabaseData();
 
       // 处理当月支出数据
-      const currentMonthRecord = monthData.find((item: any) => item.month === '2025-09');
+      const currentMonthRecord = monthData.find((item) => item.month === '2025-09');
 
       setData({
         dailyData: combinedDailyData,
-        monthData: monthData.map((item: any) => ({
+        monthData: monthData.map((item) => ({
           month: item.month,
           month_profit: item.month_profit,
           claim_amount_sum: item.claim_amount_sum,
@@ -214,32 +242,11 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // 刷新数据
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await fetchData();
-    setRefreshing(false);
-  };
-
   // 执行数据同步
-  const handleSync = async (type: 'daily' | 'monthly' | 'all') => {
-    await performSyncRequest(`/api/sync?type=${type}`, '数据同步');
-  };
-
-  // 执行带日期范围的同步
-  const handleSyncWithRange = async (type: 'daily', range: string) => {
-    await performSyncRequest(`/api/sync?type=${type}&range=${range}`, `${range}数据同步`);
-  };
-
-  // 执行强制同步
-  const handleSyncWithForce = async (type: 'force') => {
-    await performSyncRequest(`/api/sync?type=${type}`, '强制完整同步');
-  };
-
-  // 通用同步请求函数
-  const performSyncRequest = async (url: string, actionName: string) => {
+  const performSyncRequest = useCallback(async (url: string, actionName: string) => {
     setSyncing(true);
     setSyncProgress(0);
     
@@ -275,7 +282,22 @@ export default function Dashboard() {
       setSyncing(false);
       setSyncProgress(0);
     }
-  };
+  }, [fetchData]);
+
+  // 执行数据同步
+  const handleSync = useCallback(async (type: 'daily' | 'monthly' | 'all') => {
+    await performSyncRequest(`/api/sync?type=${type}`, '数据同步');
+  }, [performSyncRequest]);
+
+  // 执行带日期范围的同步
+  const handleSyncWithRange = useCallback(async (type: 'daily', range: string) => {
+    await performSyncRequest(`/api/sync?type=${type}&range=${range}`, `${range}数据同步`);
+  }, [performSyncRequest]);
+
+  // 执行强制同步
+  const handleSyncWithForce = useCallback(async (type: 'force') => {
+    await performSyncRequest(`/api/sync?type=${type}`, '强制完整同步');
+  }, [performSyncRequest]);
 
   // 自动同步功能
   useEffect(() => {
@@ -287,7 +309,7 @@ export default function Dashboard() {
 
     // 组件卸载时清除定时器
     return () => clearInterval(autoSyncInterval);
-  }, []);
+  }, [handleSync]);
 
   // 检查上次同步时间
   useEffect(() => {
@@ -311,7 +333,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
 
   // 移除chartDataType监听
 
@@ -622,7 +644,7 @@ export default function Dashboard() {
             <div style={{ marginTop: '24px', padding: '12px', backgroundColor: '#f6f8fa', borderRadius: '6px' }}>
               <p style={{ margin: 0, fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
                 🧠 <strong>智能同步:</strong> 基于飞书真实日期字段，自动识别新数据，避免重复同步。<br/>
-                ⚡ <strong>推荐:</strong> 日常使用"当月数据"，数据有误时使用"强制同步"。<br/>
+                ⚡ <strong>推荐:</strong> 日常使用「当月数据」，数据有误时使用「强制同步」。<br/>
                 🔄 <strong>自动同步:</strong> 系统每3小时自动执行智能同步。
               </p>
             </div>

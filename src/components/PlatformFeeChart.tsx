@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Spin } from 'antd';
+import { Spin } from 'antd';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatCurrency } from '@/lib/feishu-api';
 

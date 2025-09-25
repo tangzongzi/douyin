@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Spin } from 'antd';
+import { Spin } from 'antd';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { formatCurrency } from '@/lib/feishu-api';
 
@@ -44,10 +44,14 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
     
   console.log('DailyProfitChart 处理后的数据:', processedData);
 
-  const CustomTooltip = ({ active, payload, label }: { 
-    active?: boolean; 
-    payload?: Array<{ name: string; value: number; color: string; payload?: any }>; 
-    label?: string 
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean;
+    payload?: Array<{ name: string; value: number; color: string; payload?: DailyProfitData }>;
+    label?: string;
   }) => {
     if (active && payload && payload.length) {
       const dataPoint = payload[0]?.payload; // 获取完整的数据点
@@ -90,8 +94,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
   };
 
   // 自定义图例
-  const CustomLegend = (props: any) => {
-    const { payload } = props;
+  const CustomLegend = ({ payload }: { payload?: Array<{ value: string; color: string }> }) => {
     return (
       <div style={{ 
         position: 'absolute', 
@@ -101,7 +104,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
         gap: '16px',
         zIndex: 10
       }}>
-        {payload.map((entry: any, index: number) => (
+        {payload?.map((entry, index) => (
           <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <div style={{
               width: '8px',

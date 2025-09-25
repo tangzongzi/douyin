@@ -1,6 +1,6 @@
 'use client';
 
-import { Row, Col, Spin } from 'antd';
+import { Spin } from 'antd';
 import StatCard from './StatCard';
 
 interface OverviewCardsProps {

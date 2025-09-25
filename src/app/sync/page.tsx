@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Card, Space, Typography, Alert, Progress, Select, Switch, Divider, Row, Col } from 'antd';
+import { Button, Card, Space, Typography, Alert, Progress, Switch, Row, Col } from 'antd';
 import { SyncOutlined, DatabaseOutlined, CheckCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -9,7 +9,7 @@ const { Title, Text } = Typography;
 interface SyncResult {
   success: boolean;
   message: string;
-  data?: any;
+  data?: Record<string, unknown>;
   error?: string;
   timestamp?: string;
 }
@@ -202,7 +202,7 @@ export default function SyncPage() {
         {/* 同步结果 */}
         {syncResult && (
           <Card 
-            title={syncResult.success ? "同步成功" : "同步失败"} 
+            title={syncResult.success ? '同步成功' : '同步失败'} 
             style={{ marginBottom: '24px' }}
           >
             <Alert
@@ -227,7 +227,7 @@ export default function SyncPage() {
                   )}
                 </div>
               }
-              type={syncResult.success ? "success" : "error"}
+              type={syncResult.success ? 'success' : 'error'}
               showIcon
             />
           </Card>
@@ -240,7 +240,7 @@ export default function SyncPage() {
             <Text><strong>增量同步：</strong> 只同步新数据，跳过已存在的记录，提高效率</Text>
             <Text><strong>日期范围：</strong> 可选择同步最近7天、15天、30天或当月的数据</Text>
             <Text><strong>强制同步：</strong> 开启后会覆盖数据库中已存在的数据</Text>
-            <Text><strong>建议用法：</strong> 日常使用"当月数据"或"近7天"，数据有误时使用"强制完整同步"</Text>
+            <Text><strong>建议用法：</strong> 日常使用「当月数据」或「近7天」，数据有误时使用「强制完整同步」</Text>
           </Space>
         </Card>
 

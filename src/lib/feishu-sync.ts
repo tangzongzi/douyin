@@ -1,4 +1,4 @@
-import { SupabaseService, DailyProfit, MonthlySummary, SyncLog } from './supabase';
+import { SupabaseService, DailyProfit, MonthlySummary, SyncLog, getSupabaseClient } from './supabase';
 import { ENV_CONFIG } from '@/config/env';
 import axios from 'axios';
 
@@ -43,8 +43,13 @@ async function getFeishuAccessToken(): Promise<string> {
   }
 }
 
+interface FeishuRecord {
+  fields: Record<string, unknown>;
+  record_id?: string;
+}
+
 // 获取飞书表格数据
-async function getFeishuTableData(tableId: string, accessToken: string): Promise<any[]> {
+async function getFeishuTableData(tableId: string, accessToken: string): Promise<FeishuRecord[]> {
   try {
     console.log(`[Sync] 获取表格数据: ${tableId}`);
     console.log(`[Sync] APP_TOKEN: ${ENV_CONFIG.FEISHU_APP_TOKEN}`);
@@ -95,9 +100,9 @@ async function getFeishuTableData(tableId: string, accessToken: string): Promise
 }
 
 // 字段名映射函数（增强版，处理编码和变体）
-function getFieldValue(record: any, fieldKey: string): number {
+function getFieldValue(record: FeishuRecord, fieldKey: string): number {
   if (!record?.fields) return 0;
-  
+
   const fields = record.fields;
   const keys = Object.keys(fields);
   
@@ -109,7 +114,7 @@ function getFieldValue(record: any, fieldKey: string): number {
     // 2. 包含匹配
     if (key.includes(fieldKey)) return true;
     
-    // 3. 处理重复字符（如"每日每日利润汇总"）
+    // 3. 处理重复字符（如「每日每日利润汇总」）
     if (fieldKey === '每日利润汇总' && key.includes('每日') && key.includes('利润汇总')) return true;
     
     // 4. 处理简化匹配
@@ -121,14 +126,31 @@ function getFieldValue(record: any, fieldKey: string): number {
     return false;
   });
   
-  const value = matchedKey ? fields[matchedKey] : 0;
-  
-  // 处理字符串数字
-  if (typeof value === 'string') {
-    return Number(value) || 0;
+  if (!matchedKey) {
+    return 0;
   }
-  
-  return Number(value) || 0;
+
+  const value = fields[matchedKey];
+
+  if (typeof value === 'number') {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value.replace(/[,¥\s]/g, ''));
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  if (Array.isArray(value) && value.length > 0) {
+    const first = value[0];
+    if (typeof first === 'number') return first;
+    if (typeof first === 'string') {
+      const parsed = Number(first.replace(/[,¥\s]/g, ''));
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+  }
+
+  return 0;
 }
 
 // 同步每日数据（恢复简单有效的逻辑）
@@ -152,7 +174,7 @@ export async function syncDailyData(): Promise<SyncLog> {
     
     feishuData.forEach((record, index) => {
       // 恢复昨天可用的简单逻辑：基于索引推算日期，但使用正确的字段名
-      // 尝试多种字段名变体来匹配"每日每日利润汇总"
+      // 尝试多种字段名变体来匹配「每日每日利润汇总」
       const profitValue = getFieldValue(record, '每日每日利润汇总') || 
                          getFieldValue(record, '每日利润汇总') ||
                          getFieldValue(record, '利润汇总');
@@ -319,17 +341,22 @@ export async function syncAllData(): Promise<{ daily: SyncLog; monthly: SyncLog 
 // 数据验证函数
 export async function validateDataSync(): Promise<boolean> {
   try {
-    const dailyCount = await supabase
+    const supabase = getSupabaseClient();
+
+    const dailyResult = await supabase
       .from('daily_profits')
-      .select('id', { count: 'exact' });
-      
-    const monthlyCount = await supabase
+      .select('id', { count: 'exact', head: true });
+
+    const monthlyResult = await supabase
       .from('monthly_summary')
-      .select('id', { count: 'exact' });
-    
-    console.log(`[Sync] 数据验证 - 每日记录: ${dailyCount.count}, 月度记录: ${monthlyCount.count}`);
-    
-    return (dailyCount.count || 0) > 0 && (monthlyCount.count || 0) > 0;
+      .select('id', { count: 'exact', head: true });
+
+    const dailyCount = dailyResult.count ?? 0;
+    const monthlyCount = monthlyResult.count ?? 0;
+
+    console.log(`[Sync] 数据验证 - 每日记录: ${dailyCount}, 月度记录: ${monthlyCount}`);
+
+    return dailyCount > 0 && monthlyCount > 0;
   } catch (error) {
     console.error('[Sync] 数据验证失败:', error);
     return false;
