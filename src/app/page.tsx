@@ -224,6 +224,21 @@ export default function Dashboard() {
 
   // 执行数据同步
   const handleSync = async (type: 'daily' | 'monthly' | 'all') => {
+    await performSyncRequest(`/api/sync?type=${type}`, '数据同步');
+  };
+
+  // 执行带日期范围的同步
+  const handleSyncWithRange = async (type: 'daily', range: string) => {
+    await performSyncRequest(`/api/sync?type=${type}&range=${range}`, `${range}数据同步`);
+  };
+
+  // 执行强制同步
+  const handleSyncWithForce = async (type: 'force') => {
+    await performSyncRequest(`/api/sync?type=${type}`, '强制完整同步');
+  };
+
+  // 通用同步请求函数
+  const performSyncRequest = async (url: string, actionName: string) => {
     setSyncing(true);
     setSyncProgress(0);
     
@@ -232,7 +247,9 @@ export default function Dashboard() {
         setSyncProgress(prev => Math.min(prev + 10, 90));
       }, 200);
       
-      const response = await fetch(`/api/sync?type=${type}`, {
+      console.log(`[同步] 执行${actionName}:`, url);
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
       });
@@ -243,16 +260,16 @@ export default function Dashboard() {
       const result = await response.json();
       
       if (result.success) {
-        message.success('数据同步成功');
+        message.success(`${actionName}成功`);
         setLastSyncTime(new Date().toLocaleString('zh-CN'));
         // 同步成功后刷新数据
         await fetchData();
       } else {
-        message.error(`同步失败: ${result.error}`);
+        message.error(`${actionName}失败: ${result.error}`);
       }
     } catch (error) {
-      message.error('同步失败，请稍后重试');
-      console.error('同步错误:', error);
+      message.error(`${actionName}失败，请稍后重试`);
+      console.error(`${actionName}错误:`, error);
     } finally {
       setSyncing(false);
       setSyncProgress(0);
@@ -565,43 +582,72 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* 同步操作按钮 */}
+            {/* 快速同步按钮 */}
+            <div style={{ marginBottom: '16px' }}>
+              <h4>快速同步</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '12px' }}>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncWithRange('daily', '7days')}
+                  loading={syncing}
+                  size="small"
+                >
+                  近7天
+                </Button>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncWithRange('daily', '15days')}
+                  loading={syncing}
+                  size="small"
+                >
+                  近15天
+                </Button>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncWithRange('daily', '30days')}
+                  loading={syncing}
+                  size="small"
+                >
+                  近30天
+                </Button>
+                <Button 
+                  type="primary"
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncWithRange('daily', 'currentMonth')}
+                  loading={syncing}
+                  size="small"
+                >
+                  当月数据
+                </Button>
+              </div>
+            </div>
+
+            {/* 完整同步按钮 */}
             <div>
-              <h4>手动同步</h4>
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
+              <h4>完整同步</h4>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <Button 
                   type="primary"
                   icon={<SyncOutlined />}
                   onClick={() => handleSync('all')}
                   loading={syncing}
                   size="middle"
-                  style={{ height: '36px' }}
                 >
-                  完整同步
+                  智能同步
                 </Button>
                 <Button 
                   icon={<SyncOutlined />}
-                  onClick={() => handleSync('daily')}
+                  onClick={() => handleSyncWithForce('force')}
                   loading={syncing}
                   size="middle"
-                  style={{ height: '36px' }}
+                  danger
                 >
-                  同步每日数据
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSync('monthly')}
-                  loading={syncing}
-                  size="middle"
-                  style={{ height: '36px' }}
-                >
-                  同步月度数据
+                  强制同步
                 </Button>
                 <Button 
                   href="/sync"
                   target="_blank"
                   size="middle"
-                  style={{ height: '36px' }}
                 >
                   高级管理
                 </Button>
@@ -610,8 +656,9 @@ export default function Dashboard() {
 
             <div style={{ marginTop: '24px', padding: '12px', backgroundColor: '#f6f8fa', borderRadius: '6px' }}>
               <p style={{ margin: 0, fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
-                💡 <strong>提示:</strong> 系统每3小时自动同步一次数据，确保数据保持最新。
-                如需立即更新，可点击"完整同步"按钮。
+                🧠 <strong>智能同步:</strong> 基于飞书真实日期字段，自动识别新数据，避免重复同步。<br/>
+                ⚡ <strong>推荐:</strong> 日常使用"当月数据"，数据有误时使用"强制同步"。<br/>
+                🔄 <strong>自动同步:</strong> 系统每3小时自动执行智能同步。
               </p>
             </div>
           </div>
