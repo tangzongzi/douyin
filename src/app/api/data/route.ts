@@ -40,6 +40,72 @@ export async function GET(request: NextRequest) {
         const yearlyData = await SupabaseService.getYearlyData('2025');
         const currentYear = yearlyData && yearlyData.length > 0 ? yearlyData[0] : null;
         
+        console.log('[API] 年度数据查询结果:', yearlyData);
+        console.log('[API] 当前年度数据:', currentYear);
+        console.log('[API] Supabase年度数据时间戳:', currentYear?.updated_at);
+        
+        // 检查年度数据是否过期（如果更新时间超过1小时，尝试重新同步）
+        const isYearDataStale = !currentYear || 
+          !currentYear.updated_at || 
+          (new Date().getTime() - new Date(currentYear.updated_at).getTime()) > 60 * 60 * 1000;
+        
+        if (isYearDataStale) {
+          console.log('[API] 年度数据过期或不存在，尝试从飞书重新同步');
+          try {
+            // 触发年度数据同步
+            const syncResponse = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/sync?type=yearly`, {
+              method: 'POST'
+            });
+            if (syncResponse.ok) {
+              console.log('[API] 年度数据同步成功，重新获取');
+              const newYearlyData = await SupabaseService.getYearlyData('2025');
+              const newCurrentYear = newYearlyData && newYearlyData.length > 0 ? newYearlyData[0] : null;
+              if (newCurrentYear) {
+                console.log('[API] 获取到新的年度数据:', newCurrentYear);
+              }
+            }
+          } catch (syncError) {
+            console.error('[API] 年度数据同步失败:', syncError);
+          }
+        }
+        
+        // 重新获取年度数据
+        const finalYearlyData = await SupabaseService.getYearlyData('2025');
+        const finalCurrentYear = finalYearlyData && finalYearlyData.length > 0 ? finalYearlyData[0] : null;
+        
+        let profitWithDeposit = finalCurrentYear?.profit_with_deposit || 0;
+        let profitWithoutDeposit = finalCurrentYear?.profit_without_deposit || 0;
+        
+        if ((!currentYear || (profitWithDeposit === 0 && profitWithoutDeposit === 0)) && monthlyData.length > 0) {
+          console.log('[API] 年度数据为空，从月度数据计算累计值');
+          console.log('[API] 月度数据:', monthlyData.map(m => ({ 
+            month: m.month, 
+            profit: m.month_profit, 
+            deposit: m.deposit,
+            dailyProfitSum: m.daily_profit_sum 
+          })));
+          
+          // 从月度数据计算累计值
+          const totalMonthlyProfit = monthlyData.reduce((sum, month) => sum + (month.month_profit || 0), 0);
+          const totalDailyProfitSum = monthlyData.reduce((sum, month) => sum + (month.daily_profit_sum || 0), 0);
+          const totalDeposit = monthlyData.reduce((sum, month) => sum + (month.deposit || 0), 0);
+          const totalInitialFund = monthlyData.reduce((sum, month) => sum + (month.initial_fund || 0), 0);
+          
+          // 计算含保证金和不含保证金利润
+          // 含保证金利润 = 总月净利润 + 保证金 + 初始资金
+          profitWithDeposit = totalMonthlyProfit + totalDeposit + totalInitialFund;
+          // 不含保证金利润 = 总月净利润
+          profitWithoutDeposit = totalMonthlyProfit;
+          
+          console.log('[API] 计算详情:');
+          console.log('[API] - 总月净利润:', totalMonthlyProfit);
+          console.log('[API] - 总每日利润汇总:', totalDailyProfitSum);
+          console.log('[API] - 总保证金:', totalDeposit);
+          console.log('[API] - 总初始资金:', totalInitialFund);
+          console.log('[API] - 含保证金利润:', profitWithDeposit);
+          console.log('[API] - 不含保证金利润:', profitWithoutDeposit);
+        }
+        
         data = {
           dailyProfitSum: currentMonth?.daily_profit_sum || 0, // 月度每日利润汇总（第一位）
           lastMonthDailyProfitSum: lastMonth?.daily_profit_sum || 0,
@@ -52,8 +118,8 @@ export async function GET(request: NextRequest) {
           monthClaimAmount: currentMonth?.claim_amount_sum || 0, // 当月赔付申请（第五位）
           lastMonthClaimAmount: lastMonth?.claim_amount_sum || 0,
           // 年度累计数据
-          profitWithDeposit: currentYear?.profit_with_deposit || 0,
-          profitWithoutDeposit: currentYear?.profit_without_deposit || 0,
+          profitWithDeposit: profitWithDeposit,
+          profitWithoutDeposit: profitWithoutDeposit,
         };
         break;
         
