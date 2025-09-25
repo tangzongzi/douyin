@@ -94,20 +94,41 @@ async function getFeishuTableData(tableId: string, accessToken: string): Promise
   }
 }
 
-// 字段名映射函数
+// 字段名映射函数（增强版，处理编码和变体）
 function getFieldValue(record: any, fieldKey: string): number {
   if (!record?.fields) return 0;
   
   const fields = record.fields;
   const keys = Object.keys(fields);
   
-  // 查找匹配的字段名
-  const matchedKey = keys.find(key => 
-    key.includes(fieldKey) || 
-    key.includes(fieldKey.slice(0, 3))
-  );
+  // 多种匹配策略
+  const matchedKey = keys.find(key => {
+    // 1. 完全匹配
+    if (key === fieldKey) return true;
+    
+    // 2. 包含匹配
+    if (key.includes(fieldKey)) return true;
+    
+    // 3. 处理重复字符（如"每日每日利润汇总"）
+    if (fieldKey === '每日利润汇总' && key.includes('每日') && key.includes('利润汇总')) return true;
+    
+    // 4. 处理简化匹配
+    if (fieldKey === '每日盈利' && (key.includes('每日') && key.includes('盈利'))) return true;
+    
+    // 5. 前缀匹配
+    if (key.includes(fieldKey.slice(0, 3))) return true;
+    
+    return false;
+  });
   
-  return matchedKey ? Number(fields[matchedKey]) || 0 : 0;
+  const value = matchedKey ? fields[matchedKey] : 0;
+  
+  // 处理字符串数字
+  if (typeof value === 'string') {
+    return Number(value) || 0;
+  }
+  
+  return Number(value) || 0;
 }
 
 // 智能同步每日数据（支持日期范围和增量同步）
@@ -378,7 +399,7 @@ export async function syncYearlyData(): Promise<SyncLog> {
     const accessToken = await getFeishuAccessToken();
     
     // 获取年度总利润数据
-    const feishuData = await getFeishuTableData(accessToken, ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID);
+    const feishuData = await getFeishuTableData(ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID, accessToken);
     console.log('[Sync] 年度数据原始数据:', JSON.stringify(feishuData, null, 2));
     
     if (!feishuData || feishuData.length === 0) {
