@@ -152,7 +152,10 @@ export async function syncDailyData(): Promise<SyncLog> {
     
     feishuData.forEach((record, index) => {
       // 恢复昨天可用的简单逻辑：基于索引推算日期，但使用正确的字段名
-      const profitValue = getFieldValue(record, '每日每日利润汇总'); // 使用正确的字段名
+      // 尝试多种字段名变体来匹配"每日每日利润汇总"
+      const profitValue = getFieldValue(record, '每日每日利润汇总') || 
+                         getFieldValue(record, '每日利润汇总') ||
+                         getFieldValue(record, '利润汇总');
       
       // 调试：显示所有可用字段和值
       if (index < 3) {
