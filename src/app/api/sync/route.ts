@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { syncAllData, syncDailyData, syncDailyDataByRange, forceFullSync, syncMonthlyData, syncYearlyData, validateDataSync } from '@/lib/feishu-sync';
+import { syncAllData, syncDailyData, syncMonthlyData, validateDataSync } from '@/lib/feishu-sync';
 
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -16,9 +16,6 @@ export async function POST(request: NextRequest) {
         break;
       case 'monthly':
         result = await syncMonthlyData();
-        break;
-      case 'yearly':
-        result = await syncYearlyData();
         break;
       case 'all':
       default:

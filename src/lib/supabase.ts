@@ -51,20 +51,11 @@ export interface MonthlySummary {
   updated_at?: string;
 }
 
-export interface YearProfit {
-  id?: number;
-  year: string;
-  profit_with_deposit: number; // 含保证金利润
-  total_profit_with_deposit: number; // 含保证金总利润
-  profit_without_deposit: number; // 不含保证金利润
-  net_profit_without_deposit: number; // 不含保证金余利润
-  created_at?: string;
-  updated_at?: string;
-}
+// 移除年度数据接口
 
 export interface SyncLog {
   id?: number;
-  sync_type: 'daily' | 'monthly' | 'yearly';
+  sync_type: 'daily' | 'monthly';
   sync_status: 'success' | 'failed' | 'partial';
   records_synced: number;
   error_message?: string;
@@ -158,39 +149,7 @@ export class SupabaseService {
     return data;
   }
   
-  // 获取年度数据
-  static async getYearlyData(year?: string) {
-    const supabase = getSupabaseClient();
-    let query = supabase.from('year_profit').select('*');
-    
-    if (year) {
-      query = query.eq('year', year);
-    }
-    
-    const { data, error } = await query.order('year', { ascending: false });
-    
-    if (error) {
-      console.error('获取年度数据失败:', error);
-      throw error;
-    }
-    
-    return data;
-  }
-  
-  // 插入或更新年度数据
-  static async upsertYearProfit(yearData: YearProfit) {
-    const supabase = getSupabaseClient();
-    const { data, error } = await supabase
-      .from('year_profit')
-      .upsert(yearData, { onConflict: 'year' });
-    
-    if (error) {
-      console.error('更新年度数据失败:', error);
-      throw error;
-    }
-    
-    return data;
-  }
+  // 移除年度数据相关方法
 
   // 获取最近的同步状态
   static async getLastSyncStatus() {

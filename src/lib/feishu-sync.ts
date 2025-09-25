@@ -1,4 +1,4 @@
-import { SupabaseService, DailyProfit, MonthlySummary, YearProfit, SyncLog } from './supabase';
+import { SupabaseService, DailyProfit, MonthlySummary, SyncLog } from './supabase';
 import { ENV_CONFIG } from '@/config/env';
 import axios from 'axios';
 
@@ -301,98 +301,19 @@ export async function syncMonthlyData(): Promise<SyncLog> {
   return syncLog;
 }
 
-// 年度数据同步函数
-export async function syncYearlyData(): Promise<SyncLog> {
-  console.log('[Sync] 开始年度数据同步...');
-  
-  const syncLog: SyncLog = {
-    sync_type: 'yearly',
-    sync_status: 'failed',
-    records_synced: 0,
-    sync_started_at: new Date().toISOString(),
-  };
-  
-  try {
-    // 获取飞书访问令牌
-    const accessToken = await getFeishuAccessToken();
-    
-    // 获取年度总利润数据
-    const feishuData = await getFeishuTableData(ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID, accessToken);
-    console.log('[Sync] 年度数据原始数据:', JSON.stringify(feishuData, null, 2));
-    
-    if (!feishuData || feishuData.length === 0) {
-      throw new Error('年度数据为空');
-    }
-    
-    // 转换为年度利润数据
-    const yearProfits: YearProfit[] = [];
-    
-    feishuData.forEach((record) => {
-      const yearProfit: YearProfit = {
-        year: getFieldValue(record, '年份') || '2025',
-        profit_with_deposit: getFieldValue(record, '含保证金利润'),
-        total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || getFieldValue(record, '含保证金利润'), // 备用映射
-        profit_without_deposit: getFieldValue(record, '不含保证金利润'),
-        net_profit_without_deposit: getFieldValue(record, '不含保证金余利润') || getFieldValue(record, '不含保证金利润'), // 备用映射
-      };
-      yearProfits.push(yearProfit);
-    });
-    
-    console.log('[Sync] 转换后的年度数据:', yearProfits);
-    
-    // 批量插入/更新年度数据
-    for (const yearProfit of yearProfits) {
-      try {
-        await SupabaseService.upsertYearProfit(yearProfit);
-        syncLog.records_synced++;
-      } catch (error) {
-        console.error(`[Sync] 插入年度数据失败: ${yearProfit.year}`, error);
-      }
-    }
-    
-    syncLog.sync_status = 'success';
-    syncLog.sync_completed_at = new Date().toISOString();
-    
-    console.log(`[Sync] 年度数据同步完成，成功同步 ${syncLog.records_synced} 条记录`);
-    
-  } catch (error) {
-    console.error('[Sync] 年度数据同步失败:', error);
-    syncLog.error_message = error instanceof Error ? error.message : '未知错误';
-    syncLog.sync_completed_at = new Date().toISOString();
-  }
-  
-  // 记录同步日志
-  try {
-    await SupabaseService.logSync(syncLog);
-  } catch (error) {
-    console.error('[Sync] 记录同步日志失败:', error);
-  }
-  
-  return syncLog;
-}
+// 移除年度数据同步函数
 
-// 完整同步函数
-export async function syncAllData(options?: { forceSync?: boolean }): Promise<{ daily: SyncLog; monthly: SyncLog; yearly: SyncLog }> {
+// 完整同步函数（恢复昨天的简单版本）
+export async function syncAllData(): Promise<{ daily: SyncLog; monthly: SyncLog }> {
   console.log('[Sync] 开始完整数据同步...');
   
   const results = {
-    daily: await syncDailyData({ dateRange: 'all', forceSync: options?.forceSync }),
+    daily: await syncDailyData(),
     monthly: await syncMonthlyData(),
-    yearly: await syncYearlyData(),
   };
   
   console.log('[Sync] 完整数据同步完成:', results);
   return results;
-}
-
-// 按日期范围同步的便捷函数
-export async function syncDailyDataByRange(range: '7days' | '15days' | '30days' | 'currentMonth'): Promise<SyncLog> {
-  return await syncDailyData({ dateRange: range, forceSync: false });
-}
-
-// 强制完整同步（覆盖已存在数据）
-export async function forceFullSync(): Promise<{ daily: SyncLog; monthly: SyncLog; yearly: SyncLog }> {
-  return await syncAllData({ forceSync: true });
 }
 
 // 数据验证函数
