@@ -293,7 +293,7 @@ export async function syncYearlyData(): Promise<SyncLog> {
     const accessToken = await getFeishuAccessToken();
     
     // 获取年度总利润数据
-    const feishuData = await getFeishuTableData(accessToken, ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID);
+    const feishuData = await getFeishuTableData(ENV_CONFIG.FEISHU_YEAR_PROFIT_TABLE_ID, accessToken);
     console.log('[Sync] 年度数据原始数据:', JSON.stringify(feishuData, null, 2));
     
     if (!feishuData || feishuData.length === 0) {
