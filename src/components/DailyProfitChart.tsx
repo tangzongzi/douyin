@@ -57,34 +57,82 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
       const dataPoint = payload[0]?.payload; // 获取完整的数据点
       
       return (
-        <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg" style={{ minWidth: '200px' }}>
-          <p className="font-medium" style={{ marginBottom: '8px', borderBottom: '1px solid #f0f0f0', paddingBottom: '4px' }}>
+        <div style={{ 
+          background: 'linear-gradient(145deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.95) 100%)',
+          backdropFilter: 'blur(12px)',
+          padding: '16px 20px',
+          border: '1px solid rgba(0,0,0,0.08)',
+          borderRadius: '12px',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)',
+          minWidth: '220px',
+          maxWidth: '280px'
+        }}>
+          <p style={{ 
+            marginBottom: '12px', 
+            borderBottom: '1px solid rgba(0,0,0,0.08)', 
+            paddingBottom: '8px',
+            fontSize: '14px',
+            fontWeight: '600',
+            color: 'rgba(0,0,0,0.85)',
+            textAlign: 'center'
+          }}>
             {`${label}`}
           </p>
           
           {/* 显示线条数据（多赞利润） */}
-          <div style={{ marginBottom: '8px' }}>
-            <p style={{ margin: '2px 0', fontSize: '12px', color: '#666', fontWeight: '500' }}>多赞利润</p>
+          <div style={{ marginBottom: '12px' }}>
+            <p style={{ margin: '0 0 6px 0', fontSize: '12px', color: 'rgba(0,0,0,0.65)', fontWeight: '500' }}>
+              📈 多赞利润
+            </p>
             {payload.map((entry, index) => (
-              <p key={index} style={{ color: entry.color, margin: '2px 0', fontSize: '13px' }}>
-                {`${entry.name}: ${formatCurrency(entry.value)}`}
+              <p key={index} style={{ 
+                color: entry.color, 
+                margin: '4px 0', 
+                fontSize: '13px',
+                fontWeight: '500',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span>{entry.name}</span>
+                <span style={{ fontWeight: '600' }}>{formatCurrency(entry.value)}</span>
               </p>
             ))}
           </div>
           
           {/* 显示额外数据（当日总利润） */}
           {dataPoint && (
-            <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '8px' }}>
-              <p style={{ margin: '2px 0', fontSize: '12px', color: '#666', fontWeight: '500' }}>当日总利润</p>
-              <p style={{ color: '#1890ff', margin: '2px 0', fontSize: '13px' }}>
-                本月: {formatCurrency(dataPoint.currentMonthSummary || 0)}
+            <div style={{ 
+              borderTop: '1px solid rgba(0,0,0,0.08)', 
+              paddingTop: '12px',
+              background: 'linear-gradient(135deg, rgba(24,144,255,0.02) 0%, rgba(82,196,26,0.02) 100%)',
+              margin: '12px -20px -16px -20px',
+              padding: '12px 20px 16px 20px',
+              borderRadius: '0 0 12px 12px'
+            }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '12px', color: 'rgba(0,0,0,0.65)', fontWeight: '500' }}>
+                💰 当日总利润
               </p>
-              <p style={{ color: '#52c41a', margin: '2px 0', fontSize: '13px' }}>
-                上月: {formatCurrency(dataPoint.lastMonthSummary || 0)}
-              </p>
-              <p style={{ color: '#722ed1', margin: '2px 0', fontSize: '13px' }}>
-                当月平均: {formatCurrency(dataPoint.summaryAverage || 0)}
-              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: '#1890ff', fontSize: '12px', fontWeight: '500' }}>本月</span>
+                  <span style={{ color: '#1890ff', fontSize: '13px', fontWeight: '600' }}>
+                    {formatCurrency(dataPoint.currentMonthSummary || 0)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: '#52c41a', fontSize: '12px', fontWeight: '500' }}>上月</span>
+                  <span style={{ color: '#52c41a', fontSize: '13px', fontWeight: '600' }}>
+                    {formatCurrency(dataPoint.lastMonthSummary || 0)}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ color: '#722ed1', fontSize: '12px', fontWeight: '500' }}>当月平均</span>
+                  <span style={{ color: '#722ed1', fontSize: '13px', fontWeight: '600' }}>
+                    {formatCurrency(dataPoint.summaryAverage || 0)}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -98,21 +146,42 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
     return (
       <div style={{ 
         position: 'absolute', 
-        top: '10px', 
-        right: '20px', 
+        top: '12px', 
+        right: '24px', 
         display: 'flex', 
-        gap: '16px',
-        zIndex: 10
+        gap: '20px',
+        zIndex: 10,
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(248,250,252,0.8) 100%)',
+        backdropFilter: 'blur(8px)',
+        padding: '8px 16px',
+        borderRadius: '20px',
+        border: '1px solid rgba(255,255,255,0.6)',
+        boxShadow: '0 4px 12px rgba(0,0,0,0.08)'
       }}>
         {payload?.map((entry, index) => (
-          <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div key={index} style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '6px',
+            padding: '2px 4px',
+            borderRadius: '8px',
+            transition: 'all 0.2s ease'
+          }}>
             <div style={{
-              width: '8px',
-              height: '8px',
+              width: '10px',
+              height: '10px',
               borderRadius: '50%',
-              backgroundColor: entry.color
+              backgroundColor: entry.color,
+              border: '2px solid rgba(255,255,255,0.8)',
+              boxShadow: `0 2px 4px ${entry.color}40`
             }} />
-            <span style={{ fontSize: '12px', color: '#666' }}>{entry.value}</span>
+            <span style={{ 
+              fontSize: '12px', 
+              color: 'rgba(0,0,0,0.75)',
+              fontWeight: '500'
+            }}>
+              {entry.value}
+            </span>
           </div>
         ))}
       </div>
@@ -120,26 +189,45 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
   };
 
   return (
-    <div style={{ height: '400px', position: 'relative' }}>
+    <div style={{ 
+      height: '400px', 
+      position: 'relative',
+      background: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(250,251,252,0.6) 100%)',
+      borderRadius: '8px',
+      padding: '12px'
+    }}>
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={processedData} margin={{ top: 40, right: 30, left: 20, bottom: 20 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+          <CartesianGrid 
+            strokeDasharray="2 4" 
+            stroke="rgba(0,0,0,0.04)" 
+            strokeWidth={1}
+          />
           <XAxis 
             dataKey="dayLabel" 
-            tick={{ fontSize: 12 }}
-            tickLine={{ stroke: '#d9d9d9' }}
-            axisLine={{ stroke: '#d9d9d9' }}
+            tick={{ fontSize: 12, fill: 'rgba(0,0,0,0.65)' }}
+            tickLine={{ stroke: 'rgba(0,0,0,0.15)' }}
+            axisLine={{ stroke: 'rgba(0,0,0,0.15)' }}
             interval={2} // 每3天显示一个标签
           />
           <YAxis 
-            tick={{ fontSize: 12 }}
-            tickLine={{ stroke: '#d9d9d9' }}
-            axisLine={{ stroke: '#d9d9d9' }}
+            tick={{ fontSize: 12, fill: 'rgba(0,0,0,0.65)' }}
+            tickLine={{ stroke: 'rgba(0,0,0,0.15)' }}
+            axisLine={{ stroke: 'rgba(0,0,0,0.15)' }}
             tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}k`}
           />
           <Tooltip 
             content={<CustomTooltip />}
-            cursor={{ stroke: '#ccc', strokeWidth: 1, strokeDasharray: '3 3' }}
+            cursor={{ 
+              stroke: 'rgba(24,144,255,0.2)', 
+              strokeWidth: 2, 
+              strokeDasharray: '0',
+              fill: 'rgba(24,144,255,0.05)'
+            }}
+            wrapperStyle={{
+              outline: 'none',
+              border: 'none'
+            }}
           />
           <Legend content={<CustomLegend />} />
           
@@ -148,9 +236,21 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             type="monotone"
             dataKey="currentMonth"
             stroke="#1890ff"
-            strokeWidth={2}
-            dot={{ fill: '#1890ff', strokeWidth: 1, r: 3 }}
-            activeDot={{ r: 4, stroke: '#1890ff', strokeWidth: 1, fill: '#1890ff' }}
+            strokeWidth={3}
+            dot={{ 
+              fill: '#ffffff', 
+              stroke: '#1890ff', 
+              strokeWidth: 2, 
+              r: 4,
+              filter: 'drop-shadow(0 2px 4px rgba(24,144,255,0.3))'
+            }}
+            activeDot={{ 
+              r: 6, 
+              stroke: '#1890ff', 
+              strokeWidth: 3, 
+              fill: '#ffffff',
+              filter: 'drop-shadow(0 4px 8px rgba(24,144,255,0.4))'
+            }}
             name="本月"
             connectNulls={false} // 不连接空值，产生断点
           />
@@ -160,9 +260,21 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             type="monotone"
             dataKey="lastMonth"
             stroke="#52c41a"
-            strokeWidth={2}
-            dot={{ fill: '#52c41a', strokeWidth: 1, r: 3 }}
-            activeDot={{ r: 4, stroke: '#52c41a', strokeWidth: 1, fill: '#52c41a' }}
+            strokeWidth={3}
+            dot={{ 
+              fill: '#ffffff', 
+              stroke: '#52c41a', 
+              strokeWidth: 2, 
+              r: 4,
+              filter: 'drop-shadow(0 2px 4px rgba(82,196,26,0.3))'
+            }}
+            activeDot={{ 
+              r: 6, 
+              stroke: '#52c41a', 
+              strokeWidth: 3, 
+              fill: '#ffffff',
+              filter: 'drop-shadow(0 4px 8px rgba(82,196,26,0.4))'
+            }}
             name="上月"
             connectNulls={false} // 不连接空值，产生断点
           />
@@ -173,8 +285,15 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             dataKey="currentMonthAverage"
             stroke="#722ed1"
             strokeWidth={2}
+            strokeDasharray="5 5"
             dot={false}
-            activeDot={{ r: 4, stroke: '#722ed1', strokeWidth: 1, fill: '#722ed1' }}
+            activeDot={{ 
+              r: 5, 
+              stroke: '#722ed1', 
+              strokeWidth: 2, 
+              fill: '#ffffff',
+              filter: 'drop-shadow(0 3px 6px rgba(114,46,209,0.4))'
+            }}
             name="当月平均"
             connectNulls={true} // 平均线保持连续
           />
