@@ -3,8 +3,12 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // 性能优化配置
   experimental: {
-    // 其他实验性功能
-    optimizePackageImports: ['antd', '@ant-design/pro-components']
+    // 包导入优化
+    optimizePackageImports: ['antd', '@ant-design/pro-components', 'recharts'],
+    // 启用并发渲染
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
+    // 优化CSS
+    optimizeCss: true,
   },
   
   // Turbopack配置（新格式）
@@ -23,6 +27,8 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn']
     } : false,
+    // 启用SWC压缩
+    minify: true,
   },
   
   // 图片优化
@@ -47,25 +53,32 @@ const nextConfig: NextConfig = {
   },
   
   // Webpack优化
-  webpack: (config, { isServer }) => {
-    // 减少模块解析时间
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      '@': require('path').resolve(__dirname, 'src')
-    };
-    
-    // 优化代码分割
-    if (!isServer) {
+  webpack: (config, { isServer, dev }) => {
+    // 生产环境优化
+    if (!dev && !isServer) {
+      // 优化代码分割
       config.optimization.splitChunks = {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 250000,
         cacheGroups: {
           vendor: {
             test: /[\\/]node_modules[\\/]/,
             name: 'vendors',
             chunks: 'all',
+            priority: 10,
+          },
+          antd: {
+            test: /[\\/]node_modules[\\/](antd|@ant-design)[\\/]/,
+            name: 'antd',
+            chunks: 'all',
+            priority: 20,
           },
         },
       };
+      
+      // 减少模块解析时间
+      config.resolve.modules = ['node_modules'];
     }
     
     return config;

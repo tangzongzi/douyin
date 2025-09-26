@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Card, Typography, Alert, Progress, Switch, Row, Col } from 'antd';
+import { Button, Card, Alert, Progress, Switch, Row, Col } from 'antd';
 import { SyncOutlined, DatabaseOutlined, CheckCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
 
 interface SyncResult {
