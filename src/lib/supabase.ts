@@ -181,6 +181,7 @@ export const subscribeToDataChanges = (
     table: string;
   }) => void
 ) => {
+  const supabase = getSupabaseClient();
   return supabase
     .channel(`${table}_changes`)
     .on('postgres_changes', 
