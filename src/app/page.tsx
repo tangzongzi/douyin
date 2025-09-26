@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Spin, message, Row, Col, Modal, Button, Progress } from 'antd';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
-import { SyncOutlined, SettingOutlined } from '@ant-design/icons';
+import { SyncOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 // 移除飞书API导入，改用Supabase API
 // import { getDailyData, getMonthSummaryData } from '@/lib/feishu-api';
 import DailyProfitChart from '@/components/DailyProfitChart';
@@ -465,36 +465,58 @@ export default function Dashboard() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h1 style={{ 
-                fontSize: '28px', 
-                fontWeight: '700', 
-                color: 'rgba(0,0,0,0.88)', 
-                marginBottom: '4px',
-                letterSpacing: '-0.5px'
-              }}>
-                抖音电商数据中心
-                <SettingOutlined 
-                  style={{ 
-                    marginLeft: '16px', 
-                    fontSize: '18px', 
-                    color: 'rgba(0,0,0,0.15)', 
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    padding: '4px',
-                    borderRadius: '4px'
-                  }}
-                  onClick={() => setSyncModalVisible(true)}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
-                    e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.color = 'rgba(0,0,0,0.15)';
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                  title="数据同步管理"
-                />
-              </h1>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <h1 style={{ 
+                  fontSize: '28px', 
+                  fontWeight: '700', 
+                  color: 'rgba(0,0,0,0.88)', 
+                  marginBottom: '4px',
+                  letterSpacing: '-0.5px',
+                  margin: 0
+                }}>
+                  抖音电商数据中心
+                </h1>
+                
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <Button 
+                    href="/reports"
+                    type="primary"
+                    style={{
+                      borderRadius: '6px',
+                      height: '36px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    <FileTextOutlined />
+                    月度报表
+                  </Button>
+                  
+                  <SettingOutlined 
+                    style={{ 
+                      fontSize: '18px', 
+                      color: 'rgba(0,0,0,0.15)', 
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      padding: '4px',
+                      borderRadius: '4px'
+                    }}
+                    onClick={() => setSyncModalVisible(true)}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
+                      e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = 'rgba(0,0,0,0.15)';
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                    title="数据同步管理"
+                  />
+                </div>
+              </div>
               <p style={{ 
                 margin: 0, 
                 fontSize: '14px', 
