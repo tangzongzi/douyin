@@ -263,11 +263,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
           />
           <Tooltip 
             content={<CustomTooltip />}
-            cursor={{ 
-              stroke: '#ccc', 
-              strokeWidth: 1, 
-              strokeDasharray: '3 3'
-            }}
+            cursor={false}
           />
           <Legend content={<CustomLegend />} />
           
