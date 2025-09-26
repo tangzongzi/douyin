@@ -262,22 +262,6 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             axisLine={{ stroke: '#d9d9d9' }}
             tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}k`}
           />
-          <Tooltip 
-            content={<CustomTooltip />}
-            cursor={false}
-            isAnimationActive={false}
-            allowEscapeViewBox={{ x: false, y: false }}
-            wrapperStyle={{
-              outline: 'none !important',
-              border: 'none !important',
-              backgroundColor: 'transparent !important'
-            }}
-            contentStyle={{
-              outline: 'none !important',
-              border: 'none !important',
-              backgroundColor: 'transparent !important'
-            }}
-          />
           <Legend content={<CustomLegend />} />
           
           {/* 本月数据线 - 主要线条，使用鲜明的蓝色 */}
