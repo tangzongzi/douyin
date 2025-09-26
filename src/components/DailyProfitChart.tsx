@@ -86,9 +86,10 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
               color: 'rgba(0,0,0,0.45)', 
               marginBottom: '6px',
               fontWeight: '500',
-              textAlign: 'center'
+              textAlign: 'center',
+              padding: '2px 0'
             }}>
-              📈 多赞利润
+              多赞利润
             </div>
             {payload.map((entry, index) => {
               const isMainData = entry.name === '本月';
@@ -149,9 +150,10 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
                 color: 'rgba(0,0,0,0.45)', 
                 marginBottom: '6px',
                 fontWeight: '500',
-                textAlign: 'center'
+                textAlign: 'center',
+                padding: '2px 0'
               }}>
-                💰 当日总利润
+                当日总利润
               </div>
               
               {/* 本月总利润突出 */}
