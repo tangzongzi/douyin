@@ -59,138 +59,201 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
       return (
         <div style={{ 
           background: '#ffffff',
-          padding: '12px 16px',
-          border: '1px solid #f0f0f0',
-          borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          minWidth: '200px'
+          padding: '20px 24px',
+          border: '1px solid #e8e8e8',
+          borderRadius: '8px',
+          boxShadow: '0 6px 20px rgba(0,0,0,0.08)',
+          minWidth: '300px',
+          maxWidth: '350px'
         }}>
+          {/* 超大日期 - 第一视觉焦点 */}
           <div style={{ 
-            marginBottom: '12px', 
             textAlign: 'center',
-            borderBottom: '1px solid rgba(0,0,0,0.06)',
-            paddingBottom: '8px'
+            marginBottom: '20px',
+            paddingBottom: '16px',
+            borderBottom: '2px solid #f0f0f0'
           }}>
-            <p style={{ 
-              fontSize: '16px',
-              fontWeight: '600',
-              color: 'rgba(0,0,0,0.88)',
-              margin: '0'
+            <div style={{ 
+              fontSize: '28px',
+              fontWeight: '700',
+              color: '#1890ff',
+              lineHeight: '1.1',
+              marginBottom: '6px',
+              letterSpacing: '-0.5px'
             }}>
               {`${label}`}
-            </p>
+            </div>
+            <div style={{ 
+              fontSize: '12px',
+              color: 'rgba(0,0,0,0.45)',
+              fontWeight: '400',
+              textTransform: 'uppercase',
+              letterSpacing: '1px'
+            }}>
+              Daily Profit Details
+            </div>
           </div>
           
-          {/* 显示线条数据（多赞利润） - 重新设计布局 */}
-          <div style={{ marginBottom: '12px' }}>
-            <div style={{ 
-              fontSize: '11px', 
-              color: 'rgba(0,0,0,0.45)', 
-              marginBottom: '6px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.5px',
-              fontWeight: '500'
-            }}>
-              多赞利润
-            </div>
+          {/* 主要数据展示 - 卡片式布局 */}
+          <div style={{ marginBottom: '20px' }}>
             {payload.map((entry, index) => {
               const isMainData = entry.name === '本月';
-              return (
-                <div key={index} style={{ 
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: isMainData ? '6px 8px' : '3px 8px',
-                  margin: '3px 0',
-                  borderRadius: '4px',
-                  background: isMainData ? 'rgba(24,144,255,0.04)' : 'transparent',
-                  border: isMainData ? '1px solid rgba(24,144,255,0.1)' : 'none'
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{
-                      width: '6px',
-                      height: '6px',
-                      borderRadius: '50%',
-                      backgroundColor: entry.color
-                    }} />
-                    <span style={{ 
-                      fontSize: isMainData ? '13px' : '12px',
-                      color: isMainData ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.65)',
-                      fontWeight: isMainData ? '500' : '400'
+              
+              if (isMainData) {
+                // 本月数据 - 超大显示
+                return (
+                  <div key={index} style={{ 
+                    textAlign: 'center',
+                    padding: '16px 20px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, rgba(24,144,255,0.08) 0%, rgba(24,144,255,0.04) 100%)',
+                    border: '2px solid rgba(24,144,255,0.15)',
+                    marginBottom: '12px'
+                  }}>
+                    <div style={{ 
+                      fontSize: '14px',
+                      color: 'rgba(0,0,0,0.65)',
+                      marginBottom: '8px',
+                      fontWeight: '500',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px'
                     }}>
-                      {entry.name}
+                      {entry.name} 多赞利润
+                    </div>
+                    <div style={{ 
+                      fontSize: '32px',
+                      fontWeight: '700',
+                      color: '#1890ff',
+                      lineHeight: '1.1',
+                      textShadow: '0 2px 4px rgba(24,144,255,0.15)'
+                    }}>
+                      {formatCurrency(entry.value)}
+                    </div>
+                  </div>
+                );
+              } else {
+                // 对比数据 - 小尺寸显示
+                return (
+                  <div key={index} style={{ 
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '6px 12px',
+                    margin: '4px 0',
+                    borderRadius: '4px',
+                    background: 'rgba(0,0,0,0.02)',
+                    border: '1px solid rgba(0,0,0,0.04)'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: entry.color
+                      }} />
+                      <span style={{ 
+                        fontSize: '13px',
+                        color: 'rgba(0,0,0,0.65)',
+                        fontWeight: '500'
+                      }}>
+                        {entry.name}
+                      </span>
+                    </div>
+                    <span style={{ 
+                      fontSize: '14px',
+                      fontWeight: '600',
+                      color: 'rgba(0,0,0,0.75)'
+                    }}>
+                      {formatCurrency(entry.value)}
                     </span>
                   </div>
-                  <span style={{ 
-                    fontSize: isMainData ? '14px' : '13px',
-                    fontWeight: isMainData ? '600' : '500',
-                    color: entry.color
-                  }}>
-                    {formatCurrency(entry.value)}
-                  </span>
-                </div>
-              );
+                );
+              }
             })}
           </div>
           
-          {/* 显示额外数据（当日总利润） - 重新设计层级 */}
+          {/* 当日总利润 - 次要信息区 */}
           {dataPoint && (
             <div style={{ 
-              borderTop: '1px solid rgba(0,0,0,0.06)', 
-              paddingTop: '12px',
-              marginTop: '4px'
+              borderTop: '2px solid rgba(0,0,0,0.08)',
+              paddingTop: '16px',
+              background: 'rgba(250,250,250,0.6)',
+              margin: '20px -24px -20px -24px',
+              padding: '16px 24px 20px 24px',
+              borderRadius: '0 0 8px 8px'
             }}>
               <div style={{ 
-                fontSize: '11px', 
+                fontSize: '12px', 
                 color: 'rgba(0,0,0,0.45)', 
-                marginBottom: '8px',
+                marginBottom: '12px',
                 textTransform: 'uppercase',
-                letterSpacing: '0.5px',
-                fontWeight: '500'
+                letterSpacing: '1px',
+                fontWeight: '600',
+                textAlign: 'center'
               }}>
-                当日总利润
+                💰 当日总利润详情
               </div>
               
-              {/* 本月数据 - 主要焦点 */}
+              {/* 本月总利润 - 突出显示 */}
               <div style={{ 
-                display: 'flex', 
-                justifyContent: 'space-between', 
-                alignItems: 'center',
-                padding: '6px 8px',
-                margin: '3px 0',
-                borderRadius: '4px',
-                background: 'rgba(24,144,255,0.04)',
-                border: '1px solid rgba(24,144,255,0.1)'
+                textAlign: 'center',
+                padding: '12px 16px',
+                marginBottom: '12px',
+                borderRadius: '6px',
+                background: 'rgba(24,144,255,0.08)',
+                border: '1px solid rgba(24,144,255,0.2)'
               }}>
-                <span style={{ 
-                  color: 'rgba(0,0,0,0.85)', 
-                  fontSize: '13px',
+                <div style={{ 
+                  fontSize: '12px',
+                  color: 'rgba(0,0,0,0.65)',
+                  marginBottom: '4px',
                   fontWeight: '500'
                 }}>
-                  本月
-                </span>
-                <span style={{ 
-                  color: '#1890ff', 
-                  fontSize: '14px', 
-                  fontWeight: '600'
+                  本月总利润
+                </div>
+                <div style={{ 
+                  fontSize: '20px',
+                  fontWeight: '700',
+                  color: '#1890ff',
+                  lineHeight: '1.2'
                 }}>
                   {formatCurrency(dataPoint.currentMonthSummary || 0)}
-                </span>
+                </div>
               </div>
               
-              {/* 次要数据 - 降低视觉权重 */}
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '6px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2px 8px' }}>
-                  <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: '11px' }}>上月</span>
-                  <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: '12px', fontWeight: '400' }}>
+              {/* 对比数据 - 网格布局 */}
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: '1fr 1fr', 
+                gap: '8px'
+              }}>
+                <div style={{ 
+                  textAlign: 'center',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  background: 'rgba(0,0,0,0.02)',
+                  border: '1px solid rgba(0,0,0,0.06)'
+                }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(0,0,0,0.45)', marginBottom: '2px' }}>
+                    上月
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'rgba(0,0,0,0.75)' }}>
                     {formatCurrency(dataPoint.lastMonthSummary || 0)}
-                  </span>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '2px 8px' }}>
-                  <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: '11px' }}>平均</span>
-                  <span style={{ color: 'rgba(0,0,0,0.65)', fontSize: '12px', fontWeight: '400' }}>
+                <div style={{ 
+                  textAlign: 'center',
+                  padding: '8px 12px',
+                  borderRadius: '4px',
+                  background: 'rgba(0,0,0,0.02)',
+                  border: '1px solid rgba(0,0,0,0.06)'
+                }}>
+                  <div style={{ fontSize: '11px', color: 'rgba(0,0,0,0.45)', marginBottom: '2px' }}>
+                    平均
+                  </div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: 'rgba(0,0,0,0.75)' }}>
                     {formatCurrency(dataPoint.summaryAverage || 0)}
-                  </span>
+                  </div>
                 </div>
               </div>
             </div>
