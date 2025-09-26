@@ -67,7 +67,9 @@ interface OverviewData {
   lastMonthQianchuan?: number;
   monthClaimAmount?: number; // 当月赔付申请
   lastMonthClaimAmount?: number;
-  // 移除年度数据字段，恢复昨天的接口定义
+  // 年度数据字段
+  yearProfitWithDeposit?: number; // 年度含保证金利润
+  yearProfitWithoutDeposit?: number; // 年度不含保证金利润
 }
 
 interface ExpenseData {
@@ -78,11 +80,23 @@ interface ExpenseData {
   shipping_insurance: number;
 }
 
+interface YearDataItem {
+  id?: number;
+  year: string;
+  profit_with_deposit: number;
+  total_profit_with_deposit: number;
+  profit_without_deposit: number;
+  net_profit_without_deposit: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
 interface DashboardData {
   dailyData: DailyDataItem[];
   monthData: MonthDataItem[];
   overviewData: OverviewData;
   currentMonthExpense: ExpenseData;
+  yearData: YearDataItem[];
 }
 
 export default function Dashboard() {
@@ -96,7 +110,8 @@ export default function Dashboard() {
       pdd_service_fee: 0,
       douyin_service_fee: 0,
       shipping_insurance: 0
-    }
+    },
+    yearData: []
   });
   const [loading, setLoading] = useState(true);
   const [syncModalVisible, setSyncModalVisible] = useState(false);
@@ -111,20 +126,23 @@ export default function Dashboard() {
       setLoading(true);
       console.log('开始获取Supabase数据...');
       
-      const [overviewResponse, dailyResponse, monthlyResponse] = await Promise.all([
+      const [overviewResponse, dailyResponse, monthlyResponse, yearResponse] = await Promise.all([
         fetch('/api/data?type=overview'),
         fetch('/api/data?type=daily&startDate=2025-08-01&endDate=2025-09-30'), // 获取8月和9月的数据
-        fetch('/api/data?type=monthly&limit=6')
+        fetch('/api/data?type=monthly&limit=6'),
+        fetch('/api/year-profit?limit=1') // 获取最新年度数据
       ]);
       
-      const [overviewResult, dailyResult, monthlyResult]: [
+      const [overviewResult, dailyResult, monthlyResult, yearResult]: [
         ApiResponse<OverviewData>,
         ApiResponse<SupabaseDailyRecord[]>,
-        ApiResponse<SupabaseMonthlyRecord[]>
+        ApiResponse<SupabaseMonthlyRecord[]>,
+        any
       ] = await Promise.all([
         overviewResponse.json(),
         dailyResponse.json(),
-        monthlyResponse.json()
+        monthlyResponse.json(),
+        yearResponse.json()
       ]);
       
       if (!overviewResult.success || !dailyResult.success || !monthlyResult.success) {
@@ -134,10 +152,12 @@ export default function Dashboard() {
       const dailyData: SupabaseDailyRecord[] = dailyResult.data || [];
       const monthData: SupabaseMonthlyRecord[] = monthlyResult.data || [];
       const overviewData = overviewResult.data || {};
+      const yearData = yearResult.success ? (yearResult.data || []) : [];
       
       console.log('获取到的Supabase每日数据:', dailyData);
       console.log('获取到的Supabase月度数据:', monthData);
       console.log('获取到的概览数据:', overviewData);
+      console.log('获取到的年度数据:', yearData);
 
       // 处理Supabase数据为图表格式
       const processSupabaseData = () => {
@@ -233,7 +253,8 @@ export default function Dashboard() {
           pdd_service_fee: Math.abs(currentMonthRecord?.pdd_service_fee || 0),
           douyin_service_fee: Math.abs(currentMonthRecord?.douyin_service_fee || 0),
           shipping_insurance: Math.abs(currentMonthRecord?.shipping_insurance || 0),
-        }
+        },
+        yearData: yearData
       });
 
     } catch (error) {
@@ -870,7 +891,10 @@ export default function Dashboard() {
                   marginBottom: '6px',
                   textShadow: '0 2px 4px rgba(82, 196, 26, 0.15)'
                 }}>
-                  ¥167,630
+                  {data.yearData.length > 0 
+                    ? `¥${data.yearData[0].profit_with_deposit?.toLocaleString() || '0'}`
+                    : '¥0'
+                  }
                 </div>
                 <div style={{
                   fontSize: '12px',
@@ -927,7 +951,10 @@ export default function Dashboard() {
                   marginBottom: '6px',
                   textShadow: '0 2px 4px rgba(24, 144, 255, 0.15)'
                 }}>
-                  ¥152,620
+                  {data.yearData.length > 0 
+                    ? `¥${data.yearData[0].profit_without_deposit?.toLocaleString() || '0'}`
+                    : '¥0'
+                  }
                 </div>
                 <div style={{
                   fontSize: '12px',
@@ -959,7 +986,10 @@ export default function Dashboard() {
               fontWeight: '600',
               fontSize: '14px'
             }}>
-              ¥{(167629.70 - 152619.66).toLocaleString()}
+              {data.yearData.length > 0 
+                ? `¥${((data.yearData[0].profit_with_deposit || 0) - (data.yearData[0].profit_without_deposit || 0)).toLocaleString()}`
+                : '¥0'
+              }
             </span>
             {' · '}
             <span style={{ color: 'rgba(0,0,0,0.75)' }}>保证金占比</span>{' '}
@@ -968,7 +998,10 @@ export default function Dashboard() {
               fontWeight: '600',
               fontSize: '14px'
             }}>
-              {(((167629.70 - 152619.66) / 167629.70) * 100).toFixed(1)}%
+              {data.yearData.length > 0 && data.yearData[0].profit_with_deposit > 0
+                ? `${((((data.yearData[0].profit_with_deposit || 0) - (data.yearData[0].profit_without_deposit || 0)) / (data.yearData[0].profit_with_deposit || 1)) * 100).toFixed(1)}%`
+                : '0%'
+              }
             </span>
           </div>
         </div>

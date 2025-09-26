@@ -1,5 +1,6 @@
 import { SupabaseService, DailyProfit, MonthlySummary, YearProfit, SyncLog, getSupabaseClient } from './supabase';
 import { ENV_CONFIG } from '@/config/env';
+import { DAILY_FIELD_MAPPING, MONTHLY_FIELD_MAPPING, YEARLY_FIELD_MAPPING, getFieldValue } from '@/config/field-mapping';
 import axios from 'axios';
 
 // 飞书API配置
@@ -99,59 +100,7 @@ async function getFeishuTableData(tableId: string, accessToken: string): Promise
   }
 }
 
-// 字段名映射函数（增强版，处理编码和变体）
-function getFieldValue(record: FeishuRecord, fieldKey: string): number {
-  if (!record?.fields) return 0;
-
-  const fields = record.fields;
-  const keys = Object.keys(fields);
-  
-  // 多种匹配策略
-  const matchedKey = keys.find(key => {
-    // 1. 完全匹配
-    if (key === fieldKey) return true;
-    
-    // 2. 包含匹配
-    if (key.includes(fieldKey)) return true;
-    
-    // 3. 处理重复字符（如「每日每日利润汇总」）
-    if (fieldKey === '每日利润汇总' && key.includes('每日') && key.includes('利润汇总')) return true;
-    
-    // 4. 处理简化匹配
-    if (fieldKey === '每日盈利' && (key.includes('每日') && key.includes('盈利'))) return true;
-    
-    // 5. 前缀匹配
-    if (key.includes(fieldKey.slice(0, 3))) return true;
-    
-    return false;
-  });
-  
-  if (!matchedKey) {
-    return 0;
-  }
-
-  const value = fields[matchedKey];
-
-  if (typeof value === 'number') {
-    return value;
-  }
-
-  if (typeof value === 'string') {
-    const parsed = Number(value.replace(/[,¥\s]/g, ''));
-    return Number.isNaN(parsed) ? 0 : parsed;
-  }
-
-  if (Array.isArray(value) && value.length > 0) {
-    const first = value[0];
-    if (typeof first === 'number') return first;
-    if (typeof first === 'string') {
-      const parsed = Number(first.replace(/[,¥\s]/g, ''));
-      return Number.isNaN(parsed) ? 0 : parsed;
-    }
-  }
-
-  return 0;
-}
+// getFieldValue 函数现在从 @/config/field-mapping 导入
 
 // 同步每日数据（恢复简单有效的逻辑）
 export async function syncDailyData(): Promise<SyncLog> {
@@ -223,6 +172,19 @@ export async function syncDailyData(): Promise<SyncLog> {
     
     console.log(`[Sync] 每日数据同步完成，成功同步 ${syncLog.records_synced} 条记录`);
     
+    // 4. 自动同步年度数据 - 因为年度数据依赖于每日数据的累计
+    try {
+      console.log('[Sync] 开始自动同步年度数据...');
+      const yearSyncResult = await syncYearData();
+      if (yearSyncResult.sync_status === 'success') {
+        console.log(`[Sync] 年度数据自动同步成功，同步了 ${yearSyncResult.records_synced} 条记录`);
+      } else {
+        console.warn('[Sync] 年度数据自动同步失败，但不影响每日数据同步结果');
+      }
+    } catch (yearError) {
+      console.warn('[Sync] 年度数据自动同步出错，但不影响每日数据同步结果:', yearError);
+    }
+    
   } catch (error) {
     console.error('[Sync] 每日数据同步失败:', error);
     syncLog.error_message = error instanceof Error ? error.message : '未知错误';
@@ -272,19 +234,19 @@ export async function syncMonthlyData(): Promise<SyncLog> {
         
         const monthlySummary: MonthlySummary = {
           month: month,
-          daily_profit_sum: getFieldValue(record, '月度每日利润汇总'), // 红框左边的字段
+          daily_profit_sum: getFieldValue(record, '月度每日利润总计'), // ✅ 修正字段名
           month_profit: monthProfit, // 红框右边的字段
           net_cashflow: getFieldValue(record, '累计净现金流'),
-          claim_amount_sum: getFieldValue(record, '总赔付申请金额'),
+          claim_amount_sum: getFieldValue(record, '总赔付申请金额汇总'), // ✅ 修正字段名
           pdd_service_fee: getFieldValue(record, '总拼多多技术服务费'), // 保持原始值
           douyin_service_fee: getFieldValue(record, '总抖音技术服务费') || 0,
-          payment_expense_sum: getFieldValue(record, '总货款支出'), // 保持原始负数值
-          other_expense_sum: getFieldValue(record, '总其他支出'), // 保持原始值
+          payment_expense_sum: getFieldValue(record, '总货款支出汇总'), // ✅ 修正字段名
+          other_expense_sum: getFieldValue(record, '总其他支出汇总'), // ✅ 修正字段名
           shipping_insurance: getFieldValue(record, '运费保险') || 0,
           hard_expense: getFieldValue(record, '硬性支出') || 0,
-          qianchuan: getFieldValue(record, '千川') || 0,
-          deposit: getFieldValue(record, '保证金') || 0,
-          initial_fund: getFieldValue(record, '初始资金') || 0,
+          qianchuan: getFieldValue(record, '千川投流') || 0, // ✅ 修正字段名
+          deposit: getFieldValue(record, '店铺保证金') || 0, // ✅ 修正字段名
+          initial_fund: getFieldValue(record, '初始资金总额') || 0, // ✅ 修正字段名
         };
         
         monthlySummaries.push(monthlySummary);
@@ -306,6 +268,19 @@ export async function syncMonthlyData(): Promise<SyncLog> {
     syncLog.sync_completed_at = new Date().toISOString();
     
     console.log(`[Sync] 月度数据同步完成，成功同步 ${syncLog.records_synced} 条记录`);
+    
+    // 4. 自动同步年度数据 - 因为年度数据依赖于月度数据的累计
+    try {
+      console.log('[Sync] 开始自动同步年度数据...');
+      const yearSyncResult = await syncYearData();
+      if (yearSyncResult.sync_status === 'success') {
+        console.log(`[Sync] 年度数据自动同步成功，同步了 ${yearSyncResult.records_synced} 条记录`);
+      } else {
+        console.warn('[Sync] 年度数据自动同步失败，但不影响月度数据同步结果');
+      }
+    } catch (yearError) {
+      console.warn('[Sync] 年度数据自动同步出错，但不影响月度数据同步结果:', yearError);
+    }
     
   } catch (error) {
     console.error('[Sync] 月度数据同步失败:', error);
@@ -351,11 +326,11 @@ export async function syncYearData(): Promise<SyncLog> {
     
     feishuData.forEach((record, index) => {
       const yearProfit: YearProfit = {
-        year: String(getFieldValue(record, '年份') || (new Date().getFullYear() - index)), // 年份字段
-        profit_with_deposit: getFieldValue(record, '含保证金利润') || 0, // 含保证金利润
-        total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || 0, // 含保证金总利润
-        profit_without_deposit: getFieldValue(record, '不含保证金利润') || 0, // 不含保证金利润
-        net_profit_without_deposit: getFieldValue(record, '不含保证金余利润') || 0, // 不含保证金余利润
+        year: String(getFieldValue(record, '日期') || '2025').replace('年', ''), // ✅ 修正：使用"日期"字段，去掉"年"字符
+        profit_with_deposit: getFieldValue(record, '含保证金') || getFieldValue(record, '含保证金利润') || 0, // ✅ 修正字段名
+        total_profit_with_deposit: getFieldValue(record, '含保证金') || getFieldValue(record, '含保证金利润') || 0, // ✅ 修正字段名
+        profit_without_deposit: getFieldValue(record, '不含保证金总利润') || 0, // ✅ 修正字段名
+        net_profit_without_deposit: getFieldValue(record, '不含保证金剩余利润') || 0, // ✅ 修正字段名
       };
       
       yearProfits.push(yearProfit);

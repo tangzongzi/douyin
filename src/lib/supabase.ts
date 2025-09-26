@@ -182,7 +182,7 @@ export class SupabaseService {
   static async getYearProfits(limit: number = 10) {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
-      .from('year_profits')
+      .from('year_profit')
       .select('*')
       .order('year', { ascending: false })
       .limit(limit);
@@ -201,7 +201,7 @@ export class SupabaseService {
     console.log('[Supabase] 插入/更新年度利润数据:', yearProfit);
     
     const { data, error } = await supabase
-      .from('year_profits')
+      .from('year_profit')
       .upsert(yearProfit, { 
         onConflict: 'year',
         ignoreDuplicates: false 
