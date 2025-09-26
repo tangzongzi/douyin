@@ -98,18 +98,24 @@ interface FeishuRecord {
 }
 
 export function getFieldValue(record: FeishuRecord, fieldKey: string): number {
-  if (!record?.fields) return 0;
+  if (!record?.fields) {
+    console.log(`[Field Debug] record.fields 为空，fieldKey: ${fieldKey}`);
+    return 0;
+  }
 
   const fields = record.fields;
   const keys = Object.keys(fields);
   
-  // 多种匹配策略
+  // 多种匹配策略 - 按优先级排序，避免错误匹配
   const matchedKey = keys.find(key => {
-    // 1. 完全匹配
+    // 1. 完全匹配 - 最高优先级
     if (key === fieldKey) return true;
     
-    // 2. 包含匹配
-    if (key.includes(fieldKey)) return true;
+    // 2. 年度字段精确匹配 - 避免"含"匹配到"不含"
+    if (fieldKey === '含保证金' && key === '含保证金') return true;
+    if (fieldKey === '含保证金利润' && key === '含保证金利润') return true;
+    if (fieldKey === '不含保证金总利润' && key === '不含保证金总利润') return true;
+    if (fieldKey === '不含保证金利润' && key === '不含保证金利润') return true;
     
     // 3. 处理重复字符（如「每日每日利润汇总」）
     if (fieldKey === '每日利润汇总' && key.includes('每日') && key.includes('利润汇总')) return true;
@@ -117,37 +123,44 @@ export function getFieldValue(record: FeishuRecord, fieldKey: string): number {
     // 4. 处理简化匹配
     if (fieldKey === '每日盈利' && (key.includes('每日') && key.includes('盈利'))) return true;
     
-    // 5. 年度字段特殊处理
-    if (fieldKey === '含保证金利润' && (key.includes('含') || key.includes('合')) && key.includes('保证金')) return true;
-    if (fieldKey === '不含保证金利润' && key.includes('不含') && key.includes('保证金')) return true;
+    // 5. 保守的包含匹配 - 排除年度字段，避免冲突
+    if (!fieldKey.includes('保证金') && key.includes(fieldKey)) return true;
     
     return false;
   });
   
   if (!matchedKey) {
+    console.log(`[Field Debug] 未找到匹配字段，查找: "${fieldKey}"，可用字段: [${keys.join(', ')}]`);
     return 0;
   }
 
+  console.log(`[Field Debug] 字段匹配成功: "${fieldKey}" -> "${matchedKey}"`);
   const value = fields[matchedKey];
+  console.log(`[Field Debug] 原始值:`, value, `类型: ${typeof value}`);
 
   if (typeof value === 'number') {
+    console.log(`[Field Debug] 返回数字值: ${value}`);
     return value;
   }
 
   if (typeof value === 'string') {
     const parsed = Number(value.replace(/[,¥\s]/g, ''));
+    console.log(`[Field Debug] 字符串解析: "${value}" -> ${parsed}`);
     return Number.isNaN(parsed) ? 0 : parsed;
   }
 
   if (Array.isArray(value) && value.length > 0) {
     const first = value[0];
+    console.log(`[Field Debug] 数组第一个元素:`, first, `类型: ${typeof first}`);
     if (typeof first === 'number') return first;
     if (typeof first === 'string') {
       const parsed = Number(first.replace(/[,¥\s]/g, ''));
+      console.log(`[Field Debug] 数组字符串解析: "${first}" -> ${parsed}`);
       return Number.isNaN(parsed) ? 0 : parsed;
     }
   }
 
+  console.log(`[Field Debug] 无法解析值，返回0:`, value);
   return 0;
 }
 

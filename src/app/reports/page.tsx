@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Spin, Row, Col, Table, Select, Button, Radio, Space, Typography } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
 import { FileTextOutlined, DownloadOutlined, PrinterOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -87,16 +87,11 @@ export default function MonthlyReportsPage() {
   // 计算增长率
   const calculateGrowthRate = (current: number, previous: number) => {
     if (!previous) return current > 0 ? '+∞' : '0.0%';
-    const rate = ((current - previous) / Math.abs(previous) * 100).toFixed(1);
-    return `${rate > 0 ? '+' : ''}${rate}%`;
+    const rateNum = ((current - previous) / Math.abs(previous) * 100);
+    const rate = rateNum.toFixed(1);
+    return `${rateNum > 0 ? '+' : ''}${rate}%`;
   };
 
-  // 获取增长率颜色
-  const getGrowthColor = (rate: string) => {
-    if (rate.includes('+')) return '#52c41a';
-    if (rate.includes('-')) return '#ff4d4f';
-    return 'rgba(0,0,0,0.65)';
-  };
 
   if (reportData.loading) {
     return (
@@ -225,7 +220,7 @@ export default function MonthlyReportsPage() {
       key: 'growth',
       width: 100,
       align: 'right' as const,
-      render: (_: any, record: any) => {
+      render: (_: unknown, record: { currentAmount: number; lastAmount: number }) => {
         const rate = calculateGrowthRate(record.currentAmount, record.lastAmount);
         return (
           <div style={{ textAlign: 'right' }}>
@@ -280,7 +275,7 @@ export default function MonthlyReportsPage() {
       key: 'change',
       width: 100,
       align: 'right' as const,
-      render: (_: any, record: any) => {
+      render: (_: unknown, record: { currentAmount: number; lastAmount: number }) => {
         const rate = calculateGrowthRate(record.currentAmount, record.lastAmount);
         return (
           <div style={{ textAlign: 'right' }}>
@@ -322,7 +317,7 @@ export default function MonthlyReportsPage() {
       key: 'cumulative',
       width: 180,
       align: 'right' as const,
-      render: (_: any, record: MonthlyReportData, index: number) => {
+      render: (_: unknown, record: MonthlyReportData, index: number) => {
         // 计算从4月到当前月的累计净利润
         const cumulative = historicalData.slice(index).reduce((sum, item) => sum + item.month_profit, 0);
         return (
@@ -337,7 +332,7 @@ export default function MonthlyReportsPage() {
       key: 'monthGrowth',
       width: 120,
       align: 'right' as const,
-      render: (_: any, record: MonthlyReportData, index: number) => {
+      render: (_: unknown, record: MonthlyReportData, index: number) => {
         if (index === historicalData.length - 1) return '-'; // 最早月份无对比
         const prevRecord = historicalData[index + 1];
         const rate = calculateGrowthRate(record.month_profit, prevRecord?.month_profit || 0);

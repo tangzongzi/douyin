@@ -324,13 +324,56 @@ export async function syncYearData(): Promise<SyncLog> {
     // 3. 转换数据格式
     const yearProfits: YearProfit[] = [];
     
-    feishuData.forEach((record) => {
+    feishuData.forEach((record, index) => {
+      // 调试：打印所有可用字段名
+      const fields = record.fields || {};
+      const fieldNames = Object.keys(fields);
+      console.log(`[Sync Debug] 记录${index}的所有字段名:`, fieldNames);
+      console.log(`[Sync Debug] 记录${index}的字段值:`, fields);
+      
+      // 尝试多种可能的字段名来获取含保证金利润
+      const possibleDepositFields = [
+        '含保证金',
+        '含保证金利润', 
+        '含保证金总利润',
+        '年含保证金利润',
+        '总含保证金利润'
+      ];
+      
+      let profit_with_deposit = 0;
+      for (const fieldName of possibleDepositFields) {
+        const value = getFieldValue(record, fieldName);
+        if (value > 0) {
+          profit_with_deposit = value;
+          console.log(`[Sync Debug] 找到含保证金字段: "${fieldName}" = ${value}`);
+          break;
+        }
+      }
+      
+      // 尝试多种可能的字段名来获取不含保证金利润
+      const possibleWithoutDepositFields = [
+        '不含保证金总利润',
+        '不含保证金利润',
+        '年不含保证金利润',
+        '净利润不含保证金'
+      ];
+      
+      let profit_without_deposit = 0;
+      for (const fieldName of possibleWithoutDepositFields) {
+        const value = getFieldValue(record, fieldName);
+        if (value > 0) {
+          profit_without_deposit = value;
+          console.log(`[Sync Debug] 找到不含保证金字段: "${fieldName}" = ${value}`);
+          break;
+        }
+      }
+      
       const yearProfit: YearProfit = {
         year: String(getFieldValue(record, '日期') || '2025').replace('年', ''), // ✅ 修正：使用"日期"字段，去掉"年"字符
-        profit_with_deposit: getFieldValue(record, '含保证金') || 0, // ✅ 修正字段名
-        total_profit_with_deposit: getFieldValue(record, '含保证金') || 0, // ✅ 使用同一字段
-        profit_without_deposit: getFieldValue(record, '不含保证金总利润') || 0, // ✅ 修正字段名
-        net_profit_without_deposit: getFieldValue(record, '不含保证金剩余利润') || 0, // ✅ 修正字段名
+        profit_with_deposit: profit_with_deposit,
+        total_profit_with_deposit: profit_with_deposit, // 使用同一值
+        profit_without_deposit: profit_without_deposit,
+        net_profit_without_deposit: getFieldValue(record, '不含保证金剩余利润') || profit_without_deposit, // 备用使用主字段
       };
       
       yearProfits.push(yearProfit);
