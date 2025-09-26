@@ -496,56 +496,6 @@ export default function Dashboard() {
                 />
               </h1>
               
-              {/* 页面导航 - 在标题下方 */}
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center',
-                marginBottom: '16px'
-              }}>
-                <div style={{
-                  display: 'inline-flex',
-                  background: 'rgba(255,255,255,0.9)',
-                  borderRadius: '8px',
-                  padding: '4px',
-                  border: '1px solid rgba(0,0,0,0.06)',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-                }}>
-                  <div style={{
-                    padding: '6px 20px',
-                    borderRadius: '6px',
-                    background: '#1890ff',
-                    color: '#ffffff',
-                    fontSize: '14px',
-                    fontWeight: '500',
-                    boxShadow: '0 1px 3px rgba(24,144,255,0.3)'
-                  }}>
-                    首页
-                  </div>
-                  <a 
-                    href="/reports" 
-                    style={{
-                      padding: '6px 20px',
-                      borderRadius: '6px',
-                      background: 'transparent',
-                      color: 'rgba(0,0,0,0.65)',
-                      fontSize: '14px',
-                      fontWeight: '500',
-                      textDecoration: 'none',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(24,144,255,0.08)';
-                      e.currentTarget.style.color = '#1890ff';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                      e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
-                    }}
-                  >
-                    月度报表
-                  </a>
-                </div>
-              </div>
               
               <p style={{ 
                 margin: 0, 
@@ -589,6 +539,57 @@ export default function Dashboard() {
         </div>
 
         {/* 核心指标卡片区域 - 优化布局和视觉层次 */}
+        {/* 页面导航 - 中心位置 */}
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center',
+          marginBottom: '32px'
+        }}>
+          <div style={{
+            display: 'inline-flex',
+            background: 'rgba(255,255,255,0.9)',
+            borderRadius: '8px',
+            padding: '4px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+          }}>
+            <div style={{
+              padding: '8px 24px',
+              borderRadius: '6px',
+              background: '#1890ff',
+              color: '#ffffff',
+              fontSize: '14px',
+              fontWeight: '500',
+              boxShadow: '0 2px 4px rgba(24,144,255,0.3)'
+            }}>
+              首页
+            </div>
+            <a 
+              href="/reports" 
+              style={{
+                padding: '8px 24px',
+                borderRadius: '6px',
+                background: 'transparent',
+                color: 'rgba(0,0,0,0.65)',
+                fontSize: '14px',
+                fontWeight: '500',
+                textDecoration: 'none',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(24,144,255,0.08)';
+                e.currentTarget.style.color = '#1890ff';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
+              }}
+            >
+              月度报表
+            </a>
+          </div>
+        </div>
+
         {/* 核心指标卡片区域 - Ant Design Pro标准布局 */}
         <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
           {/* 主要指标1 - 月度每日利润汇总 */}
