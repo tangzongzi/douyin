@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Spin, Row, Col, Table, Select, Button, Radio, Space, Typography } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
-import { FileTextOutlined, DownloadOutlined, PrinterOutlined, BarChartOutlined, TableOutlined, HomeOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { FileTextOutlined, DownloadOutlined, PrinterOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import dayjs from 'dayjs';
 
@@ -436,29 +436,6 @@ export default function MonthlyReportsPage() {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
-                  <Button 
-                    href="/"
-                    type="text"
-                    icon={<ArrowLeftOutlined />}
-                    style={{
-                      padding: '4px 8px',
-                      height: 'auto',
-                      fontSize: '12px',
-                      color: 'rgba(0,0,0,0.45)',
-                      marginRight: '12px'
-                    }}
-                  >
-                    返回首页
-                  </Button>
-                  <Text style={{ 
-                    color: 'rgba(0,0,0,0.25)',
-                    fontSize: '12px'
-                  }}>
-                    抖音电商数据中心 > 月度报表
-                  </Text>
-                </div>
-                
                 <Title level={2} style={{ 
                   margin: 0, 
                   color: 'rgba(0,0,0,0.88)',
@@ -523,6 +500,57 @@ export default function MonthlyReportsPage() {
                   <Button icon={<PrinterOutlined />} size="small" onClick={() => window.print()}>打印</Button>
                 </Space>
               </Space>
+            </div>
+          </div>
+
+          {/* 页面导航 - 融合设计 */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center',
+            marginBottom: '24px'
+          }}>
+            <div style={{
+              display: 'inline-flex',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '8px',
+              padding: '4px',
+              border: '1px solid rgba(0,0,0,0.06)',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+            }}>
+              <a 
+                href="/" 
+                style={{
+                  padding: '8px 24px',
+                  borderRadius: '6px',
+                  background: 'transparent',
+                  color: 'rgba(0,0,0,0.65)',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  textDecoration: 'none',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(24,144,255,0.08)';
+                  e.currentTarget.style.color = '#1890ff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
+                }}
+              >
+                首页
+              </a>
+              <div style={{
+                padding: '8px 24px',
+                borderRadius: '6px',
+                background: '#1890ff',
+                color: '#ffffff',
+                fontSize: '14px',
+                fontWeight: '500',
+                boxShadow: '0 2px 4px rgba(24,144,255,0.3)'
+              }}>
+                月度报表
+              </div>
             </div>
           </div>
 

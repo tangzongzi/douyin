@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Spin, message, Row, Col, Modal, Button, Progress } from 'antd';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
-import { SyncOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons';
+import { SyncOutlined, SettingOutlined } from '@ant-design/icons';
 // 移除飞书API导入，改用Supabase API
 // import { getDailyData, getMonthSummaryData } from '@/lib/feishu-api';
 import DailyProfitChart from '@/components/DailyProfitChart';
@@ -465,58 +465,88 @@ export default function Dashboard() {
         }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <h1 style={{ 
-                  fontSize: '28px', 
-                  fontWeight: '700', 
-                  color: 'rgba(0,0,0,0.88)', 
-                  marginBottom: '4px',
-                  letterSpacing: '-0.5px',
-                  margin: 0
+              <h1 style={{ 
+                fontSize: '28px', 
+                fontWeight: '700', 
+                color: 'rgba(0,0,0,0.88)', 
+                marginBottom: '16px',
+                letterSpacing: '-0.5px'
+              }}>
+                抖音电商数据中心
+                <SettingOutlined 
+                  style={{ 
+                    marginLeft: '16px', 
+                    fontSize: '18px', 
+                    color: 'rgba(0,0,0,0.15)', 
+                    cursor: 'pointer',
+                    transition: 'all 0.3s ease',
+                    padding: '4px',
+                    borderRadius: '4px'
+                  }}
+                  onClick={() => setSyncModalVisible(true)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
+                    e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgba(0,0,0,0.15)';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
+                  title="数据同步管理"
+                />
+              </h1>
+              
+              {/* 页面导航 - 在标题下方 */}
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'center',
+                marginBottom: '16px'
+              }}>
+                <div style={{
+                  display: 'inline-flex',
+                  background: 'rgba(255,255,255,0.9)',
+                  borderRadius: '8px',
+                  padding: '4px',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                 }}>
-                  抖音电商数据中心
-                </h1>
-                
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <Button 
-                    href="/reports"
-                    type="primary"
+                  <div style={{
+                    padding: '6px 20px',
+                    borderRadius: '6px',
+                    background: '#1890ff',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    boxShadow: '0 1px 3px rgba(24,144,255,0.3)'
+                  }}>
+                    首页
+                  </div>
+                  <a 
+                    href="/reports" 
                     style={{
+                      padding: '6px 20px',
                       borderRadius: '6px',
-                      height: '36px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
+                      background: 'transparent',
+                      color: 'rgba(0,0,0,0.65)',
                       fontSize: '14px',
-                      fontWeight: '500'
+                      fontWeight: '500',
+                      textDecoration: 'none',
+                      transition: 'all 0.2s ease'
                     }}
-                  >
-                    <FileTextOutlined />
-                    月度报表
-                  </Button>
-                  
-                  <SettingOutlined 
-                    style={{ 
-                      fontSize: '18px', 
-                      color: 'rgba(0,0,0,0.15)', 
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease',
-                      padding: '4px',
-                      borderRadius: '4px'
-                    }}
-                    onClick={() => setSyncModalVisible(true)}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
-                      e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
+                      e.currentTarget.style.background = 'rgba(24,144,255,0.08)';
+                      e.currentTarget.style.color = '#1890ff';
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.color = 'rgba(0,0,0,0.15)';
                       e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
                     }}
-                    title="数据同步管理"
-                  />
+                  >
+                    月度报表
+                  </a>
                 </div>
               </div>
+              
               <p style={{ 
                 margin: 0, 
                 fontSize: '14px', 
