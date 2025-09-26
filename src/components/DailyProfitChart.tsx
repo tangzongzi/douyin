@@ -264,6 +264,8 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
           <Tooltip 
             content={<CustomTooltip />}
             cursor={false}
+            isAnimationActive={false}
+            allowEscapeViewBox={{ x: false, y: false }}
           />
           <Legend content={<CustomLegend />} />
           
@@ -274,7 +276,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             stroke="#1890ff"
             strokeWidth={3}
             dot={{ fill: '#1890ff', strokeWidth: 2, r: 4 }}
-            activeDot={{ r: 5, stroke: '#1890ff', strokeWidth: 2, fill: '#1890ff' }}
+            activeDot={false}
             name="本月"
             connectNulls={false} // 不连接空值，产生断点
           />
@@ -287,7 +289,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             strokeWidth={2}
             strokeDasharray="5 5"
             dot={{ fill: '#8c8c8c', strokeWidth: 1, r: 3 }}
-            activeDot={{ r: 4, stroke: '#8c8c8c', strokeWidth: 2, fill: '#8c8c8c' }}
+            activeDot={false}
             name="上月"
             connectNulls={false} // 不连接空值，产生断点
           />
@@ -300,7 +302,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             strokeWidth={1}
             strokeDasharray="2 2"
             dot={false}
-            activeDot={{ r: 3, stroke: '#d9d9d9', strokeWidth: 1, fill: '#d9d9d9' }}
+            activeDot={false}
             name="当月平均"
             connectNulls={true} // 平均线保持连续
           />
