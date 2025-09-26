@@ -3,17 +3,19 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // 性能优化配置
   experimental: {
-    // 启用Turbopack增量构建
-    turbo: {
-      // 优化模块解析
-      resolveAlias: {
-        'react': 'react',
-        'react-dom': 'react-dom'
-      }
-    },
-    // 启用并发特性
-    serverComponentsExternalPackages: ['@supabase/supabase-js']
+    // 其他实验性功能
+    optimizePackageImports: ['antd', '@ant-design/pro-components']
   },
+  
+  // Turbopack配置（新格式）
+  turbopack: {
+    resolveAlias: {
+      '@': './src'
+    }
+  },
+  
+  // 外部包配置（新格式）
+  serverExternalPackages: ['@supabase/supabase-js'],
   
   // 编译优化
   compiler: {
