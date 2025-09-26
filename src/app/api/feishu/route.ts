@@ -82,9 +82,12 @@ export async function GET(request: NextRequest) {
       case 'monthly':
         tableId = ENV_CONFIG.TABLE_MONTH_SUMMARY;
         break;
+      case 'yearly':
+        tableId = ENV_CONFIG.TABLE_YEAR_PROFIT;
+        break;
       default:
         return NextResponse.json(
-          { error: '无效的表格类型', code: 400 },
+          { error: '无效的表格类型，支持: daily, monthly, yearly', code: 400 },
           { status: 400 }
         );
     }

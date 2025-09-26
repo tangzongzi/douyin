@@ -39,6 +39,7 @@ type TestResult = LoadingResult | SuccessResult | ErrorResult;
 export default function TestPage() {
   const [dailyTest, setDailyTest] = useState<TestResult | null>(null);
   const [monthlyTest, setMonthlyTest] = useState<TestResult | null>(null);
+  const [yearlyTest, setYearlyTest] = useState<TestResult | null>(null);
 
   const testAPI = async (endpoint: string, setResult: (result: TestResult) => void) => {
     setResult({ status: 'loading', message: '正在测试...' });
@@ -173,7 +174,7 @@ export default function TestPage() {
           </Paragraph>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card title="每日基础数据测试" className="h-fit">
             <Paragraph>
               测试从飞书表格获取每日基础数据（daily profit, expenses等）
@@ -203,6 +204,21 @@ export default function TestPage() {
             </Button>
             {renderTestResult(monthlyTest)}
           </Card>
+
+          <Card title="年度利润数据测试" className="h-fit">
+            <Paragraph>
+              测试从飞书表格获取年度利润数据（profit_with_deposit, profit_without_deposit等）
+            </Paragraph>
+            <Button 
+              type="primary" 
+              onClick={() => testAPI('yearly', setYearlyTest)}
+              loading={yearlyTest?.status === 'loading'}
+              className="mb-4"
+            >
+              测试年度数据API
+            </Button>
+            {renderTestResult(yearlyTest)}
+          </Card>
         </div>
 
         <Card className="mt-6">
@@ -223,6 +239,10 @@ export default function TestPage() {
             <div>
               <Text strong>月度数据表ID：</Text>
               <Text code>tbl5hVlzM1gNVCT2</Text>
+            </div>
+            <div>
+              <Text strong>年度利润表ID：</Text>
+              <Text code>tblYearProfitPlaceholder</Text>
             </div>
           </div>
         </Card>
@@ -255,6 +275,7 @@ export default function TestPage() {
               onClick={() => {
                 setDailyTest(null);
                 setMonthlyTest(null);
+                setYearlyTest(null);
               }}
             >
               清除结果
