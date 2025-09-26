@@ -61,113 +61,318 @@ export default function SyncPage() {
   };
 
   return (
-    <div style={{ background: '#f0f2f5', minHeight: '100vh', padding: '24px' }}>
-      <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+    <>
+      <style jsx global>{`
+        .sync-page-animation {
+          animation: slideInUp 0.6s ease-out;
+        }
         
-        {/* 页面标题 */}
-        <Card style={{ marginBottom: '24px' }}>
-          <Title level={2}>
-            <DatabaseOutlined style={{ marginRight: '8px', color: '#1890ff' }} />
-            智能数据同步系统
-          </Title>
-          <Text type="secondary">
-            基于飞书表格真实日期字段的智能同步，支持增量同步和日期范围选择
-          </Text>
-        </Card>
-
-        {/* 同步设置 */}
-        <Card title="同步设置" style={{ marginBottom: '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-            <div>
-              <Text strong>强制覆盖已存在数据：</Text>
-              <Switch
-                checked={forceSync}
-                onChange={setForceSync}
-                style={{ marginLeft: '8px' }}
-                checkedChildren="开启"
-                unCheckedChildren="关闭"
-              />
-            </div>
-            <Text type="secondary">
-              {forceSync ? '将覆盖数据库中已存在的数据' : '只同步新数据，跳过已存在的'}
-            </Text>
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .sync-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(0,0,0,0.08) !important;
+          transition: all 0.3s ease;
+        }
+      `}</style>
+      
+      <div style={{ 
+        background: 'linear-gradient(180deg, #f0f2f5 0%, #f5f7fa 100%)', 
+        minHeight: '100vh', 
+        padding: '24px' 
+      }}>
+        <div className="sync-page-animation" style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto' 
+        }}>
+        
+        {/* 页面标题 - Pro级别优化 */}
+        <div style={{ 
+          marginBottom: '32px',
+          padding: '32px',
+          background: 'rgba(255,255,255,0.9)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.6)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.06)',
+          textAlign: 'center'
+        }}>
+          <div style={{
+            padding: '12px',
+            background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+            borderRadius: '12px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: '20px'
+          }}>
+            <DatabaseOutlined style={{ color: 'white', fontSize: '24px' }} />
           </div>
-        </Card>
+          
+          <h1 style={{ 
+            margin: '0 0 12px 0',
+            fontSize: '28px',
+            fontWeight: '700',
+            color: 'rgba(0,0,0,0.88)',
+            letterSpacing: '-0.5px'
+          }}>
+            智能数据同步系统
+          </h1>
+          
+          <p style={{
+            margin: 0,
+            fontSize: '16px',
+            color: 'rgba(0,0,0,0.65)',
+            fontWeight: '400',
+            lineHeight: '1.5'
+          }}>
+            基于飞书表格真实日期字段的智能同步，支持增量同步和日期范围选择
+          </p>
+        </div>
 
-        {/* 快速同步区域 */}
-        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-          <Col span={12}>
-            <Card title="📅 按日期范围同步" size="small">
-              <Space direction="vertical" style={{ width: '100%' }}>
+        {/* 同步设置 - 优化版 */}
+        <div style={{ 
+          marginBottom: '32px',
+          padding: '24px',
+          background: 'rgba(255,255,255,0.8)',
+          borderRadius: '12px',
+          border: '1px solid rgba(0,0,0,0.06)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
+        }}>
+          <h3 style={{
+            margin: '0 0 20px 0',
+            fontSize: '16px',
+            fontWeight: '600',
+            color: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <div style={{
+              width: '4px',
+              height: '16px',
+              background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+              borderRadius: '2px'
+            }}></div>
+            同步设置
+          </h3>
+          
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            padding: '16px 20px',
+            background: 'rgba(250,250,250,0.8)',
+            borderRadius: '8px',
+            border: '1px solid rgba(0,0,0,0.04)'
+          }}>
+            <div>
+              <div style={{
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)',
+                marginBottom: '4px'
+              }}>
+                强制覆盖已存在数据
+              </div>
+              <div style={{
+                fontSize: '12px',
+                color: 'rgba(0,0,0,0.45)'
+              }}>
+                {forceSync ? '将覆盖数据库中已存在的数据' : '只同步新数据，跳过已存在的'}
+              </div>
+            </div>
+            <Switch
+              checked={forceSync}
+              onChange={setForceSync}
+              checkedChildren="开启"
+              unCheckedChildren="关闭"
+              style={{
+                background: forceSync ? 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)' : undefined
+              }}
+            />
+          </div>
+        </div>
+
+        {/* 快速同步区域 - 全新设计 */}
+        <Row gutter={[20, 20]} style={{ marginBottom: '32px' }}>
+          <Col span={14}>
+            <div className="sync-card" style={{
+              padding: '24px',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.06)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+              height: '100%'
+            }}>
+              <h3 style={{
+                margin: '0 0 20px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <div style={{
+                  width: '4px',
+                  height: '16px',
+                  background: 'linear-gradient(135deg, #fa8c16 0%, #fa541c 100%)',
+                  borderRadius: '2px'
+                }}></div>
+                按日期范围同步
+              </h3>
+              
+              <div style={{ 
+                display: 'grid',
+                gridTemplateColumns: 'repeat(2, 1fr)',
+                gap: '12px'
+              }}>
                 <Button 
-                  block
                   icon={<SyncOutlined />}
                   onClick={() => performSync('daily', '7days')}
                   loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontWeight: '500'
+                  }}
                 >
                   近7天数据
                 </Button>
                 <Button 
-                  block
                   icon={<SyncOutlined />}
                   onClick={() => performSync('daily', '15days')}
                   loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontWeight: '500'
+                  }}
                 >
                   近15天数据
                 </Button>
                 <Button 
-                  block
                   icon={<SyncOutlined />}
                   onClick={() => performSync('daily', '30days')}
                   loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontWeight: '500'
+                  }}
                 >
                   近30天数据
                 </Button>
                 <Button 
-                  block
                   type="primary"
                   icon={<SyncOutlined />}
                   onClick={() => performSync('daily', 'currentMonth')}
                   loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(24,144,255,0.3)',
+                    fontWeight: '600'
+                  }}
                 >
                   当月数据
                 </Button>
-              </Space>
-            </Card>
+              </div>
+            </div>
           </Col>
           
-          <Col span={12}>
-            <Card title="🔄 完整同步选项" size="small">
-              <Space direction="vertical" style={{ width: '100%' }}>
+          <Col span={10}>
+            <div className="sync-card" style={{
+              padding: '24px',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.06)',
+              boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
+              height: '100%'
+            }}>
+              <h3 style={{
+                margin: '0 0 20px 0',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}>
+                <div style={{
+                  width: '4px',
+                  height: '16px',
+                  background: 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
+                  borderRadius: '2px'
+                }}></div>
+                完整同步选项
+              </h3>
+              
+              <div style={{ 
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px'
+              }}>
                 <Button 
-                  block
                   type="primary"
                   icon={<SyncOutlined />}
                   onClick={() => performSync('all')}
                   loading={syncing}
-                  size="large"
+                  style={{
+                    height: '48px',
+                    borderRadius: '8px',
+                    background: 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(82,196,26,0.3)',
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
                 >
                   智能完整同步
                 </Button>
                 <Button 
-                  block
                   icon={<ThunderboltOutlined />}
                   onClick={() => performSync('force')}
                   loading={syncing}
                   danger
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    fontWeight: '600'
+                  }}
                 >
                   强制完整同步
                 </Button>
                 <Button 
-                  block
                   icon={<SyncOutlined />}
                   onClick={() => performSync('yearly')}
                   loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(114,46,209,0.3)',
+                    color: '#722ed1',
+                    fontWeight: '500'
+                  }}
                 >
                   同步年度数据
                 </Button>
                 <Button 
-                  block
                   icon={<CheckCircleOutlined />}
                   onClick={() => {
                     setSyncing(true);
@@ -177,26 +382,64 @@ export default function SyncPage() {
                       .finally(() => setSyncing(false));
                   }}
                   loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontWeight: '500'
+                  }}
                 >
                   验证数据完整性
                 </Button>
-              </Space>
-            </Card>
+              </div>
+            </div>
           </Col>
         </Row>
 
-        {/* 同步进度 */}
+        {/* 同步进度 - 优化版 */}
         {syncing && (
-          <Card title="同步进度" style={{ marginBottom: '24px' }}>
+          <div style={{ 
+            marginBottom: '32px',
+            padding: '24px',
+            background: 'rgba(255,255,255,0.9)',
+            borderRadius: '12px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
+          }}>
+            <h3 style={{
+              margin: '0 0 16px 0',
+              fontSize: '16px',
+              fontWeight: '600',
+              color: 'rgba(0,0,0,0.85)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              <SyncOutlined style={{ color: '#1890ff', fontSize: '16px' }} spin />
+              同步进度
+            </h3>
+            
             <Progress 
               percent={syncProgress} 
               status="active"
-              strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
+              strokeColor={{ 
+                '0%': '#1890ff', 
+                '50%': '#13c2c2',
+                '100%': '#52c41a' 
+              }}
+              strokeWidth={8}
+              style={{ marginBottom: '12px' }}
             />
-            <Text type="secondary" style={{ marginTop: '8px', display: 'block' }}>
+            
+            <div style={{
+              textAlign: 'center',
+              fontSize: '14px',
+              color: 'rgba(0,0,0,0.65)',
+              fontWeight: '500'
+            }}>
               正在同步数据，请稍候...
-            </Text>
-          </Card>
+            </div>
+          </div>
         )}
 
         {/* 同步结果 */}
@@ -233,18 +476,121 @@ export default function SyncPage() {
           </Card>
         )}
 
-        {/* 使用说明 */}
-        <Card title="💡 使用说明" style={{ marginBottom: '24px' }}>
-          <Space direction="vertical" size="small" style={{ width: '100%' }}>
-            <Text><strong>智能同步：</strong> 基于飞书表格的真实日期字段，自动识别和同步数据</Text>
-            <Text><strong>增量同步：</strong> 只同步新数据，跳过已存在的记录，提高效率</Text>
-            <Text><strong>日期范围：</strong> 可选择同步最近7天、15天、30天或当月的数据</Text>
-            <Text><strong>强制同步：</strong> 开启后会覆盖数据库中已存在的数据</Text>
-            <Text><strong>建议用法：</strong> 日常使用「当月数据」或「近7天」，数据有误时使用「强制完整同步」</Text>
-          </Space>
-        </Card>
+        {/* 使用说明 - Pro级别优化 */}
+        <div style={{
+          marginBottom: '32px',
+          padding: '28px',
+          background: 'linear-gradient(135deg, rgba(114,46,209,0.04) 0%, rgba(235,47,150,0.04) 100%)',
+          borderRadius: '16px',
+          border: '1px solid rgba(114,46,209,0.08)'
+        }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            marginBottom: '24px'
+          }}>
+            <div style={{
+              padding: '10px',
+              background: 'linear-gradient(135deg, #722ed1 0%, #eb2f96 100%)',
+              borderRadius: '10px',
+              color: 'white',
+              fontSize: '16px',
+              fontWeight: '600'
+            }}>
+              💡
+            </div>
+            <h3 style={{
+              margin: 0,
+              fontSize: '18px',
+              fontWeight: '700',
+              color: 'rgba(0,0,0,0.88)'
+            }}>
+              使用说明
+            </h3>
+          </div>
+          
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '16px'
+          }}>
+            <div style={{
+              padding: '16px 20px',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '10px',
+              border: '1px solid rgba(0,0,0,0.04)'
+            }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#1890ff'
+              }}>
+                智能同步
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '13px',
+                color: 'rgba(0,0,0,0.65)',
+                lineHeight: '1.6'
+              }}>
+                基于飞书表格的真实日期字段，自动识别新数据，避免重复同步，推荐日常使用
+              </p>
+            </div>
+            
+            <div style={{
+              padding: '16px 20px',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '10px',
+              border: '1px solid rgba(0,0,0,0.04)'
+            }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#fa541c'
+              }}>
+                强制同步
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '13px',
+                color: 'rgba(0,0,0,0.65)',
+                lineHeight: '1.6'
+              }}>
+                完全重新同步所有数据，跳过已存在的记录，数据异常时使用
+              </p>
+            </div>
+            
+            <div style={{
+              padding: '16px 20px',
+              background: 'rgba(255,255,255,0.8)',
+              borderRadius: '10px',
+              border: '1px solid rgba(0,0,0,0.04)'
+            }}>
+              <h4 style={{
+                margin: '0 0 8px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: '#52c41a'
+              }}>
+                自动同步
+              </h4>
+              <p style={{
+                margin: 0,
+                fontSize: '13px',
+                color: 'rgba(0,0,0,0.65)',
+                lineHeight: '1.6'
+              }}>
+                系统每3小时自动执行智能同步
+              </p>
+            </div>
+          </div>
+        </div>
 
+        </div>
       </div>
-    </div>
+    </>
   );
 }

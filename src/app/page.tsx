@@ -269,7 +269,16 @@ export default function Dashboard() {
       
       if (result.success) {
         message.success(`${actionName}成功`);
-        setLastSyncTime(new Date().toLocaleString('zh-CN'));
+        const currentTime = new Date().toLocaleString('zh-CN', {
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        setLastSyncTime(currentTime);
+        // 保存到localStorage
+        localStorage.setItem('lastSyncTime', currentTime);
         // 同步成功后刷新数据
         await fetchData();
       } else {
@@ -318,11 +327,28 @@ export default function Dashboard() {
         const response = await fetch('/api/sync?action=validate');
         const result = await response.json();
         if (result.success && result.data) {
-          // 这里可以设置上次同步时间
-          setLastSyncTime('自动获取中...');
+          // 从API响应中获取实际的同步时间
+          if (result.data.lastSyncTime) {
+            setLastSyncTime(result.data.lastSyncTime);
+          } else {
+            // 如果没有同步时间，从localStorage获取
+            const storedSyncTime = localStorage.getItem('lastSyncTime');
+            if (storedSyncTime) {
+              setLastSyncTime(storedSyncTime);
+            } else {
+              setLastSyncTime('从未同步');
+            }
+          }
+        } else {
+          // API失败时从localStorage获取
+          const storedSyncTime = localStorage.getItem('lastSyncTime');
+          setLastSyncTime(storedSyncTime || '从未同步');
         }
       } catch (error) {
         console.log('获取同步状态失败:', error);
+        // 错误时从localStorage获取
+        const storedSyncTime = localStorage.getItem('lastSyncTime');
+        setLastSyncTime(storedSyncTime || '从未同步');
       }
     };
     
@@ -352,165 +378,409 @@ export default function Dashboard() {
   };
 
   return (
-    <div style={{ background: '#f0f2f5', minHeight: '100vh', padding: '24px' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        {/* 页面标题区域 */}
-        <div style={{ marginBottom: '24px' }}>
+    <>
+      <style jsx global>{`
+        @keyframes pulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.5; }
+        }
+        
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .dashboard-container {
+          animation: slideInUp 0.6s ease-out;
+        }
+        
+        .card-hover:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 12px 40px rgba(0,0,0,0.08) !important;
+        }
+        
+        /* 响应式优化 */
+        @media (max-width: 1200px) {
+          .dashboard-container {
+            max-width: 95% !important;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .dashboard-container {
+            padding: 16px !important;
+          }
+        }
+      `}</style>
+      
+      <div style={{ 
+        background: 'linear-gradient(180deg, #f0f2f5 0%, #f5f7fa 100%)', 
+        minHeight: '100vh', 
+        padding: '24px 24px 48px 24px' 
+      }}>
+        <div 
+          className="dashboard-container"
+          style={{ 
+            maxWidth: '1400px', 
+            margin: '0 auto',
+            transition: 'all 0.3s ease'
+          }}
+        >
+        {/* 页面标题区域 - Pro级别优化 */}
+        <div style={{ 
+          marginBottom: '32px',
+          padding: '24px 32px',
+          background: 'rgba(255,255,255,0.8)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255,255,255,0.4)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
+        }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div>
-              <h1 style={{ fontSize: '24px', fontWeight: '600', color: 'rgba(0,0,0,0.85)', marginBottom: '8px' }}>
-                抖音电商
-                {/* 隐藏式同步入口 */}
+              <h1 style={{ 
+                fontSize: '28px', 
+                fontWeight: '700', 
+                color: 'rgba(0,0,0,0.88)', 
+                marginBottom: '4px',
+                letterSpacing: '-0.5px'
+              }}>
+                抖音电商数据中心
                 <SettingOutlined 
                   style={{ 
-                    marginLeft: '12px', 
-                    fontSize: '16px', 
-                    color: 'rgba(0,0,0,0.25)', 
+                    marginLeft: '16px', 
+                    fontSize: '18px', 
+                    color: 'rgba(0,0,0,0.15)', 
                     cursor: 'pointer',
-                    transition: 'color 0.3s'
+                    transition: 'all 0.3s ease',
+                    padding: '4px',
+                    borderRadius: '4px'
                   }}
                   onClick={() => setSyncModalVisible(true)}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(0,0,0,0.65)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(0,0,0,0.25)'}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
+                    e.currentTarget.style.background = 'rgba(0,0,0,0.04)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'rgba(0,0,0,0.15)';
+                    e.currentTarget.style.background = 'transparent';
+                  }}
                   title="数据同步管理"
                 />
               </h1>
+              <p style={{ 
+                margin: 0, 
+                fontSize: '14px', 
+                color: 'rgba(0,0,0,0.55)',
+                fontWeight: '400'
+              }}>
+                实时监控电商运营数据，智能分析业务趋势
+              </p>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center' }}>
-              <span style={{ color: 'rgba(0,0,0,0.45)', fontSize: '12px' }}>
-                数据更新: {new Date().toLocaleString('zh-CN')}
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center',
+              padding: '8px 12px',
+              background: 'rgba(0,0,0,0.02)',
+              borderRadius: '6px',
+              border: '1px solid rgba(0,0,0,0.06)'
+            }}>
+              <div style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                background: '#52c41a',
+                marginRight: '8px',
+                animation: 'pulse 2s infinite'
+              }}></div>
+              <span style={{ 
+                color: 'rgba(0,0,0,0.65)', 
+                fontSize: '13px',
+                fontWeight: '500'
+              }}>
+                实时更新 · {new Date().toLocaleString('zh-CN', { 
+                  month: '2-digit', 
+                  day: '2-digit', 
+                  hour: '2-digit', 
+                  minute: '2-digit' 
+                })}
               </span>
             </div>
           </div>
         </div>
 
-        {/* 核心指标卡片区域 - 所有卡片在一行，统一高度 */}
-        <Row gutter={[12, 16]} style={{ marginBottom: '24px', display: 'flex', alignItems: 'stretch' }}>
-          {/* 大卡片1 - 月度每日利润汇总 */}
-          <Col span={6} style={{ display: 'flex' }}>
+        {/* 核心指标卡片区域 - 优化布局和视觉层次 */}
+        <Row gutter={[16, 20]} style={{ marginBottom: '32px' }}>
+          {/* 主要指标1 - 月度每日利润汇总 */}
+          <Col span={6}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
-              title="月度每日利润汇总"
+              style={{ 
+                width: '100%', 
+                minHeight: '130px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                border: '1px solid rgba(0,0,0,0.06)'
+              }}
+              title={
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '500',
+                  color: 'rgba(0,0,0,0.75)'
+                }}>
+                  月度每日利润汇总
+                </span>
+              }
               tooltip="当月每日利润汇总金额"
               statistic={{
                 value: data.overviewData.dailyProfitSum || 0,
-                valueStyle: { color: '#3f8600', fontSize: '24px' },
+                valueStyle: { 
+                  color: '#52c41a', 
+                  fontSize: '26px',
+                  fontWeight: '600',
+                  lineHeight: '1.2'
+                },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthDailyProfitSum ? 
                   (data.overviewData.dailyProfitSum || 0) > (data.overviewData.lastMonthDailyProfitSum || 0) ? 'up' : 'down' : undefined,
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
-                  {data.overviewData.lastMonthDailyProfitSum && (
+                <div style={{ 
+                  height: '36px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  fontSize: '12px', 
+                  color: 'rgba(0,0,0,0.45)',
+                  marginTop: '4px'
+                }}>
+                  {data.overviewData.lastMonthDailyProfitSum ? (
                     <>
                       <span>较上月</span>
                       <span style={{ 
-                        color: (data.overviewData.dailyProfitSum || 0) > (data.overviewData.lastMonthDailyProfitSum || 0) ? '#3f8600' : '#cf1322',
-                        marginLeft: '4px'
+                        color: (data.overviewData.dailyProfitSum || 0) > (data.overviewData.lastMonthDailyProfitSum || 0) ? '#52c41a' : '#ff4d4f',
+                        marginLeft: '4px',
+                        fontWeight: '500'
                       }}>
                         {calculatePercent(data.overviewData.dailyProfitSum || 0, data.overviewData.lastMonthDailyProfitSum || 0)}%
                       </span>
                     </>
+                  ) : (
+                    <span style={{ color: 'rgba(0,0,0,0.25)' }}>暂无对比数据</span>
                   )}
                 </div>
               }
             />
           </Col>
           
-          {/* 大卡片2 - 月净利润 */}
-          <Col span={6} style={{ display: 'flex' }}>
+          {/* 主要指标2 - 月净利润 */}
+          <Col span={6}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
-              title="月净利润"
+              style={{ 
+                width: '100%', 
+                minHeight: '130px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
+                border: '1px solid rgba(0,0,0,0.06)'
+              }}
+              title={
+                <span style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '500',
+                  color: 'rgba(0,0,0,0.75)'
+                }}>
+                  月净利润
+                </span>
+              }
               tooltip="当月净利润金额"
               statistic={{
                 value: data.overviewData.monthProfit || 0,
-                valueStyle: { color: '#1890ff', fontSize: '24px' },
+                valueStyle: { 
+                  color: '#1890ff', 
+                  fontSize: '26px',
+                  fontWeight: '600',
+                  lineHeight: '1.2'
+                },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthProfit ? 
                   (data.overviewData.monthProfit || 0) > (data.overviewData.lastMonthProfit || 0) ? 'up' : 'down' : undefined,
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
-                  {data.overviewData.lastMonthProfit && (
+                <div style={{ 
+                  height: '36px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  fontSize: '12px', 
+                  color: 'rgba(0,0,0,0.45)',
+                  marginTop: '4px'
+                }}>
+                  {data.overviewData.lastMonthProfit ? (
                     <>
                       <span>较上月</span>
                       <span style={{ 
-                        color: (data.overviewData.monthProfit || 0) > (data.overviewData.lastMonthProfit || 0) ? '#3f8600' : '#cf1322',
-                        marginLeft: '4px'
+                        color: (data.overviewData.monthProfit || 0) > (data.overviewData.lastMonthProfit || 0) ? '#52c41a' : '#ff4d4f',
+                        marginLeft: '4px',
+                        fontWeight: '500'
                       }}>
                         {calculatePercent(data.overviewData.monthProfit || 0, data.overviewData.lastMonthProfit || 0)}%
                       </span>
                     </>
+                  ) : (
+                    <span style={{ color: 'rgba(0,0,0,0.25)' }}>暂无对比数据</span>
                   )}
                 </div>
               }
             />
           </Col>
           
-          {/* 小卡片1 - 硬性支出 */}
-          <Col span={4} style={{ display: 'flex' }}>
+          {/* 次要指标1 - 硬性支出 */}
+          <Col span={4}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
-              title="硬性支出"
+              style={{ 
+                width: '100%', 
+                minHeight: '130px',
+                borderRadius: '8px',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(0,0,0,0.04)'
+              }}
+              title={
+                <span style={{ 
+                  fontSize: '13px', 
+                  fontWeight: '500',
+                  color: 'rgba(0,0,0,0.65)'
+                }}>
+                  硬性支出
+                </span>
+              }
               tooltip="当月硬性支出金额"
               statistic={{
                 value: data.overviewData.hardExpense || 0,
-                valueStyle: { color: '#722ed1', fontSize: '18px' },
+                valueStyle: { 
+                  color: '#722ed1', 
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  lineHeight: '1.2'
+                },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
+                <div style={{ 
+                  height: '36px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  fontSize: '11px', 
+                  color: 'rgba(0,0,0,0.35)',
+                  marginTop: '4px'
+                }}>
                   <span>固定支出</span>
                 </div>
               }
             />
           </Col>
           
-          {/* 小卡片2 - 千川投流 */}
-          <Col span={4} style={{ display: 'flex' }}>
+          {/* 次要指标2 - 千川投流 */}
+          <Col span={4}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
-              title="千川投流"
+              style={{ 
+                width: '100%', 
+                minHeight: '130px',
+                borderRadius: '8px',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(0,0,0,0.04)'
+              }}
+              title={
+                <span style={{ 
+                  fontSize: '13px', 
+                  fontWeight: '500',
+                  color: 'rgba(0,0,0,0.65)'
+                }}>
+                  千川投流
+                </span>
+              }
               tooltip="当月千川投流金额"
               statistic={{
                 value: data.overviewData.qianchuan || 0,
-                valueStyle: { color: '#52c41a', fontSize: '18px' },
+                valueStyle: { 
+                  color: '#13c2c2', 
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  lineHeight: '1.2'
+                },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
+                <div style={{ 
+                  height: '36px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  fontSize: '11px', 
+                  color: 'rgba(0,0,0,0.35)',
+                  marginTop: '4px'
+                }}>
                   <span>投流支出</span>
                 </div>
               }
             />
           </Col>
           
-          {/* 小卡片3 - 当月赔付申请 */}
-          <Col span={4} style={{ display: 'flex' }}>
+          {/* 次要指标3 - 当月赔付申请 */}
+          <Col span={4}>
             <StatisticCard
-              style={{ width: '100%', minHeight: '120px' }}
-              title="当月赔付申请"
+              style={{ 
+                width: '100%', 
+                minHeight: '130px',
+                borderRadius: '8px',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+                border: '1px solid rgba(0,0,0,0.04)'
+              }}
+              title={
+                <span style={{ 
+                  fontSize: '13px', 
+                  fontWeight: '500',
+                  color: 'rgba(0,0,0,0.65)'
+                }}>
+                  当月赔付申请
+                </span>
+              }
               tooltip="当月总赔付申请金额"
               statistic={{
                 value: data.overviewData.monthClaimAmount || 0,
-                valueStyle: { color: '#fa8c16', fontSize: '18px' },
+                valueStyle: { 
+                  color: '#fa541c', 
+                  fontSize: '20px',
+                  fontWeight: '600',
+                  lineHeight: '1.2'
+                },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthClaimAmount ? 
                   (data.overviewData.monthClaimAmount || 0) > (data.overviewData.lastMonthClaimAmount || 0) ? 'up' : 'down' : undefined,
               }}
               chart={
-                <div style={{ height: '40px', display: 'flex', alignItems: 'center', fontSize: '11px', color: 'rgba(0,0,0,0.45)' }}>
-                  {data.overviewData.lastMonthClaimAmount && (
+                <div style={{ 
+                  height: '36px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  fontSize: '11px', 
+                  color: 'rgba(0,0,0,0.35)',
+                  marginTop: '4px'
+                }}>
+                  {data.overviewData.lastMonthClaimAmount ? (
                     <>
                       <span>较上月</span>
                       <span style={{ 
-                        color: (data.overviewData.monthClaimAmount || 0) > (data.overviewData.lastMonthClaimAmount || 0) ? '#cf1322' : '#3f8600',
-                        marginLeft: '4px'
+                        color: (data.overviewData.monthClaimAmount || 0) > (data.overviewData.lastMonthClaimAmount || 0) ? '#ff4d4f' : '#52c41a',
+                        marginLeft: '4px',
+                        fontWeight: '500'
                       }}>
                         {calculatePercent(data.overviewData.monthClaimAmount || 0, data.overviewData.lastMonthClaimAmount || 0)}%
                       </span>
                     </>
+                  ) : (
+                    <span>暂无对比数据</span>
                   )}
                 </div>
               }
@@ -518,66 +788,440 @@ export default function Dashboard() {
           </Col>
         </Row>
 
-        {/* 移除年度数据区域，恢复昨天的简洁布局 */}
+        {/* 年度利润数据区域 - Pro级别深度优化 */}
+        <div style={{ 
+          marginBottom: '40px',
+          padding: '32px',
+          background: 'linear-gradient(135deg, rgba(248,254,255,0.8) 0%, rgba(246,255,237,0.8) 100%)',
+          backdropFilter: 'blur(8px)',
+          borderRadius: '16px',
+          border: '1px solid rgba(255,255,255,0.6)',
+          boxShadow: '0 8px 32px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+          position: 'relative',
+          overflow: 'hidden'
+        }}>
+          {/* 装饰性元素 */}
+          <div style={{
+            position: 'absolute',
+            top: '-50%',
+            right: '-50%',
+            width: '200%',
+            height: '200%',
+            background: 'radial-gradient(circle, rgba(82,196,26,0.03) 0%, transparent 70%)',
+            pointerEvents: 'none'
+          }}></div>
+          
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '32px',
+            borderBottom: '1px solid rgba(0,0,0,0.08)',
+            paddingBottom: '20px',
+            position: 'relative'
+          }}>
+            <h3 style={{
+              margin: 0,
+              fontSize: '20px',
+              fontWeight: '700',
+              color: 'rgba(0,0,0,0.88)',
+              letterSpacing: '-0.3px',
+              marginBottom: '6px'
+            }}>
+              年度利润概览
+            </h3>
+            <span style={{
+              fontSize: '14px',
+              color: 'rgba(0,0,0,0.55)',
+              fontWeight: '500',
+              padding: '4px 12px',
+              background: 'rgba(82,196,26,0.08)',
+              borderRadius: '12px',
+              border: '1px solid rgba(82,196,26,0.12)'
+            }}>
+              2025年度累计数据
+            </span>
+          </div>
+          
+          <Row gutter={[24, 0]} justify="center">
+            <Col span={10}>
+              <div style={{
+                textAlign: 'center',
+                padding: '24px 20px',
+                background: 'rgba(82, 196, 26, 0.06)',
+                borderRadius: '12px',
+                border: '1px solid rgba(82, 196, 26, 0.15)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 4px 12px rgba(82, 196, 26, 0.08)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  fontSize: '13px',
+                  color: 'rgba(0,0,0,0.65)',
+                  marginBottom: '8px',
+                  fontWeight: '500'
+                }}>
+                  含保证金利润
+                </div>
+                <div style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  color: '#52c41a',
+                  lineHeight: '1.1',
+                  marginBottom: '6px',
+                  textShadow: '0 2px 4px rgba(82, 196, 26, 0.15)'
+                }}>
+                  ¥167,630
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: 'rgba(82, 196, 26, 0.75)',
+                  fontWeight: '500',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  年度累计收益
+                </div>
+              </div>
+            </Col>
+            
+            <Col span={4}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                height: '100%'
+              }}>
+                <div style={{
+                  width: '1px',
+                  height: '60px',
+                  background: 'linear-gradient(to bottom, transparent, rgba(0,0,0,0.06), transparent)'
+                }}></div>
+              </div>
+            </Col>
+            
+            <Col span={10}>
+              <div style={{
+                textAlign: 'center',
+                padding: '24px 20px',
+                background: 'rgba(24, 144, 255, 0.06)',
+                borderRadius: '12px',
+                border: '1px solid rgba(24, 144, 255, 0.15)',
+                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                boxShadow: '0 4px 12px rgba(24, 144, 255, 0.08)',
+                position: 'relative',
+                overflow: 'hidden'
+              }}>
+                <div style={{
+                  fontSize: '13px',
+                  color: 'rgba(0,0,0,0.65)',
+                  marginBottom: '8px',
+                  fontWeight: '500'
+                }}>
+                  不含保证金利润
+                </div>
+                <div style={{
+                  fontSize: '32px',
+                  fontWeight: '700',
+                  color: '#1890ff',
+                  lineHeight: '1.1',
+                  marginBottom: '6px',
+                  textShadow: '0 2px 4px rgba(24, 144, 255, 0.15)'
+                }}>
+                  ¥152,620
+                </div>
+                <div style={{
+                  fontSize: '12px',
+                  color: 'rgba(24, 144, 255, 0.75)',
+                  fontWeight: '500',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  净利润收益
+                </div>
+              </div>
+            </Col>
+          </Row>
+          
+          <div style={{
+            textAlign: 'center',
+            marginTop: '24px',
+            padding: '12px 20px',
+            background: 'rgba(0,0,0,0.02)',
+            borderRadius: '8px',
+            border: '1px solid rgba(0,0,0,0.06)',
+            fontSize: '13px',
+            color: 'rgba(0,0,0,0.55)',
+            fontWeight: '500'
+          }}>
+            <span style={{ color: 'rgba(0,0,0,0.75)' }}>差额</span>{' '}
+            <span style={{ 
+              color: '#fa8c16', 
+              fontWeight: '600',
+              fontSize: '14px'
+            }}>
+              ¥{(167629.70 - 152619.66).toLocaleString()}
+            </span>
+            {' · '}
+            <span style={{ color: 'rgba(0,0,0,0.75)' }}>保证金占比</span>{' '}
+            <span style={{ 
+              color: '#722ed1', 
+              fontWeight: '600',
+              fontSize: '14px'
+            }}>
+              {(((167629.70 - 152619.66) / 167629.70) * 100).toFixed(1)}%
+            </span>
+          </div>
+        </div>
 
-        {/* 主要图表区域 */}
-        <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+        {/* 主要图表区域 - 优化视觉效果 */}
+        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
           <Col xs={24}>
-            <ProCard title="当月日盈利趋势对比" headerBordered>
+            <ProCard 
+              title={
+                <span style={{
+                  fontSize: '16px',
+                  fontWeight: '600',
+                  color: 'rgba(0,0,0,0.85)'
+                }}>
+                  当月日盈利趋势对比
+                </span>
+              }
+              headerBordered
+              style={{
+                borderRadius: '12px',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.06)',
+                border: '1px solid rgba(0,0,0,0.08)',
+                background: 'rgba(255,255,255,0.8)',
+                backdropFilter: 'blur(8px)'
+              }}
+              bodyStyle={{
+                padding: '32px',
+                background: 'linear-gradient(145deg, #ffffff 0%, #fafbfc 100%)',
+                borderRadius: '0 0 12px 12px'
+              }}
+            >
               <DailyProfitChart data={data.dailyData} loading={loading} />
             </ProCard>
           </Col>
         </Row>
 
 
-        {/* 隐藏式同步管理Modal */}
+        {/* 数据同步管理Modal - Pro级别优化 */}
         <Modal
           title={
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <SyncOutlined />
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '12px',
+              padding: '8px 0'
+            }}>
+              <div style={{
+                padding: '8px',
+                background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <SyncOutlined style={{ color: 'white', fontSize: '16px' }} />
+              </div>
+              <div>
+                <h3 style={{ 
+                  margin: 0, 
+                  fontSize: '18px', 
+                  fontWeight: '600',
+                  color: 'rgba(0,0,0,0.88)'
+                }}>
               数据同步管理
+                </h3>
+                <p style={{ 
+                  margin: 0, 
+                  fontSize: '13px', 
+                  color: 'rgba(0,0,0,0.45)',
+                  fontWeight: '400'
+                }}>
+                  智能同步飞书数据到本地数据库
+                </p>
+              </div>
             </div>
           }
           open={syncModalVisible}
           onCancel={() => setSyncModalVisible(false)}
           footer={null}
-          width={600}
+          width={580}
+          styles={{
+            header: { 
+              borderBottom: '1px solid rgba(0,0,0,0.06)',
+              paddingBottom: '12px',
+              marginBottom: '16px'
+            },
+            body: { 
+              padding: '16px 24px 24px 24px' 
+            }
+          }}
+          style={{
+            borderRadius: '12px'
+          }}
         >
-          <div style={{ padding: '16px 0' }}>
-            {/* 同步状态显示 */}
-            <div style={{ marginBottom: '24px' }}>
-              <h4>同步状态</h4>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span>上次同步时间:</span>
-                <span style={{ color: '#1890ff' }}>{lastSyncTime || '未知'}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>自动同步:</span>
-                <span style={{ color: '#52c41a' }}>每3小时执行</span>
+          <div>
+            {/* 同步状态显示 - 优化版 */}
+            <div style={{ 
+              marginBottom: '20px',
+              padding: '16px',
+              background: 'linear-gradient(135deg, rgba(24,144,255,0.04) 0%, rgba(19,194,194,0.04) 100%)',
+              borderRadius: '8px',
+              border: '1px solid rgba(24,144,255,0.08)'
+            }}>
+              <h4 style={{ 
+                margin: '0 0 12px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#52c41a',
+                  animation: 'pulse 2s infinite'
+                }}></div>
+                同步状态
+              </h4>
+              
+              <div style={{ 
+                display: 'flex', 
+                gap: '12px',
+                flexWrap: 'wrap'
+              }}>
+                <div style={{
+                  flex: '1',
+                  minWidth: '150px',
+                  padding: '12px 16px',
+                  background: 'rgba(255,255,255,0.9)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: 'rgba(0,0,0,0.45)',
+                    marginBottom: '6px',
+                    fontWeight: '500'
+                  }}>
+                    上次同步时间
+                  </div>
+                  <div style={{ 
+                    fontSize: '14px',
+                    color: '#1890ff',
+                    fontWeight: '600',
+                    wordBreak: 'keep-all'
+                  }}>
+                    {lastSyncTime || '从未同步'}
+                  </div>
+                </div>
+
+                <div style={{
+                  flex: '1',
+                  minWidth: '150px',
+                  padding: '12px 16px',
+                  background: 'rgba(255,255,255,0.9)',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(0,0,0,0.06)',
+                  textAlign: 'center'
+                }}>
+                  <div style={{ 
+                    fontSize: '12px', 
+                    color: 'rgba(0,0,0,0.45)',
+                    marginBottom: '6px',
+                    fontWeight: '500'
+                  }}>
+                    自动同步
+                  </div>
+                  <div style={{ 
+                    fontSize: '14px',
+                    color: '#52c41a',
+                    fontWeight: '600'
+                  }}>
+                    每3小时执行
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* 同步进度 */}
+            {/* 同步进度 - 优化版 */}
             {syncing && (
-              <div style={{ marginBottom: '24px' }}>
-                <h4>同步进度</h4>
+              <div style={{ 
+                marginBottom: '20px',
+                padding: '16px',
+                background: 'linear-gradient(135deg, rgba(16,142,233,0.04) 0%, rgba(135,208,104,0.04) 100%)',
+                borderRadius: '8px',
+                border: '1px solid rgba(16,142,233,0.08)'
+              }}>
+                <h4 style={{ 
+                  margin: '0 0 12px 0',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  color: 'rgba(0,0,0,0.85)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <SyncOutlined style={{ color: '#1890ff', fontSize: '14px' }} spin />
+                  同步进度
+                </h4>
                 <Progress 
                   percent={syncProgress} 
                   status="active"
-                  strokeColor={{ '0%': '#108ee9', '100%': '#87d068' }}
+                  strokeColor={{ 
+                    '0%': '#1890ff', 
+                    '50%': '#13c2c2',
+                    '100%': '#52c41a' 
+                  }}
+                  strokeWidth={6}
+                  style={{ marginBottom: '6px' }}
                 />
+                <div style={{
+                  fontSize: '12px',
+                  color: 'rgba(0,0,0,0.45)',
+                  textAlign: 'center'
+                }}>
+                  正在同步数据，请稍候...
+                </div>
               </div>
             )}
 
-            {/* 快速同步按钮 */}
-            <div style={{ marginBottom: '16px' }}>
-              <h4>快速同步</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '12px' }}>
+            {/* 快速同步按钮 - 重新设计 */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{ 
+                margin: '0 0 12px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)'
+              }}>
+                快速同步
+              </h4>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(2, 1fr)', 
+                gap: '10px'
+              }}>
                 <Button 
                   icon={<SyncOutlined />}
                   onClick={() => handleSyncWithRange('daily', '7days')}
                   loading={syncing}
-                  size="small"
+                  style={{
+                    height: '36px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '500'
+                  }}
                 >
                   近7天
                 </Button>
@@ -585,7 +1229,15 @@ export default function Dashboard() {
                   icon={<SyncOutlined />}
                   onClick={() => handleSyncWithRange('daily', '15days')}
                   loading={syncing}
-                  size="small"
+                  style={{
+                    height: '36px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '500'
+                  }}
                 >
                   近15天
                 </Button>
@@ -593,7 +1245,15 @@ export default function Dashboard() {
                   icon={<SyncOutlined />}
                   onClick={() => handleSyncWithRange('daily', '30days')}
                   loading={syncing}
-                  size="small"
+                  style={{
+                    height: '36px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '500'
+                  }}
                 >
                   近30天
                 </Button>
@@ -602,23 +1262,58 @@ export default function Dashboard() {
                   icon={<SyncOutlined />}
                   onClick={() => handleSyncWithRange('daily', 'currentMonth')}
                   loading={syncing}
-                  size="small"
+                  style={{
+                    height: '36px',
+                    borderRadius: '6px',
+                    background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                    border: 'none',
+                    boxShadow: '0 4px 12px rgba(24,144,255,0.3)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '600'
+                  }}
                 >
                   当月数据
                 </Button>
               </div>
             </div>
 
-            {/* 完整同步按钮 */}
+            {/* 完整同步按钮 - 重新设计 */}
             <div>
-              <h4>完整同步</h4>
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <h4 style={{ 
+                margin: '0 0 12px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)'
+              }}>
+                完整同步
+              </h4>
+              
+              <div style={{ 
+                display: 'flex', 
+                gap: '10px',
+                flexWrap: 'wrap'
+              }}>
                 <Button 
                   type="primary"
                   icon={<SyncOutlined />}
                   onClick={() => handleSync('all')}
                   loading={syncing}
-                  size="middle"
+                  style={{
+                    flex: '1',
+                    minWidth: '100px',
+                    height: '40px',
+                    borderRadius: '6px',
+                    background: 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
+                    border: 'none',
+                    boxShadow: '0 2px 8px rgba(82,196,26,0.2)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
                 >
                   智能同步
                 </Button>
@@ -626,31 +1321,96 @@ export default function Dashboard() {
                   icon={<SyncOutlined />}
                   onClick={() => handleSyncWithForce('force')}
                   loading={syncing}
-                  size="middle"
                   danger
+                  style={{
+                    flex: '1',
+                    minWidth: '100px',
+                    height: '40px',
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '600',
+                    fontSize: '14px'
+                  }}
                 >
                   强制同步
                 </Button>
                 <Button 
                   href="/sync"
                   target="_blank"
-                  size="middle"
+                  style={{
+                    flex: '1',
+                    minWidth: '100px',
+                    height: '40px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontWeight: '500',
+                    fontSize: '14px'
+                  }}
                 >
                   高级管理
                 </Button>
               </div>
             </div>
 
-            <div style={{ marginTop: '24px', padding: '12px', backgroundColor: '#f6f8fa', borderRadius: '6px' }}>
-              <p style={{ margin: 0, fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>
-                🧠 <strong>智能同步:</strong> 基于飞书真实日期字段，自动识别新数据，避免重复同步。<br/>
-                ⚡ <strong>推荐:</strong> 日常使用「当月数据」，数据有误时使用「强制同步」。<br/>
-                🔄 <strong>自动同步:</strong> 系统每3小时自动执行智能同步。
-              </p>
+            <div style={{ 
+              marginTop: '20px', 
+              padding: '16px', 
+              background: 'linear-gradient(135deg, rgba(250,250,250,0.8) 0%, rgba(246,248,250,0.8) 100%)', 
+              borderRadius: '12px',
+              border: '1px solid rgba(0,0,0,0.06)'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '10px',
+                marginBottom: '12px'
+              }}>
+                <div style={{
+                  padding: '6px',
+                  background: 'linear-gradient(135deg, #722ed1 0%, #eb2f96 100%)',
+                  borderRadius: '6px',
+                  color: 'white',
+                  fontSize: '12px',
+                  fontWeight: '600'
+                }}>
+                  💡
+                </div>
+                <div>
+                  <h5 style={{
+                    margin: '0 0 8px 0',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    color: 'rgba(0,0,0,0.85)'
+                  }}>
+                    使用说明
+                  </h5>
+                  <div style={{
+                    fontSize: '13px',
+                    color: 'rgba(0,0,0,0.65)',
+                    lineHeight: '1.6'
+                  }}>
+                    <div style={{ marginBottom: '8px' }}>
+                      <span style={{ fontWeight: '600', color: '#1890ff' }}>智能同步</span>：自动识别新数据，避免重复同步，推荐日常使用
+                    </div>
+                    <div style={{ marginBottom: '8px' }}>
+                      <span style={{ fontWeight: '600', color: '#fa541c' }}>强制同步</span>：完全重新同步所有数据，数据异常时使用
+                    </div>
+                    <div>
+                      <span style={{ fontWeight: '600', color: '#52c41a' }}>自动同步</span>：系统每3小时自动执行智能同步
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </Modal>
       </div>
     </div>
+    </>
   );
 }
