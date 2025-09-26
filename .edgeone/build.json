@@ -1,0 +1,25 @@
+{
+  "build": {
+    "commands": [
+      "npm ci --only=production --no-audit --no-fund",
+      "npm run build"
+    ],
+    "environment": {
+      "NODE_ENV": "production",
+      "NODE_OPTIONS": "--max-old-space-size=4096"
+    },
+    "cache": {
+      "paths": [
+        "node_modules",
+        ".next/cache"
+      ]
+    }
+  },
+  "deploy": {
+    "output": ".next/standalone",
+    "static": {
+      "directory": ".next/static",
+      "prefix": "/_next/static/"
+    }
+  }
+}
