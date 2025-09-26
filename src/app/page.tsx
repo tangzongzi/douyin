@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Spin, message, Row, Col, Modal, Button, Progress } from 'antd';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
-import { SyncOutlined, SettingOutlined } from '@ant-design/icons';
+import { SyncOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 // 移除飞书API导入，改用Supabase API
 // import { getDailyData, getMonthSummaryData } from '@/lib/feishu-api';
 import DailyProfitChart from '@/components/DailyProfitChart';
@@ -469,7 +469,7 @@ export default function Dashboard() {
                 fontSize: '28px', 
                 fontWeight: '700', 
                 color: 'rgba(0,0,0,0.88)', 
-                marginBottom: '16px',
+                marginBottom: '4px',
                 letterSpacing: '-0.5px'
               }}>
                 抖音电商数据中心
@@ -509,87 +509,72 @@ export default function Dashboard() {
             <div style={{ 
               display: 'flex', 
               alignItems: 'center',
-              padding: '8px 12px',
-              background: 'rgba(0,0,0,0.02)',
-              borderRadius: '6px',
-              border: '1px solid rgba(0,0,0,0.06)'
+              gap: '12px'
             }}>
-              <div style={{
-                width: '6px',
-                height: '6px',
-                borderRadius: '50%',
-                background: '#52c41a',
-                marginRight: '8px',
-                animation: 'pulse 2s infinite'
-              }}></div>
-              <span style={{ 
-                color: 'rgba(0,0,0,0.65)', 
-                fontSize: '13px',
-                fontWeight: '500'
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center',
+                padding: '8px 12px',
+                background: 'rgba(0,0,0,0.02)',
+                borderRadius: '6px',
+                border: '1px solid rgba(0,0,0,0.06)'
               }}>
-                实时更新 · {new Date().toLocaleString('zh-CN', { 
-                  month: '2-digit', 
-                  day: '2-digit', 
-                  hour: '2-digit', 
-                  minute: '2-digit' 
-                })}
-              </span>
+                <div style={{
+                  width: '6px',
+                  height: '6px',
+                  borderRadius: '50%',
+                  background: '#52c41a',
+                  marginRight: '8px',
+                  animation: 'pulse 2s infinite'
+                }}></div>
+                <span style={{ 
+                  color: 'rgba(0,0,0,0.65)', 
+                  fontSize: '13px',
+                  fontWeight: '500'
+                }}>
+                  实时更新 · {new Date().toLocaleString('zh-CN', { 
+                    month: '2-digit', 
+                    day: '2-digit', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                  })}
+                </span>
+              </div>
+              
+              {/* 月度报表按钮 */}
+              <a 
+                href="/reports"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  padding: '8px 16px',
+                  background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
+                  color: '#ffffff',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  boxShadow: '0 2px 8px rgba(24,144,255,0.3)',
+                  transition: 'all 0.3s ease',
+                  border: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(24,144,255,0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(24,144,255,0.3)';
+                }}
+              >
+                <FileTextOutlined style={{ marginRight: '6px', fontSize: '12px' }} />
+                月度报表
+              </a>
             </div>
           </div>
         </div>
 
         {/* 核心指标卡片区域 - 优化布局和视觉层次 */}
-        {/* 页面导航 - 中心位置 */}
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'center',
-          marginBottom: '32px'
-        }}>
-          <div style={{
-            display: 'inline-flex',
-            background: 'rgba(255,255,255,0.9)',
-            borderRadius: '8px',
-            padding: '4px',
-            border: '1px solid rgba(0,0,0,0.06)',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-          }}>
-            <div style={{
-              padding: '8px 24px',
-              borderRadius: '6px',
-              background: '#1890ff',
-              color: '#ffffff',
-              fontSize: '14px',
-              fontWeight: '500',
-              boxShadow: '0 2px 4px rgba(24,144,255,0.3)'
-            }}>
-              首页
-            </div>
-            <a 
-              href="/reports" 
-              style={{
-                padding: '8px 24px',
-                borderRadius: '6px',
-                background: 'transparent',
-                color: 'rgba(0,0,0,0.65)',
-                fontSize: '14px',
-                fontWeight: '500',
-                textDecoration: 'none',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(24,144,255,0.08)';
-                e.currentTarget.style.color = '#1890ff';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
-              }}
-            >
-              月度报表
-            </a>
-          </div>
-        </div>
-
         {/* 核心指标卡片区域 - Ant Design Pro标准布局 */}
         <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
           {/* 主要指标1 - 月度每日利润汇总 */}

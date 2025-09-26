@@ -503,56 +503,6 @@ export default function MonthlyReportsPage() {
             </div>
           </div>
 
-          {/* 页面导航 - 中心位置，与首页保持一致 */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center',
-            marginBottom: '32px'
-          }}>
-            <div style={{
-              display: 'inline-flex',
-              background: 'rgba(255,255,255,0.9)',
-              borderRadius: '8px',
-              padding: '4px',
-              border: '1px solid rgba(0,0,0,0.06)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
-            }}>
-              <a 
-                href="/" 
-                style={{
-                  padding: '8px 24px',
-                  borderRadius: '6px',
-                  background: 'transparent',
-                  color: 'rgba(0,0,0,0.65)',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  textDecoration: 'none',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = 'rgba(24,144,255,0.08)';
-                  e.currentTarget.style.color = '#1890ff';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'transparent';
-                  e.currentTarget.style.color = 'rgba(0,0,0,0.65)';
-                }}
-              >
-                首页
-              </a>
-              <div style={{
-                padding: '8px 24px',
-                borderRadius: '6px',
-                background: '#1890ff',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontWeight: '500',
-                boxShadow: '0 2px 4px rgba(24,144,255,0.3)'
-              }}>
-                月度报表
-              </div>
-            </div>
-          </div>
 
           {/* 报表基本信息 */}
           <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
