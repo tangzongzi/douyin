@@ -60,10 +60,11 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
         <div style={{ 
           background: '#ffffff',
           padding: '12px 16px',
-          border: '1px solid #f0f0f0',
+          border: '1px solid #e8e8e8',
           borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-          minWidth: '200px'
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+          minWidth: '200px',
+          outline: 'none'
         }}>
           <div style={{ 
             marginBottom: '12px', 
@@ -266,6 +267,16 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             cursor={false}
             isAnimationActive={false}
             allowEscapeViewBox={{ x: false, y: false }}
+            wrapperStyle={{
+              outline: 'none !important',
+              border: 'none !important',
+              backgroundColor: 'transparent !important'
+            }}
+            contentStyle={{
+              outline: 'none !important',
+              border: 'none !important',
+              backgroundColor: 'transparent !important'
+            }}
           />
           <Legend content={<CustomLegend />} />
           
