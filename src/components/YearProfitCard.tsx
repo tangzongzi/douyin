@@ -108,7 +108,6 @@ export default function YearProfitCard({ className }: YearProfitCardProps) {
   }
 
   const currentYear = data[0]; // 最新年度数据
-  const previousYear = data[1]; // 前一年数据
 
   return (
     <Card 

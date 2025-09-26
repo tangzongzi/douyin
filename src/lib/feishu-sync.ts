@@ -351,7 +351,7 @@ export async function syncYearData(): Promise<SyncLog> {
     
     feishuData.forEach((record, index) => {
       const yearProfit: YearProfit = {
-        year: getFieldValue(record, '年份') || String(new Date().getFullYear() - index), // 年份字段
+        year: String(getFieldValue(record, '年份') || (new Date().getFullYear() - index)), // 年份字段
         profit_with_deposit: getFieldValue(record, '含保证金利润') || 0, // 含保证金利润
         total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || 0, // 含保证金总利润
         profit_without_deposit: getFieldValue(record, '不含保证金利润') || 0, // 不含保证金利润

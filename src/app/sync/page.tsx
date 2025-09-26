@@ -1,10 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button, Card, Space, Typography, Alert, Progress, Switch, Row, Col } from 'antd';
+import { Button, Card, Typography, Alert, Progress, Switch, Row, Col } from 'antd';
 import { SyncOutlined, DatabaseOutlined, CheckCircleOutlined, ThunderboltOutlined } from '@ant-design/icons';
-
-const { Title, Text } = Typography;
 
 interface SyncResult {
   success: boolean;
