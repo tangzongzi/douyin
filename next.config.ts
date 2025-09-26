@@ -5,8 +5,6 @@ const nextConfig: NextConfig = {
   experimental: {
     // 包导入优化
     optimizePackageImports: ['antd', '@ant-design/pro-components', 'recharts'],
-    // 启用并发渲染
-    serverComponentsExternalPackages: ['@supabase/supabase-js'],
     // 优化CSS
     optimizeCss: true,
   },
@@ -27,8 +25,6 @@ const nextConfig: NextConfig = {
     removeConsole: process.env.NODE_ENV === 'production' ? {
       exclude: ['error', 'warn']
     } : false,
-    // 启用SWC压缩
-    minify: true,
   },
   
   // 图片优化
