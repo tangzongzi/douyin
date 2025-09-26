@@ -6,12 +6,35 @@ import { ApiOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-desi
 
 const { Title, Text, Paragraph } = Typography;
 
-interface TestResult {
-  status: 'loading' | 'success' | 'error';
+type LoadingResult = {
+  status: 'loading';
   message: string;
-  details?: Record<string, unknown>;
-  timestamp?: string;
-}
+};
+
+type SuccessResult = {
+  status: 'success';
+  message: string;
+  details: {
+    responseTime: string;
+    dataCount: number;
+    firstRecord: unknown | null;
+  };
+  timestamp: string;
+};
+
+type ErrorResult = {
+  status: 'error';
+  message: string;
+  details: {
+    status?: number;
+    statusText?: string;
+    responseData?: unknown;
+    error?: unknown;
+  };
+  timestamp: string;
+};
+
+type TestResult = LoadingResult | SuccessResult | ErrorResult;
 
 export default function TestPage() {
   const [dailyTest, setDailyTest] = useState<TestResult | null>(null);
@@ -41,7 +64,7 @@ export default function TestPage() {
           details: {
             responseTime: `${responseTime}ms`,
             dataCount: data.data?.length || 0,
-            firstRecord: data.data?.[0] || null
+            firstRecord: data.data?.[0] ?? null
           },
           timestamp: new Date().toLocaleString()
         });
@@ -61,7 +84,7 @@ export default function TestPage() {
       setResult({
         status: 'error',
         message: `❌ 网络错误：${error instanceof Error ? error.message : '未知错误'}`,
-        details: { error: error },
+        details: { error },
         timestamp: new Date().toLocaleString()
       });
     }
@@ -70,27 +93,34 @@ export default function TestPage() {
   const renderTestResult = (result: TestResult | null) => {
     if (!result) return null;
 
-    const { status, message, details, timestamp } = result;
-    
-    return (
-      <div className="mt-4">
-        {status === 'loading' && (
+    if (result.status === 'loading') {
+      return (
+        <div className="mt-4">
           <div className="flex items-center gap-2">
             <Spin size="small" />
-            <Text>{message}</Text>
+            <Text>{result.message}</Text>
           </div>
-        )}
-        
-        {status === 'success' && (
+        </div>
+      );
+    }
+
+    if (result.status === 'success') {
+      const { message, details, timestamp } = result;
+
+      return (
+        <div className="mt-4">
           <Alert
             message={message}
             type="success"
             icon={<CheckCircleOutlined />}
             description={
               <div className="mt-2">
-                <Text strong>响应时间：</Text>{details.responseTime}<br/>
-                <Text strong>数据条数：</Text>{details.dataCount}<br/>
-                <Text strong>测试时间：</Text>{timestamp}<br/>
+                <Text strong>响应时间：</Text>{details.responseTime}
+                <br />
+                <Text strong>数据条数：</Text>{details.dataCount}
+                <br />
+                <Text strong>测试时间：</Text>{timestamp}
+                <br />
                 {details.firstRecord && (
                   <>
                     <Text strong>首条记录：</Text>
@@ -102,28 +132,29 @@ export default function TestPage() {
               </div>
             }
           />
-        )}
-        
-        {status === 'error' && (
-          <Alert
-            message={message}
-            type="error"
-            icon={<CloseCircleOutlined />}
-            description={
-              <div className="mt-2">
-                <Text strong>测试时间：</Text>{timestamp}<br/>
-                {details && (
-                  <>
-                    <Text strong>错误详情：</Text>
-                    <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
-                      {JSON.stringify(details, null, 2)}
-                    </pre>
-                  </>
-                )}
-              </div>
-            }
-          />
-        )}
+        </div>
+      );
+    }
+
+    const { message, details, timestamp } = result;
+
+    return (
+      <div className="mt-4">
+        <Alert
+          message={message}
+          type="error"
+          icon={<CloseCircleOutlined />}
+          description={
+            <div className="mt-2">
+              <Text strong>测试时间：</Text>{timestamp}
+              <br />
+              <Text strong>错误详情：</Text>
+              <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto">
+                {JSON.stringify(details, null, 2)}
+              </pre>
+            </div>
+          }
+        />
       </div>
     );
   };
