@@ -537,34 +537,19 @@ export default function Dashboard() {
         </div>
 
         {/* 核心指标卡片区域 - 优化布局和视觉层次 */}
-        <Row gutter={[16, 20]} style={{ marginBottom: '32px' }}>
+        {/* 核心指标卡片区域 - Ant Design Pro标准布局 */}
+        <Row gutter={[16, 16]} style={{ marginBottom: '32px' }}>
           {/* 主要指标1 - 月度每日利润汇总 */}
-          <Col span={6}>
+          <Col xs={24} sm={12} md={8} lg={6}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: '130px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                border: '1px solid rgba(0,0,0,0.06)'
-              }}
-              title={
-                <span style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '500',
-                  color: 'rgba(0,0,0,0.75)'
-                }}>
-                  月度每日利润汇总
-                </span>
-              }
+              title="月度每日利润汇总"
               tooltip="当月每日利润汇总金额"
               statistic={{
                 value: data.overviewData.dailyProfitSum || 0,
                 valueStyle: { 
                   color: '#52c41a', 
-                  fontSize: '26px',
-                  fontWeight: '600',
-                  lineHeight: '1.2'
+                  fontSize: '24px',
+                  fontWeight: '600'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthDailyProfitSum ? 
@@ -572,12 +557,11 @@ export default function Dashboard() {
               }}
               chart={
                 <div style={{ 
-                  height: '36px', 
+                  height: '32px', 
                   display: 'flex', 
                   alignItems: 'center', 
                   fontSize: '12px', 
-                  color: 'rgba(0,0,0,0.45)',
-                  marginTop: '4px'
+                  color: 'rgba(0,0,0,0.45)'
                 }}>
                   {data.overviewData.lastMonthDailyProfitSum ? (
                     <>
@@ -599,32 +583,16 @@ export default function Dashboard() {
           </Col>
           
           {/* 主要指标2 - 月净利润 */}
-          <Col span={6}>
+          <Col xs={24} sm={12} md={8} lg={6}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: '130px',
-                borderRadius: '8px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                border: '1px solid rgba(0,0,0,0.06)'
-              }}
-              title={
-                <span style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '500',
-                  color: 'rgba(0,0,0,0.75)'
-                }}>
-                  月净利润
-                </span>
-              }
+              title="月净利润"
               tooltip="当月净利润金额"
               statistic={{
                 value: data.overviewData.monthProfit || 0,
                 valueStyle: { 
                   color: '#1890ff', 
-                  fontSize: '26px',
-                  fontWeight: '600',
-                  lineHeight: '1.2'
+                  fontSize: '24px',
+                  fontWeight: '600'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthProfit ? 
@@ -632,12 +600,11 @@ export default function Dashboard() {
               }}
               chart={
                 <div style={{ 
-                  height: '36px', 
+                  height: '32px', 
                   display: 'flex', 
                   alignItems: 'center', 
                   fontSize: '12px', 
-                  color: 'rgba(0,0,0,0.45)',
-                  marginTop: '4px'
+                  color: 'rgba(0,0,0,0.45)'
                 }}>
                   {data.overviewData.lastMonthProfit ? (
                     <>
@@ -659,43 +626,26 @@ export default function Dashboard() {
           </Col>
           
           {/* 次要指标1 - 硬性支出 */}
-          <Col span={4}>
+          <Col xs={24} sm={12} md={8} lg={4}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: '130px',
-                borderRadius: '8px',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
-                border: '1px solid rgba(0,0,0,0.04)'
-              }}
-              title={
-                <span style={{ 
-                  fontSize: '13px', 
-                  fontWeight: '500',
-                  color: 'rgba(0,0,0,0.65)'
-                }}>
-                  硬性支出
-                </span>
-              }
+              title="硬性支出"
               tooltip="当月硬性支出金额"
               statistic={{
                 value: data.overviewData.hardExpense || 0,
                 valueStyle: { 
-                  color: '#722ed1', 
+                  color: 'rgba(0,0,0,0.85)', 
                   fontSize: '20px',
-                  fontWeight: '600',
-                  lineHeight: '1.2'
+                  fontWeight: '600'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
                 <div style={{ 
-                  height: '36px', 
+                  height: '32px', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  fontSize: '11px', 
-                  color: 'rgba(0,0,0,0.35)',
-                  marginTop: '4px'
+                  fontSize: '12px', 
+                  color: 'rgba(0,0,0,0.45)'
                 }}>
                   <span>固定支出</span>
                 </div>
@@ -704,43 +654,26 @@ export default function Dashboard() {
           </Col>
           
           {/* 次要指标2 - 千川投流 */}
-          <Col span={4}>
+          <Col xs={24} sm={12} md={8} lg={4}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: '130px',
-                borderRadius: '8px',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
-                border: '1px solid rgba(0,0,0,0.04)'
-              }}
-              title={
-                <span style={{ 
-                  fontSize: '13px', 
-                  fontWeight: '500',
-                  color: 'rgba(0,0,0,0.65)'
-                }}>
-                  千川投流
-                </span>
-              }
+              title="千川投流"
               tooltip="当月千川投流金额"
               statistic={{
                 value: data.overviewData.qianchuan || 0,
                 valueStyle: { 
-                  color: '#13c2c2', 
+                  color: 'rgba(0,0,0,0.85)', 
                   fontSize: '20px',
-                  fontWeight: '600',
-                  lineHeight: '1.2'
+                  fontWeight: '600'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
               }}
               chart={
                 <div style={{ 
-                  height: '36px', 
+                  height: '32px', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  fontSize: '11px', 
-                  color: 'rgba(0,0,0,0.35)',
-                  marginTop: '4px'
+                  fontSize: '12px', 
+                  color: 'rgba(0,0,0,0.45)'
                 }}>
                   <span>投流支出</span>
                 </div>
@@ -749,32 +682,16 @@ export default function Dashboard() {
           </Col>
           
           {/* 次要指标3 - 当月赔付申请 */}
-          <Col span={4}>
+          <Col xs={24} sm={12} md={8} lg={4}>
             <StatisticCard
-              style={{ 
-                width: '100%', 
-                minHeight: '130px',
-                borderRadius: '8px',
-                boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
-                border: '1px solid rgba(0,0,0,0.04)'
-              }}
-              title={
-                <span style={{ 
-                  fontSize: '13px', 
-                  fontWeight: '500',
-                  color: 'rgba(0,0,0,0.65)'
-                }}>
-                  当月赔付申请
-                </span>
-              }
+              title="当月赔付申请"
               tooltip="当月总赔付申请金额"
               statistic={{
                 value: data.overviewData.monthClaimAmount || 0,
                 valueStyle: { 
-                  color: '#fa541c', 
+                  color: '#ff4d4f', 
                   fontSize: '20px',
-                  fontWeight: '600',
-                  lineHeight: '1.2'
+                  fontWeight: '600'
                 },
                 formatter: (value) => formatCurrency(Number(value)),
                 trend: data.overviewData.lastMonthClaimAmount ? 
@@ -782,12 +699,11 @@ export default function Dashboard() {
               }}
               chart={
                 <div style={{ 
-                  height: '36px', 
+                  height: '32px', 
                   display: 'flex', 
                   alignItems: 'center', 
-                  fontSize: '11px', 
-                  color: 'rgba(0,0,0,0.35)',
-                  marginTop: '4px'
+                  fontSize: '12px', 
+                  color: 'rgba(0,0,0,0.45)'
                 }}>
                   {data.overviewData.lastMonthClaimAmount ? (
                     <>
