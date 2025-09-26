@@ -204,39 +204,40 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
           />
           <Legend content={<CustomLegend />} />
           
-          {/* 本月数据线 */}
+          {/* 本月数据线 - 主要线条，使用鲜明的蓝色 */}
           <Line
             type="monotone"
             dataKey="currentMonth"
             stroke="#1890ff"
-            strokeWidth={2}
-            dot={{ fill: '#1890ff', strokeWidth: 2, r: 3 }}
-            activeDot={{ r: 4, stroke: '#1890ff', strokeWidth: 2, fill: '#1890ff' }}
+            strokeWidth={3}
+            dot={{ fill: '#1890ff', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 5, stroke: '#1890ff', strokeWidth: 2, fill: '#1890ff' }}
             name="本月"
             connectNulls={false} // 不连接空值，产生断点
           />
           
-          {/* 上月数据线 */}
+          {/* 上月数据线 - 对比线条，使用淡灰色 */}
           <Line
             type="monotone"
             dataKey="lastMonth"
-            stroke="#52c41a"
+            stroke="#8c8c8c"
             strokeWidth={2}
-            dot={{ fill: '#52c41a', strokeWidth: 2, r: 3 }}
-            activeDot={{ r: 4, stroke: '#52c41a', strokeWidth: 2, fill: '#52c41a' }}
+            strokeDasharray="5 5"
+            dot={{ fill: '#8c8c8c', strokeWidth: 1, r: 3 }}
+            activeDot={{ r: 4, stroke: '#8c8c8c', strokeWidth: 2, fill: '#8c8c8c' }}
             name="上月"
             connectNulls={false} // 不连接空值，产生断点
           />
           
-          {/* 当月平均线 */}
+          {/* 当月平均线 - 参考线，使用更淡的色彩 */}
           <Line
             type="monotone"
             dataKey="currentMonthAverage"
-            stroke="#722ed1"
-            strokeWidth={2}
-            strokeDasharray="5 5"
+            stroke="#d9d9d9"
+            strokeWidth={1}
+            strokeDasharray="2 2"
             dot={false}
-            activeDot={{ r: 4, stroke: '#722ed1', strokeWidth: 2, fill: '#722ed1' }}
+            activeDot={{ r: 3, stroke: '#d9d9d9', strokeWidth: 1, fill: '#d9d9d9' }}
             name="当月平均"
             connectNulls={true} // 平均线保持连续
           />
