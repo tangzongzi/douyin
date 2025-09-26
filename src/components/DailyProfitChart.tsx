@@ -57,14 +57,14 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
       const dataPoint = payload[0]?.payload; // 获取完整的数据点
       
       return (
-         <div style={{ 
-           background: '#ffffff',
-           padding: '12px 16px',
-           border: '1px solid #f0f0f0',
-           borderRadius: '8px',
-           boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-           minWidth: '200px'
-         }}>
+        <div style={{ 
+          background: '#ffffff',
+          padding: '12px 16px',
+          border: '1px solid #f0f0f0',
+          borderRadius: '6px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          minWidth: '200px'
+        }}>
           <div style={{ 
             marginBottom: '12px', 
             textAlign: 'center',
@@ -272,7 +272,7 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
             type="monotone"
             dataKey="currentMonth"
             stroke="#1890ff"
-            strokeWidth={3}
+            strokeWidth={2}
             dot={{ fill: '#1890ff', strokeWidth: 2, r: 4 }}
             activeDot={false}
             name="本月"
@@ -283,9 +283,9 @@ export default function DailyProfitChart({ data, loading = false }: DailyProfitC
           <Line
             type="monotone"
             dataKey="lastMonth"
-            stroke="#8c8c8c"
-            strokeWidth={2}
-            strokeDasharray="5 5"
+            stroke="#d9d9d9"
+            strokeWidth={1}
+            strokeDasharray="4 4"
             dot={{ fill: '#8c8c8c', strokeWidth: 1, r: 3 }}
             activeDot={false}
             name="上月"
