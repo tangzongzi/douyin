@@ -391,6 +391,31 @@ export default function SyncPage() {
                 >
                   验证数据完整性
                 </Button>
+                
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => {
+                    setSyncing(true);
+                    const params = new URLSearchParams();
+                    params.append('type', 'debug');
+                    if (forceSync) params.append('force', 'true');
+                    
+                    fetch(`/api/sync-debug?${params.toString()}`, { method: 'POST' })
+                      .then(r => r.json())
+                      .then(result => setSyncResult(result))
+                      .finally(() => setSyncing(false));
+                  }}
+                  loading={syncing}
+                  style={{
+                    height: '44px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(19,194,194,0.3)',
+                    color: '#13c2c2',
+                    fontWeight: '500'
+                  }}
+                >
+                  测试Force参数
+                </Button>
               </div>
             </div>
           </Col>

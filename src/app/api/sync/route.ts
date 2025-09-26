@@ -4,9 +4,11 @@ import { syncAllData, syncDailyData, syncMonthlyData, syncYearData, validateData
 export async function POST(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const type = searchParams.get('type') || 'all';
+  const force = searchParams.get('force') === 'true';
+  const range = searchParams.get('range');
   
   try {
-    console.log(`[API] 开始同步，类型: ${type}`);
+    console.log(`[API] 开始同步，类型: ${type}, 强制: ${force}, 范围: ${range}`);
     
     let result;
     
@@ -19,6 +21,11 @@ export async function POST(request: NextRequest) {
         break;
       case 'yearly':
         result = await syncYearData();
+        break;
+      case 'force':
+        // 强制完整同步
+        result = await syncAllData();
+        console.log('[API] 执行强制完整同步');
         break;
       case 'all':
       default:
