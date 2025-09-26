@@ -137,7 +137,7 @@ export default function Dashboard() {
         ApiResponse<OverviewData>,
         ApiResponse<SupabaseDailyRecord[]>,
         ApiResponse<SupabaseMonthlyRecord[]>,
-        any
+        ApiResponse<YearDataItem[]>
       ] = await Promise.all([
         overviewResponse.json(),
         dailyResponse.json(),

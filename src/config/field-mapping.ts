@@ -67,10 +67,6 @@ export const YEARLY_FIELD_MAPPING = {
   
   // 含保证金利润 - 修正字段名
   '含保证金': 'profit_with_deposit',            // ✅ 实际字段名 - 值167629.7
-  '含保证金利润': 'profit_with_deposit',        // ✅ 实际字段名 - 值167629.7 (备用)
-  
-  // 含保证金总利润 - 使用含保证金字段  
-  '含保证金': 'total_profit_with_deposit',      // ✅ 实际字段名
   
   // 不含保证金利润 - 修正字段名
   '不含保证金总利润': 'profit_without_deposit', // ✅ 实际字段名 - 值152619.66
@@ -96,7 +92,12 @@ export const FEISHU_CONFIG = {
  * 获取字段值的增强函数
  * 支持多种匹配策略，处理字段名变体
  */
-export function getFieldValue(record: any, fieldKey: string): number {
+interface FeishuRecord {
+  fields: Record<string, unknown>;
+  record_id?: string;
+}
+
+export function getFieldValue(record: FeishuRecord, fieldKey: string): number {
   if (!record?.fields) return 0;
 
   const fields = record.fields;

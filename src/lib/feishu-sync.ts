@@ -1,6 +1,6 @@
 import { SupabaseService, DailyProfit, MonthlySummary, YearProfit, SyncLog, getSupabaseClient } from './supabase';
 import { ENV_CONFIG } from '@/config/env';
-import { DAILY_FIELD_MAPPING, MONTHLY_FIELD_MAPPING, YEARLY_FIELD_MAPPING, getFieldValue } from '@/config/field-mapping';
+import { getFieldValue } from '@/config/field-mapping';
 import axios from 'axios';
 
 // 飞书API配置
@@ -324,11 +324,11 @@ export async function syncYearData(): Promise<SyncLog> {
     // 3. 转换数据格式
     const yearProfits: YearProfit[] = [];
     
-    feishuData.forEach((record, index) => {
+    feishuData.forEach((record) => {
       const yearProfit: YearProfit = {
         year: String(getFieldValue(record, '日期') || '2025').replace('年', ''), // ✅ 修正：使用"日期"字段，去掉"年"字符
-        profit_with_deposit: getFieldValue(record, '含保证金') || getFieldValue(record, '含保证金利润') || 0, // ✅ 修正字段名
-        total_profit_with_deposit: getFieldValue(record, '含保证金') || getFieldValue(record, '含保证金利润') || 0, // ✅ 修正字段名
+        profit_with_deposit: getFieldValue(record, '含保证金') || 0, // ✅ 修正字段名
+        total_profit_with_deposit: getFieldValue(record, '含保证金') || 0, // ✅ 使用同一字段
         profit_without_deposit: getFieldValue(record, '不含保证金总利润') || 0, // ✅ 修正字段名
         net_profit_without_deposit: getFieldValue(record, '不含保证金剩余利润') || 0, // ✅ 修正字段名
       };
