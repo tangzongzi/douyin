@@ -1,4 +1,4 @@
-import { SupabaseService, DailyProfit, MonthlySummary, SyncLog, getSupabaseClient } from './supabase';
+import { SupabaseService, DailyProfit, MonthlySummary, YearProfit, SyncLog, getSupabaseClient } from './supabase';
 import { ENV_CONFIG } from '@/config/env';
 import axios from 'axios';
 
@@ -323,7 +323,76 @@ export async function syncMonthlyData(): Promise<SyncLog> {
   return syncLog;
 }
 
-// 移除年度数据同步函数
+// 同步年度利润数据
+export async function syncYearData(): Promise<SyncLog> {
+  const syncLog: SyncLog = {
+    sync_type: 'yearly',
+    sync_status: 'failed',
+    records_synced: 0,
+    sync_started_at: new Date().toISOString(),
+  };
+
+  try {
+    console.log('[Sync] 开始同步年度利润数据...');
+    
+    // 1. 获取飞书访问令牌
+    const accessToken = await getFeishuAccessToken();
+    
+    // 2. 获取年度利润表数据
+    const feishuData = await getFeishuTableData(ENV_CONFIG.TABLE_YEAR_PROFIT, accessToken);
+    console.log(`[Sync] 从飞书获取到 ${feishuData.length} 条年度数据`);
+    
+    if (feishuData.length === 0) {
+      throw new Error('飞书年度利润表无数据');
+    }
+    
+    // 3. 转换数据格式
+    const yearProfits: YearProfit[] = [];
+    
+    feishuData.forEach((record, index) => {
+      const yearProfit: YearProfit = {
+        year: getFieldValue(record, '年份') || String(new Date().getFullYear() - index), // 年份字段
+        profit_with_deposit: getFieldValue(record, '含保证金利润') || 0, // 含保证金利润
+        total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || 0, // 含保证金总利润
+        profit_without_deposit: getFieldValue(record, '不含保证金利润') || 0, // 不含保证金利润
+        net_profit_without_deposit: getFieldValue(record, '不含保证金余利润') || 0, // 不含保证金余利润
+      };
+      
+      yearProfits.push(yearProfit);
+      console.log(`[Sync] 处理年度数据: ${yearProfit.year} = 含保证金利润¥${yearProfit.profit_with_deposit}, 不含保证金利润¥${yearProfit.profit_without_deposit}`);
+    });
+    
+    // 4. 批量插入到Supabase
+    for (const yearProfit of yearProfits) {
+      try {
+        await SupabaseService.upsertYearProfit(yearProfit);
+        syncLog.records_synced++;
+      } catch (error) {
+        console.error(`[Sync] 插入年度数据失败: ${yearProfit.year}`, error);
+      }
+    }
+    
+    syncLog.sync_status = 'success';
+    syncLog.sync_completed_at = new Date().toISOString();
+    
+    console.log(`[Sync] 年度数据同步完成，成功同步 ${syncLog.records_synced} 条记录`);
+    
+  } catch (error) {
+    console.error('[Sync] 年度数据同步失败:', error);
+    syncLog.sync_status = 'failed';
+    syncLog.error_message = error instanceof Error ? error.message : '未知错误';
+    syncLog.sync_completed_at = new Date().toISOString();
+  }
+  
+  // 记录同步日志
+  try {
+    await SupabaseService.logSync(syncLog);
+  } catch (error) {
+    console.error('[Sync] 记录年度同步日志失败:', error);
+  }
+  
+  return syncLog;
+}
 
 // 完整同步函数（恢复昨天的简单版本）
 export async function syncAllData(): Promise<{ daily: SyncLog; monthly: SyncLog }> {

@@ -51,11 +51,20 @@ export interface MonthlySummary {
   updated_at?: string;
 }
 
-// 移除年度数据接口
+export interface YearProfit {
+  id?: number;
+  year: string;
+  profit_with_deposit: number; // 含保证金利润
+  total_profit_with_deposit: number; // 含保证金总利润
+  profit_without_deposit: number; // 不含保证金利润
+  net_profit_without_deposit: number; // 不含保证金余利润
+  created_at?: string;
+  updated_at?: string;
+}
 
 export interface SyncLog {
   id?: number;
-  sync_type: 'daily' | 'monthly';
+  sync_type: 'daily' | 'monthly' | 'yearly';
   sync_status: 'success' | 'failed' | 'partial';
   records_synced: number;
   error_message?: string;
@@ -168,11 +177,50 @@ export class SupabaseService {
     
     return data;
   }
+  
+  // 获取年度利润数据
+  static async getYearProfits(limit: number = 10) {
+    const supabase = getSupabaseClient();
+    const { data, error } = await supabase
+      .from('year_profits')
+      .select('*')
+      .order('year', { ascending: false })
+      .limit(limit);
+    
+    if (error) {
+      console.error('获取年度利润数据失败:', error);
+      throw error;
+    }
+    
+    return data || [];
+  }
+  
+  // 插入或更新年度利润数据
+  static async upsertYearProfit(yearProfit: YearProfit) {
+    const supabase = getSupabaseClient();
+    console.log('[Supabase] 插入/更新年度利润数据:', yearProfit);
+    
+    const { data, error } = await supabase
+      .from('year_profits')
+      .upsert(yearProfit, { 
+        onConflict: 'year',
+        ignoreDuplicates: false 
+      })
+      .select();
+    
+    if (error) {
+      console.error('[Supabase] 年度利润数据操作失败:', error);
+      throw error;
+    }
+    
+    console.log('[Supabase] 年度利润数据操作成功:', data);
+    return data;
+  }
 }
 
 // 实时订阅功能
 export const subscribeToDataChanges = (
-  table: 'daily_profits' | 'monthly_summary',
+  table: 'daily_profits' | 'monthly_summary' | 'year_profits',
   callback: (payload: { 
     eventType: 'INSERT' | 'UPDATE' | 'DELETE';
     new: Record<string, unknown>;
