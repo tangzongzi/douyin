@@ -17,7 +17,7 @@ type SuccessResult = {
   details: {
     responseTime: string;
     dataCount: number;
-    firstRecord: Record<string, any> | null;
+    firstRecord: object | null;
   };
   timestamp: string;
 };
