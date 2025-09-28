@@ -502,45 +502,66 @@ export class AIAnalysisLogic {
   }
 
   /**
-   * 准备发送给EdgeOne AI的数据
+   * 准备发送给腾讯EdgeOne AI的完整数据（包含历史数据分析）
    */
   static prepareAIPrompt(request: AIAnalysisRequest): string {
     const { currentMonthData, lastMonthData, historicalData } = request;
     
-    let prompt = `请分析以下电商财务数据，提供专业的财务分析和建议：\n\n`;
+    let prompt = `作为资深电商财务分析专家，请基于以下完整财务数据进行深度分析：\n\n`;
     
-    // 当前月数据
-    prompt += `【当前月份：${currentMonthData.month}】\n`;
-    prompt += `- 月净利润：${currentMonthData.month_profit.toLocaleString()}元\n`;
-    prompt += `- 月度每日利润总计：${currentMonthData.daily_profit_sum.toLocaleString()}元\n`;
-    prompt += `- 总货款支出：${Math.abs(currentMonthData.payment_expense_sum).toLocaleString()}元\n`;
-    prompt += `- 千川投流：${Math.abs(currentMonthData.qianchuan).toLocaleString()}元\n`;
-    prompt += `- 硬性支出：${Math.abs(currentMonthData.hard_expense).toLocaleString()}元\n`;
-    prompt += `- 赔付申请金额：${currentMonthData.claim_amount_sum.toLocaleString()}元\n`;
-    prompt += `- 拼多多技术服务费：${Math.abs(currentMonthData.pdd_service_fee).toLocaleString()}元\n\n`;
+    // 当前月详细数据
+    prompt += `【${currentMonthData.month}月经营数据】\n`;
+    prompt += `💰 月净利润：¥${currentMonthData.month_profit.toLocaleString()}（日均¥${(currentMonthData.month_profit/30).toFixed(0)}）\n`;
+    prompt += `📊 营收总额：¥${currentMonthData.daily_profit_sum.toLocaleString()}\n`;
+    prompt += `🛒 货款支出：¥${Math.abs(currentMonthData.payment_expense_sum).toLocaleString()}\n`;
+    prompt += `📱 千川投流：¥${Math.abs(currentMonthData.qianchuan).toLocaleString()}（ROI=${currentMonthData.qianchuan > 0 ? (currentMonthData.month_profit/Math.abs(currentMonthData.qianchuan)).toFixed(1) : 0}倍）\n`;
+    prompt += `💼 硬性支出：¥${Math.abs(currentMonthData.hard_expense).toLocaleString()}\n`;
+    prompt += `🎁 多赞平台补贴：¥${currentMonthData.claim_amount_sum.toLocaleString()}（占利润${(currentMonthData.claim_amount_sum/currentMonthData.month_profit*100).toFixed(1)}%）\n`;
+    prompt += `🏪 保证金占用：¥${Math.abs(currentMonthData.deposit).toLocaleString()}\n\n`;
     
-    // 上月对比数据
+    // 环比变化分析
     if (lastMonthData) {
-      prompt += `【上月对比：${lastMonthData.month}】\n`;
-      prompt += `- 月净利润：${lastMonthData.month_profit.toLocaleString()}元\n`;
-      prompt += `- 千川投流：${Math.abs(lastMonthData.qianchuan).toLocaleString()}元\n`;
-      prompt += `- 赔付申请金额：${lastMonthData.claim_amount_sum.toLocaleString()}元\n\n`;
+      const profitChange = ((currentMonthData.month_profit - lastMonthData.month_profit) / Math.abs(lastMonthData.month_profit)) * 100;
+      const claimChange = ((currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum) / Math.abs(lastMonthData.claim_amount_sum || 1)) * 100;
+      const qianchuanChange = ((Math.abs(currentMonthData.qianchuan) - Math.abs(lastMonthData.qianchuan)) / Math.abs(lastMonthData.qianchuan || 1)) * 100;
+      
+      prompt += `【环比变化分析】\n`;
+      prompt += `📈 利润变化：${profitChange > 0 ? '+' : ''}${profitChange.toFixed(1)}%（¥${(currentMonthData.month_profit - lastMonthData.month_profit).toLocaleString()}）\n`;
+      prompt += `🎁 补贴变化：${claimChange > 0 ? '+' : ''}${claimChange.toFixed(1)}%（¥${(currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum).toLocaleString()}）\n`;
+      prompt += `📱 投流变化：${qianchuanChange > 0 ? '+' : ''}${qianchuanChange.toFixed(1)}%（¥${(Math.abs(currentMonthData.qianchuan) - Math.abs(lastMonthData.qianchuan)).toLocaleString()}）\n\n`;
     }
     
-    // 历史趋势
+    // 历史数据趋势（过往6个月完整数据）
     if (historicalData.length > 0) {
-      prompt += `【历史趋势】\n`;
+      prompt += `【历史经营趋势（${historicalData.length}个月数据）】\n`;
+      historicalData.forEach(month => {
+        const monthProfit = month.month_profit;
+        const qianchuanROI = month.qianchuan > 0 ? (monthProfit / Math.abs(month.qianchuan)).toFixed(1) : '0';
+        const claimRatio = (month.claim_amount_sum / monthProfit * 100).toFixed(1);
+        prompt += `${month.month}：利润¥${monthProfit.toLocaleString()}，投流ROI=${qianchuanROI}倍，补贴占比${claimRatio}%\n`;
+      });
+      
       const avgProfit = historicalData.reduce((sum, month) => sum + month.month_profit, 0) / historicalData.length;
-      prompt += `- 近${historicalData.length}个月平均利润：${avgProfit.toLocaleString()}元\n`;
-      prompt += `- 利润波动情况：${historicalData.map(m => m.month_profit.toLocaleString()).join('元, ')}元\n\n`;
+      const maxProfit = Math.max(...historicalData.map(m => m.month_profit));
+      const minProfit = Math.min(...historicalData.map(m => m.month_profit));
+      
+      prompt += `历史统计：平均¥${avgProfit.toLocaleString()}，最高¥${maxProfit.toLocaleString()}，最低¥${minProfit.toLocaleString()}\n\n`;
     }
     
-    prompt += `请提供：\n`;
-    prompt += `1. 财务健康度评估（评分0-100）\n`;
-    prompt += `2. 关键风险点识别\n`;
-    prompt += `3. 具体优化建议（不超过3条）\n`;
-    prompt += `4. 下月利润预测区间\n\n`;
-    prompt += `要求：分析要专业、简洁，重点关注实用性建议，字数控制在500字以内。`;
+    // 行业标准参考
+    prompt += `【行业参考标准】\n`;
+    prompt += `- 优秀利润目标：月净利润¥50,000+\n`;
+    prompt += `- 良好利润目标：月净利润¥35,000+\n`;
+    prompt += `- 千川投流ROI：优秀15倍+，良好8倍+，警戒3倍以下\n`;
+    prompt += `- 投流预算上限：建议控制在¥3,000以内\n\n`;
+    
+    prompt += `【分析要求】\n`;
+    prompt += `请结合历史数据趋势，提供：\n`;
+    prompt += `1. 当前经营状况评估（用具体金额说明，不要抽象评分）\n`;
+    prompt += `2. 与历史最佳/最差月份的对比分析\n`;
+    prompt += `3. 千川投流和多赞补贴的具体优化建议\n`;
+    prompt += `4. 基于历史趋势的下月利润预测（给出具体区间和理由）\n\n`;
+    prompt += `要求：语言通俗易懂，多用具体金额，少用百分比，字数400字左右。`;
     
     return prompt;
   }
