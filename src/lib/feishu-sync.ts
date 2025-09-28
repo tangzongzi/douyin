@@ -223,6 +223,14 @@ export async function syncMonthlyData(): Promise<SyncLog> {
     feishuData.forEach((record, index) => {
       const monthProfit = getFieldValue(record, '月净利润');
       
+      // 调试：显示所有可用字段和值
+      if (index < 3) {
+        console.log(`[Sync] 月度记录${index}的所有字段:`, Object.keys(record?.fields || {}));
+        console.log(`[Sync] 月净利润值:`, monthProfit);
+        console.log(`[Sync] 月度每日利润总计值:`, getFieldValue(record, '月度每日利润总计'));
+        console.log(`[Sync] 累计净现金流值:`, getFieldValue(record, '累计净现金流'));
+      }
+      
       if (monthProfit > 0) {
         // 根据飞书表格实际顺序：第1行是4月，第2行是5月...第6行是9月
         // 所以索引0对应4月，索引1对应5月...索引5对应9月
