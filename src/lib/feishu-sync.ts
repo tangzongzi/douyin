@@ -240,22 +240,29 @@ export async function syncMonthlyData(): Promise<SyncLog> {
         
         const month = `${year}-${String(targetMonth).padStart(2, '0')}`; // '2025-04', '2025-05'...
         
+        const dailyProfitSum = getFieldValue(record, '月度每日利润总计');
+        
         const monthlySummary: MonthlySummary = {
           month: month,
-          daily_profit_sum: getFieldValue(record, '月度每日利润总计'), // ✅ 修正字段名
-          month_profit: monthProfit, // 红框右边的字段
+          daily_profit_sum: dailyProfitSum, // 月度每日利润总计
+          month_profit: monthProfit, // 月净利润
           net_cashflow: getFieldValue(record, '累计净现金流'),
-          claim_amount_sum: getFieldValue(record, '总赔付申请金额汇总'), // ✅ 修正字段名
-          pdd_service_fee: getFieldValue(record, '总拼多多技术服务费'), // 保持原始值
+          claim_amount_sum: getFieldValue(record, '总赔付申请金额汇总'),
+          pdd_service_fee: getFieldValue(record, '总拼多多技术服务费'),
           douyin_service_fee: getFieldValue(record, '总抖音技术服务费') || 0,
-          payment_expense_sum: getFieldValue(record, '总货款支出汇总'), // ✅ 修正字段名
-          other_expense_sum: getFieldValue(record, '总其他支出汇总'), // ✅ 修正字段名
+          payment_expense_sum: getFieldValue(record, '总货款支出汇总'),
+          other_expense_sum: getFieldValue(record, '总其他支出汇总'),
           shipping_insurance: getFieldValue(record, '运费保险') || 0,
           hard_expense: getFieldValue(record, '硬性支出') || 0,
-          qianchuan: getFieldValue(record, '千川投流') || 0, // ✅ 修正字段名
-          deposit: getFieldValue(record, '店铺保证金') || 0, // ✅ 修正字段名
-          initial_fund: getFieldValue(record, '初始资金总额') || 0, // ✅ 修正字段名
+          qianchuan: getFieldValue(record, '千川投流') || 0,
+          deposit: getFieldValue(record, '店铺保证金') || 0,
+          initial_fund: getFieldValue(record, '初始资金总额') || 0,
         };
+        
+        console.log(`[Sync Debug] ${month} 字段值对比:`);
+        console.log(`  月净利润: ${monthProfit}`);
+        console.log(`  月度每日利润总计: ${dailyProfitSum}`);
+        console.log(`  总赔付申请金额汇总: ${getFieldValue(record, '总赔付申请金额汇总')}`);
         
         monthlySummaries.push(monthlySummary);
         console.log(`[Sync] 处理月度数据: ${monthlySummary.month} = ¥${monthlySummary.month_profit}`);
