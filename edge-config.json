@@ -1,0 +1,21 @@
+{
+  "name": "feishu-dashboard",
+  "functions": {
+    "ai-analysis": {
+      "path": "/edge-functions/ai-analysis",
+      "runtime": "edge",
+      "memory": 128,
+      "timeout": 30
+    }
+  },
+  "build": {
+    "command": "npm run build",
+    "outputDirectory": ".next",
+    "nodeVersion": "18"
+  },
+  "environment": {
+    "NEXT_PUBLIC_SUPABASE_URL": "https://gayywaplwsilukawgwpt.supabase.co",
+    "FEISHU_APP_ID": "cli_a85bf6b4153bd013",
+    "NEXT_PUBLIC_FEISHU_APP_TOKEN": "R8XfbOXZ2a4fJjsWdpmc1rJOnbm"
+  }
+}

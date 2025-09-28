@@ -28,14 +28,14 @@ export async function onRequestPost({ request }) {
 
     // 调用EdgeOne边缘AI服务
     const response = await AI.chatCompletions({
-      model: '@tx/deepseek-ai/deepseek-r1-0528', // 使用R1模型，每日20次限制
+      model: '@tx/deepseek-ai/deepseek-v3-0324', // 使用v3模型，每日50次限制，质量更高
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: prompt }
       ],
       stream: false, // 不使用流式输出，获取完整结果
-      temperature: 0.3, // 较低温度，确保分析的准确性
-      max_tokens: 800 // 控制输出长度
+      temperature: 0.1, // 很低温度，确保分析的准确性和一致性
+      max_tokens: 600 // 控制输出长度，500字以内
     });
 
     // 解析AI响应
