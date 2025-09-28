@@ -331,53 +331,21 @@ export async function syncYearData(): Promise<SyncLog> {
       console.log(`[Sync Debug] 记录${index}的所有字段名:`, fieldNames);
       console.log(`[Sync Debug] 记录${index}的字段值:`, fields);
       
-      // 尝试多种可能的字段名来获取含保证金利润
-      const possibleDepositFields = [
-        '含保证金',
-        '含保证金利润', 
-        '含保证金总利润',
-        '年含保证金利润',
-        '总含保证金利润'
-      ];
-      
-      let profit_with_deposit = 0;
-      for (const fieldName of possibleDepositFields) {
-        const value = getFieldValue(record, fieldName);
-        if (value > 0) {
-          profit_with_deposit = value;
-          console.log(`[Sync Debug] 找到含保证金字段: "${fieldName}" = ${value}`);
-          break;
-        }
-      }
-      
-      // 尝试多种可能的字段名来获取不含保证金利润
-      const possibleWithoutDepositFields = [
-        '不含保证金总利润',
-        '不含保证金利润',
-        '年不含保证金利润',
-        '净利润不含保证金'
-      ];
-      
-      let profit_without_deposit = 0;
-      for (const fieldName of possibleWithoutDepositFields) {
-        const value = getFieldValue(record, fieldName);
-        if (value > 0) {
-          profit_without_deposit = value;
-          console.log(`[Sync Debug] 找到不含保证金字段: "${fieldName}" = ${value}`);
-          break;
-        }
-      }
-      
+      // 根据开发文档，年度利润表只有4个核心字段，直接使用getFieldValue进行匹配
       const yearProfit: YearProfit = {
-        year: String(getFieldValue(record, '日期') || '2025').replace('年', ''), // ✅ 修正：使用"日期"字段，去掉"年"字符
-        profit_with_deposit: profit_with_deposit,
-        total_profit_with_deposit: profit_with_deposit, // 使用同一值
-        profit_without_deposit: profit_without_deposit,
-        net_profit_without_deposit: getFieldValue(record, '不含保证金剩余利润') || profit_without_deposit, // 备用使用主字段
+        year: String(getFieldValue(record, '日期') || getFieldValue(record, '年份') || '2025').replace('年', ''), 
+        profit_with_deposit: getFieldValue(record, '含保证金利润') || getFieldValue(record, '含保证金'),
+        total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || getFieldValue(record, '含保证金利润') || getFieldValue(record, '含保证金'),
+        profit_without_deposit: getFieldValue(record, '不含保证金利润') || getFieldValue(record, '不含保证金总利润'),
+        net_profit_without_deposit: getFieldValue(record, '不含保证金余利润') || getFieldValue(record, '不含保证金剩余利润'),
       };
       
       yearProfits.push(yearProfit);
-      console.log(`[Sync] 处理年度数据: ${yearProfit.year} = 含保证金利润¥${yearProfit.profit_with_deposit}, 不含保证金利润¥${yearProfit.profit_without_deposit}`);
+      console.log(`[Sync] 处理年度数据: ${yearProfit.year}`);
+      console.log(`  - 含保证金利润: ¥${yearProfit.profit_with_deposit}`);
+      console.log(`  - 含保证金总利润: ¥${yearProfit.total_profit_with_deposit}`);
+      console.log(`  - 不含保证金利润: ¥${yearProfit.profit_without_deposit}`);
+      console.log(`  - 不含保证金余利润: ¥${yearProfit.net_profit_without_deposit}`);
     });
     
     // 4. 批量插入到Supabase

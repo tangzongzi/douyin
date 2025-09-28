@@ -10,18 +10,22 @@
 
 // 每日数据表字段映射 (基础表)
 export const DAILY_FIELD_MAPPING = {
-  // 核心利润字段
+  // 核心利润字段 - 支持多种可能的字段名
   '每日盈利': 'daily_profit',                    // ✅ 已验证 - 每日实际盈利
-  '每日利润汇总': 'profit_summary',              // ✅ 已验证 - 每日利润汇总 (包含多种变体匹配)
+  '每日利润汇总': 'profit_summary',              // ✅ 已验证 - 每日利润汇总
   '每日每日利润汇总': 'profit_summary',          // ✅ 已验证 - 处理重复字符的情况
+  '利润汇总': 'profit_summary',                  // 备选字段名
+  '日利润汇总': 'profit_summary',                // 备选字段名
   
   // 支出字段
   '其他支出': 'other_expense',                   // ✅ 已验证
   '货款支出': 'payment_expense',                 // ✅ 已验证 - 保持原始负数值
+  '支出': 'other_expense',                       // 备选字段名
   
   // 其他字段
   '提现金额': 'withdraw_amount',                 // ✅ 已验证
   '赔付申请金额': 'claim_amount',                // ✅ 已验证
+  '赔付金额': 'claim_amount',                    // 备选字段名
   
   // 日期相关 (通过索引计算，不直接映射)
   // '日期': 'date'  // 使用索引推算，从今天开始往前推
@@ -61,18 +65,26 @@ export const MONTHLY_FIELD_MAPPING = {
 } as const;
 
 // 年度利润表字段映射 (年度利润表)
+// 根据开发文档，年度利润表只有这4个核心字段
 export const YEARLY_FIELD_MAPPING = {
-  // 年份 - 修正字段名
-  '日期': 'year',                              // ✅ 实际字段名 - 飞书中显示为"日期"
+  // 年份字段 - 飞书中可能显示为"日期"或"年份"
+  '日期': 'year',                              // 飞书字段名：日期
+  '年份': 'year',                              // 备选字段名：年份
   
-  // 含保证金利润 - 修正字段名
-  '含保证金': 'profit_with_deposit',            // ✅ 实际字段名 - 值167629.7
+  // 含保证金利润 - 根据开发文档的字段名
+  '含保证金利润': 'profit_with_deposit',        // 开发文档标准字段名
+  '含保证金': 'profit_with_deposit',            // 飞书可能的简化字段名
   
-  // 不含保证金利润 - 修正字段名
-  '不含保证金总利润': 'profit_without_deposit', // ✅ 实际字段名 - 值152619.66
+  // 含保证金总利润 - 开发文档中的第二个字段
+  '含保证金总利润': 'total_profit_with_deposit', // 开发文档标准字段名
   
-  // 不含保证金余利润 - 修正字段名
-  '不含保证金剩余利润': 'net_profit_without_deposit', // ✅ 实际字段名 - 值152619.66
+  // 不含保证金利润 - 开发文档中的第三个字段  
+  '不含保证金利润': 'profit_without_deposit',   // 开发文档标准字段名
+  '不含保证金总利润': 'profit_without_deposit', // 飞书可能的字段名变体
+  
+  // 不含保证金余利润 - 开发文档中的第四个字段
+  '不含保证金余利润': 'net_profit_without_deposit', // 开发文档标准字段名
+  '不含保证金剩余利润': 'net_profit_without_deposit', // 飞书可能的字段名变体
 } as const;
 
 // 表格ID配置 (已确认)
@@ -106,31 +118,74 @@ export function getFieldValue(record: FeishuRecord, fieldKey: string): number {
   const fields = record.fields;
   const keys = Object.keys(fields);
   
-  // 多种匹配策略 - 按优先级排序，避免错误匹配
+  // 改进的字段匹配策略 - 按优先级排序
   const matchedKey = keys.find(key => {
     // 1. 完全匹配 - 最高优先级
     if (key === fieldKey) return true;
     
     // 2. 年度字段精确匹配 - 避免"含"匹配到"不含"
-    if (fieldKey === '含保证金' && key === '含保证金') return true;
-    if (fieldKey === '含保证金利润' && key === '含保证金利润') return true;
-    if (fieldKey === '不含保证金总利润' && key === '不含保证金总利润') return true;
-    if (fieldKey === '不含保证金利润' && key === '不含保证金利润') return true;
+    if (fieldKey === '含保证金') {
+      return key === '含保证金' || key === '含保证金利润';
+    }
+    if (fieldKey === '不含保证金总利润') {
+      return key === '不含保证金总利润' || key === '不含保证金利润';
+    }
+    if (fieldKey === '不含保证金剩余利润') {
+      return key === '不含保证金剩余利润' || key === '不含保证金余利润';
+    }
     
-    // 3. 处理重复字符（如「每日每日利润汇总」）
-    if (fieldKey === '每日利润汇总' && key.includes('每日') && key.includes('利润汇总')) return true;
+    // 3. 每日利润字段的特殊处理
+    if (fieldKey === '每日利润汇总' || fieldKey === '每日每日利润汇总' || fieldKey === '利润汇总') {
+      return (key.includes('利润') && key.includes('汇总')) ||
+             (key.includes('每日') && key.includes('利润')) ||
+             key === '利润汇总' || key === '日利润汇总';
+    }
     
-    // 4. 处理简化匹配
-    if (fieldKey === '每日盈利' && (key.includes('每日') && key.includes('盈利'))) return true;
+    // 4. 每日盈利字段匹配
+    if (fieldKey === '每日盈利') {
+      return key.includes('盈利') || (key.includes('每日') && key.includes('利润'));
+    }
     
-    // 5. 保守的包含匹配 - 排除年度字段，避免冲突
-    if (!fieldKey.includes('保证金') && key.includes(fieldKey)) return true;
+    // 5. 支出字段匹配
+    if (fieldKey === '其他支出' || fieldKey === '支出') {
+      return key.includes('支出') && !key.includes('货款') && !key.includes('总');
+    }
+    if (fieldKey === '货款支出') {
+      return key.includes('货款') && key.includes('支出');
+    }
+    
+    // 6. 赔付字段匹配
+    if (fieldKey === '赔付申请金额' || fieldKey === '赔付金额') {
+      return key.includes('赔付') && (key.includes('金额') || key.includes('申请'));
+    }
+    
+    // 7. 月度字段匹配
+    if (fieldKey === '月度每日利润总计') {
+      return (key.includes('月度') && key.includes('利润')) ||
+             (key.includes('每日') && key.includes('总计')) ||
+             key === '每日利润总计';
+    }
+    
+    // 8. 技术服务费匹配
+    if (fieldKey.includes('技术服务费')) {
+      return key.includes('技术服务费') || key.includes('服务费');
+    }
+    
+    // 9. 通用包含匹配 - 最后的备选方案
+    if (key.includes(fieldKey) || fieldKey.includes(key)) {
+      // 避免误匹配保证金相关字段
+      if (fieldKey.includes('保证金') || key.includes('保证金')) {
+        return false;
+      }
+      return true;
+    }
     
     return false;
   });
   
   if (!matchedKey) {
-    console.log(`[Field Debug] 未找到匹配字段，查找: "${fieldKey}"，可用字段: [${keys.join(', ')}]`);
+    console.log(`[Field Debug] 未找到匹配字段，查找: "${fieldKey}"`);
+    console.log(`[Field Debug] 可用字段: [${keys.join(', ')}]`);
     return 0;
   }
 
@@ -138,14 +193,17 @@ export function getFieldValue(record: FeishuRecord, fieldKey: string): number {
   const value = fields[matchedKey];
   console.log(`[Field Debug] 原始值:`, value, `类型: ${typeof value}`);
 
+  // 改进的值解析逻辑
   if (typeof value === 'number') {
     console.log(`[Field Debug] 返回数字值: ${value}`);
     return value;
   }
 
   if (typeof value === 'string') {
-    const parsed = Number(value.replace(/[,¥\s]/g, ''));
-    console.log(`[Field Debug] 字符串解析: "${value}" -> ${parsed}`);
+    // 移除常见的格式化字符
+    const cleanValue = value.replace(/[,¥\s%]/g, '').replace(/^[\+\-]?/, match => match);
+    const parsed = Number(cleanValue);
+    console.log(`[Field Debug] 字符串解析: "${value}" -> "${cleanValue}" -> ${parsed}`);
     return Number.isNaN(parsed) ? 0 : parsed;
   }
 
@@ -154,9 +212,24 @@ export function getFieldValue(record: FeishuRecord, fieldKey: string): number {
     console.log(`[Field Debug] 数组第一个元素:`, first, `类型: ${typeof first}`);
     if (typeof first === 'number') return first;
     if (typeof first === 'string') {
-      const parsed = Number(first.replace(/[,¥\s]/g, ''));
-      console.log(`[Field Debug] 数组字符串解析: "${first}" -> ${parsed}`);
+      const cleanValue = first.replace(/[,¥\s%]/g, '').replace(/^[\+\-]?/, match => match);
+      const parsed = Number(cleanValue);
+      console.log(`[Field Debug] 数组字符串解析: "${first}" -> "${cleanValue}" -> ${parsed}`);
       return Number.isNaN(parsed) ? 0 : parsed;
+    }
+  }
+
+  // 处理对象类型的值（飞书可能返回对象格式的数值）
+  if (typeof value === 'object' && value !== null) {
+    if ('text' in value && typeof value.text === 'string') {
+      const cleanValue = value.text.replace(/[,¥\s%]/g, '');
+      const parsed = Number(cleanValue);
+      console.log(`[Field Debug] 对象文本解析: "${value.text}" -> ${parsed}`);
+      return Number.isNaN(parsed) ? 0 : parsed;
+    }
+    if ('value' in value && typeof value.value === 'number') {
+      console.log(`[Field Debug] 对象值解析: ${value.value}`);
+      return value.value;
     }
   }
 
