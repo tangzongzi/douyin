@@ -531,6 +531,17 @@ export default function MonthlyReportsPage() {
             </Col>
           </Row>
 
+          {/* AI智能分析面板 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+            <Col span={24}>
+              <AIAnalysisPanel 
+                selectedMonth={reportData.selectedMonth}
+                onAnalysisComplete={(result) => {
+                  console.log('AI分析完成:', result);
+                }}
+              />
+            </Col>
+          </Row>
 
           {/* 视图切换渲染 */}
           {viewMode === 'table' ? (
@@ -861,73 +872,6 @@ export default function MonthlyReportsPage() {
             </>
           )}
 
-          {/* 经营分析建议 */}
-          <Row gutter={[16, 16]}>
-            <Col span={24}>
-              <ProCard 
-                title={
-                  <span style={{ fontSize: '16px', fontWeight: '600' }}>
-                    经营分析与决策建议
-                  </span>
-                }
-                headerBordered
-              >
-                {currentMonth && lastMonth && (
-                  <div style={{ padding: '16px 0' }}>
-                    {/* 自动生成的分析建议 */}
-                    <div style={{ marginBottom: '16px' }}>
-                      <Text strong style={{ color: '#ff4d4f', fontSize: '14px' }}>
-                        关键风险：
-                      </Text>
-                      <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-                        {currentMonth.month_profit < lastMonth.month_profit && (
-                          <div style={{ marginBottom: '4px' }}>
-                            净利润环比下降{Math.abs(((currentMonth.month_profit - lastMonth.month_profit) / lastMonth.month_profit * 100)).toFixed(1)}%，需要立即关注
-                          </div>
-                        )}
-                        {currentMonth.qianchuan > 0 && (currentMonth.month_profit / Math.abs(currentMonth.qianchuan)) < 1.5 && (
-                          <div style={{ marginBottom: '4px' }}>
-                            千川投流ROI仅{(currentMonth.month_profit / Math.abs(currentMonth.qianchuan)).toFixed(2)}，投入产出比过低
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div style={{ marginBottom: '16px' }}>
-                      <Text strong style={{ color: '#fa8c16', fontSize: '14px' }}>
-                        重点关注：
-                      </Text>
-                      <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-                        {currentMonth.hard_expense > lastMonth.hard_expense && (
-                          <div style={{ marginBottom: '4px' }}>
-                            硬性支出增长{((Math.abs(currentMonth.hard_expense) / Math.abs(lastMonth.hard_expense) - 1) * 100).toFixed(1)}%，需要成本控制
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <Text strong style={{ color: '#52c41a', fontSize: '14px' }}>
-                        积极因素：
-                      </Text>
-                      <div style={{ marginLeft: '20px', marginTop: '8px' }}>
-                        {currentMonth.claim_amount_sum < lastMonth.claim_amount_sum && (
-                          <div style={{ marginBottom: '4px' }}>
-                            赔付申请金额减少{Math.abs(((currentMonth.claim_amount_sum - lastMonth.claim_amount_sum) / lastMonth.claim_amount_sum * 100)).toFixed(1)}%，风险控制改善
-                          </div>
-                        )}
-                        {Math.abs(currentMonth.deposit) < Math.abs(lastMonth.deposit) && (
-                          <div style={{ marginBottom: '4px' }}>
-                            保证金占用减少{Math.abs(((Math.abs(currentMonth.deposit) - Math.abs(lastMonth.deposit)) / Math.abs(lastMonth.deposit) * 100)).toFixed(1)}%，资金效率提升
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </ProCard>
-            </Col>
-          </Row>
 
           {/* 报表页脚 */}
           <div style={{ 
