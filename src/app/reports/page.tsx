@@ -63,11 +63,16 @@ export default function MonthlyReportsPage() {
           item.month === dayjs(reportData.selectedMonth).subtract(1, 'month').format('YYYY-MM')
         );
         
+        // 按月份从小到大排序历史数据
+        const sortedHistoricalData = monthlyData
+          .sort((a: MonthlyReportData, b: MonthlyReportData) => a.month.localeCompare(b.month))
+          .slice(0, 6);
+        
         setReportData(prev => ({
           ...prev,
           currentMonth: current || null,
           lastMonth: last || null,
-          historicalData: monthlyData.slice(0, 6),
+          historicalData: sortedHistoricalData,
           loading: false
         }));
       }

@@ -129,7 +129,7 @@ export class SupabaseService {
         created_at,
         updated_at
       `)
-      .order('month', { ascending: false })
+      .order('month', { ascending: true })
       .limit(limit);
     
     if (error) {
