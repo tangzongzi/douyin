@@ -145,67 +145,84 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
               <ProCard>
                 <Statistic
                   title="财务健康度"
-                  value={deep_analysis.healthScore}
-                  suffix="/100"
+                  value={
+                    deep_analysis.healthLevel === 'excellent' ? '优秀经营' :
+                    deep_analysis.healthLevel === 'good' ? '良好状态' :
+                    deep_analysis.healthLevel === 'fair' ? '一般水平' : '需要改进'
+                  }
                   valueStyle={{ 
                     color: '#1890ff',
-                    fontSize: '24px',
+                    fontSize: '16px',
                     fontWeight: '600'
                   }}
                   prefix={<TrophyOutlined style={{ color: '#1890ff' }} />}
                 />
-                <div style={{ marginTop: '8px', textAlign: 'center' }}>
-                  <Tag color="blue">
-                    {deep_analysis.healthLevel === 'excellent' ? '优秀' :
-                     deep_analysis.healthLevel === 'good' ? '良好' :
-                     deep_analysis.healthLevel === 'fair' ? '一般' : '较差'}
-                  </Tag>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                  综合评分：{deep_analysis.healthScore}/100分
                 </div>
               </ProCard>
             </Col>
             <Col span={6}>
               <ProCard>
                 <Statistic
-                  title="盈利能力"
-                  value={deep_analysis.profitabilityScore}
-                  suffix="/30"
+                  title="盈利水平"
+                  value={
+                    deep_analysis.profitabilityScore >= 25 ? '盈利优秀' :
+                    deep_analysis.profitabilityScore >= 20 ? '盈利良好' :
+                    deep_analysis.profitabilityScore >= 15 ? '盈利一般' : '需要提升'
+                  }
                   valueStyle={{ 
                     color: '#1890ff',
-                    fontSize: '20px',
+                    fontSize: '16px',
                     fontWeight: '600'
                   }}
                   prefix={<RiseOutlined style={{ color: '#1890ff' }} />}
                 />
+                <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                  评估得分：{deep_analysis.profitabilityScore}/30分
+                </div>
               </ProCard>
             </Col>
             <Col span={6}>
               <ProCard>
                 <Statistic
-                  title="风险控制"
-                  value={deep_analysis.riskControlScore}
-                  suffix="/30"
+                  title="补贴能力"
+                  value={
+                    deep_analysis.riskControlScore >= 25 ? '获取优秀' :
+                    deep_analysis.riskControlScore >= 20 ? '获取良好' :
+                    deep_analysis.riskControlScore >= 15 ? '获取一般' : '有待提升'
+                  }
                   valueStyle={{ 
                     color: '#1890ff',
-                    fontSize: '20px',
+                    fontSize: '16px',
                     fontWeight: '600'
                   }}
                   prefix={<WarningOutlined style={{ color: '#1890ff' }} />}
                 />
+                <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                  能力评分：{deep_analysis.riskControlScore}/30分
+                </div>
               </ProCard>
             </Col>
             <Col span={6}>
               <ProCard>
                 <Statistic
                   title="成本控制"
-                  value={deep_analysis.costControlScore}
-                  suffix="/40"
+                  value={
+                    deep_analysis.costControlScore >= 35 ? '控制优秀' :
+                    deep_analysis.costControlScore >= 30 ? '控制良好' :
+                    deep_analysis.costControlScore >= 25 ? '控制一般' : '需要优化'
+                  }
                   valueStyle={{ 
                     color: '#1890ff',
-                    fontSize: '20px',
+                    fontSize: '16px',
                     fontWeight: '600'
                   }}
                   prefix={<BulbOutlined style={{ color: '#1890ff' }} />}
                 />
+                <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                  控制评分：{deep_analysis.costControlScore}/40分
+                </div>
               </ProCard>
             </Col>
           </Row>

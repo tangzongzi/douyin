@@ -12,8 +12,8 @@ const ANALYSIS_THRESHOLDS = {
   GOOD_PROFIT: 35000,         // 良好利润线
   WARNING_PROFIT: 20000,      // 警告利润线
   
-  // 薅羊毛收入阈值
-  EXCELLENT_CLAIM_RATIO: 10,  // 薅羊毛收入占利润比例优秀线(%)
+  // 多赞平台补贴阈值
+  EXCELLENT_CLAIM_RATIO: 10,  // 多赞平台补贴占利润比例优秀线(%)
   GOOD_CLAIM_RATIO: 5,        // 良好线(%)
   LOW_CLAIM_RATIO: 2,         // 偏低线(%)
   
@@ -76,25 +76,23 @@ export class AIAnalysisLogic {
         positiveFactors.push(`⚡ 营收增长${revenueChange.toFixed(1)}%且利润增长更快，运营效率优秀`);
       }
 
-      // 3. 薅羊毛收入分析（赔付申请金额是额外收入）
+      // 3. 多赞平台补贴分析（具体化说明）
       const claimChange = ((currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum) / Math.abs(lastMonthData.claim_amount_sum || 1)) * 100;
       const claimIncomeRatio = (currentMonthData.claim_amount_sum / currentMonthData.month_profit) * 100;
       
-      if (claimChange > 50) {
-        positiveFactors.push(`💰 薅羊毛收入大增${claimChange.toFixed(1)}%至¥${currentMonthData.claim_amount_sum.toLocaleString()}，额外收入能力提升`);
+      if (claimChange < -80) {
+        positiveFactors.push(`💰 多赞平台补贴从¥${lastMonthData.claim_amount_sum.toLocaleString()}降至¥${currentMonthData.claim_amount_sum.toLocaleString()}，减少了¥${(lastMonthData.claim_amount_sum - currentMonthData.claim_amount_sum).toLocaleString()}支出风险`);
+      } else if (claimChange > 50) {
+        positiveFactors.push(`📈 多赞平台补贴增加¥${(currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum).toLocaleString()}，额外收入能力提升`);
       } else if (claimChange > 0) {
-        positiveFactors.push(`📈 薅羊毛收入增长${claimChange.toFixed(1)}%，为¥${currentMonthData.claim_amount_sum.toLocaleString()}`);
-      } else if (claimChange < -60) {
-        keyInsights.push(`📉 薅羊毛收入下降${Math.abs(claimChange).toFixed(1)}%，机会减少或策略调整`);
-      } else if (claimChange < -30) {
-        keyInsights.push(`🔍 薅羊毛收入减少${Math.abs(claimChange).toFixed(1)}%，可寻找新的机会`);
+        positiveFactors.push(`📊 多赞平台补贴为¥${currentMonthData.claim_amount_sum.toLocaleString()}，比上月增加¥${(currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum).toLocaleString()}`);
       }
       
-      // 薅羊毛收入占比分析
-      if (claimIncomeRatio > 10) {
-        positiveFactors.push(`🎯 薅羊毛收入占净利润${claimIncomeRatio.toFixed(1)}%，额外收入贡献显著`);
-      } else if (claimIncomeRatio > 5) {
-        keyInsights.push(`💡 薅羊毛收入占净利润${claimIncomeRatio.toFixed(1)}%，补充收入来源稳定`);
+      // 具体的收入贡献说明
+      if (currentMonthData.claim_amount_sum > 1000) {
+        const contributionAmount = currentMonthData.claim_amount_sum;
+        const withoutClaimProfit = currentMonthData.month_profit - contributionAmount;
+        keyInsights.push(`💡 多赞平台补贴为本月贡献¥${contributionAmount.toLocaleString()}收入，若无此收入净利润仅为¥${withoutClaimProfit.toLocaleString()}`);
       }
 
       // 4. 营销投入效率分析
@@ -103,19 +101,24 @@ export class AIAnalysisLogic {
         const qianchuanROI = currentProfit / Math.abs(currentMonthData.qianchuan);
         const lastROI = lastMonthData.month_profit / Math.abs(lastMonthData.qianchuan || 1);
         
+        // 具体ROI分析
+        const investmentAmount = Math.abs(currentMonthData.qianchuan);
+        const returnAmount = currentProfit;
+        const actualReturn = returnAmount - investmentAmount;
+        
         if (qianchuanROI > ANALYSIS_THRESHOLDS.EXCELLENT_QIANCHUAN_ROI) {
-          positiveFactors.push(`🎯 千川投流ROI高达${qianchuanROI.toFixed(1)}，营销投入效果卓越`);
+          positiveFactors.push(`🎯 千川投流：投入¥${investmentAmount.toLocaleString()}，获得¥${returnAmount.toLocaleString()}利润，净赚¥${actualReturn.toLocaleString()}，ROI=${qianchuanROI.toFixed(1)}倍，效果卓越`);
         } else if (qianchuanROI > ANALYSIS_THRESHOLDS.GOOD_QIANCHUAN_ROI) {
-          positiveFactors.push(`📊 千川投流ROI为${qianchuanROI.toFixed(1)}，投入产出良好`);
+          positiveFactors.push(`📊 千川投流：投入¥${investmentAmount.toLocaleString()}，净赚¥${actualReturn.toLocaleString()}，ROI=${qianchuanROI.toFixed(1)}倍，投入产出良好`);
         } else if (qianchuanROI < ANALYSIS_THRESHOLDS.WARNING_QIANCHUAN_ROI) {
-          riskWarnings.push(`📉 千川投流ROI仅${qianchuanROI.toFixed(1)}，投入效率亟需提升`);
+          riskWarnings.push(`📉 千川投流：投入¥${investmentAmount.toLocaleString()}但ROI仅${qianchuanROI.toFixed(1)}倍，建议暂停或优化投放策略`);
         } else {
-          keyInsights.push(`🔍 千川投流ROI为${qianchuanROI.toFixed(1)}，处于合理范围`);
+          keyInsights.push(`🔍 千川投流：投入¥${investmentAmount.toLocaleString()}，ROI=${qianchuanROI.toFixed(1)}倍，处于合理范围`);
         }
         
-        // 千川投流支出绝对值检查
-        if (Math.abs(currentMonthData.qianchuan) > ANALYSIS_THRESHOLDS.MAX_QIANCHUAN_COST) {
-          riskWarnings.push(`💸 千川投流支出¥${Math.abs(currentMonthData.qianchuan).toLocaleString()}超出建议上限¥${ANALYSIS_THRESHOLDS.MAX_QIANCHUAN_COST.toLocaleString()}`);
+        // 千川投流支出预算检查
+        if (investmentAmount > ANALYSIS_THRESHOLDS.MAX_QIANCHUAN_COST) {
+          riskWarnings.push(`💸 千川投流¥${investmentAmount.toLocaleString()}超出预算上限¥${ANALYSIS_THRESHOLDS.MAX_QIANCHUAN_COST.toLocaleString()}，建议控制在预算内`);
         }
       }
     }
@@ -145,26 +148,32 @@ export class AIAnalysisLogic {
       }
     }
 
-    // 6. 成本效率深度分析（使用固定阈值）
+    // 6. 成本效率具体分析
     const profitMargin = (currentProfit / (currentProfit + totalCosts)) * 100;
+    const dailyProfit = currentProfit / 30; // 日均利润
     
-    if (profitMargin > ANALYSIS_THRESHOLDS.EXCELLENT_MARGIN) {
-      positiveFactors.push(`💎 利润率${profitMargin.toFixed(1)}%，盈利能力强劲`);
-    } else if (profitMargin > ANALYSIS_THRESHOLDS.GOOD_MARGIN) {
-      positiveFactors.push(`✨ 利润率${profitMargin.toFixed(1)}%，盈利水平良好`);
-    } else if (profitMargin < ANALYSIS_THRESHOLDS.WARNING_MARGIN) {
-      riskWarnings.push(`⚠️ 利润率仅${profitMargin.toFixed(1)}%，成本压力较大`);
-    } else {
-      keyInsights.push(`📊 利润率${profitMargin.toFixed(1)}%，处于合理水平`);
+    // 具体利润水平说明
+    if (currentProfit > ANALYSIS_THRESHOLDS.EXCELLENT_PROFIT) {
+      positiveFactors.push(`🏆 月净利润¥${currentProfit.toLocaleString()}（日均¥${dailyProfit.toLocaleString()}），已达到优秀盈利水平`);
+    } else if (currentProfit > ANALYSIS_THRESHOLDS.GOOD_PROFIT) {
+      positiveFactors.push(`📈 月净利润¥${currentProfit.toLocaleString()}（日均¥${dailyProfit.toLocaleString()}），保持良好盈利状态`);
+    } else if (currentProfit < ANALYSIS_THRESHOLDS.WARNING_PROFIT) {
+      riskWarnings.push(`📉 月净利润¥${currentProfit.toLocaleString()}（日均¥${dailyProfit.toLocaleString()}），距离理想目标¥${ANALYSIS_THRESHOLDS.GOOD_PROFIT.toLocaleString()}还差¥${(ANALYSIS_THRESHOLDS.GOOD_PROFIT - currentProfit).toLocaleString()}`);
     }
     
-    // 绝对利润水平分析
-    if (currentProfit > ANALYSIS_THRESHOLDS.EXCELLENT_PROFIT) {
-      positiveFactors.push(`🏆 月净利润¥${currentProfit.toLocaleString()}，已达到优秀水平`);
-    } else if (currentProfit > ANALYSIS_THRESHOLDS.GOOD_PROFIT) {
-      positiveFactors.push(`📈 月净利润¥${currentProfit.toLocaleString()}，保持良好盈利状态`);
-    } else if (currentProfit < ANALYSIS_THRESHOLDS.WARNING_PROFIT) {
-      riskWarnings.push(`📉 月净利润¥${currentProfit.toLocaleString()}，需要提升盈利能力`);
+    // 具体成本分析
+    const costBreakdown = {
+      payment: Math.abs(currentMonthData.payment_expense_sum),
+      qianchuan: Math.abs(currentMonthData.qianchuan),
+      hard: Math.abs(currentMonthData.hard_expense),
+      other: Math.abs(currentMonthData.other_expense_sum)
+    };
+    
+    const maxCost = Math.max(costBreakdown.payment, costBreakdown.qianchuan, costBreakdown.hard);
+    if (maxCost === costBreakdown.payment) {
+      keyInsights.push(`💰 货款支出¥${costBreakdown.payment.toLocaleString()}是最大成本项，占总成本${(costBreakdown.payment/totalCosts*100).toFixed(1)}%`);
+    } else if (maxCost === costBreakdown.qianchuan) {
+      keyInsights.push(`📱 千川投流¥${costBreakdown.qianchuan.toLocaleString()}是最大成本项，每投入¥1获得¥${(currentProfit/costBreakdown.qianchuan).toFixed(1)}利润`);
     }
 
     // 7. 资金效率分析
@@ -259,19 +268,19 @@ export class AIAnalysisLogic {
   private static calculateRiskControlScore(current: MonthlyFinancialData, last?: MonthlyFinancialData): number {
     let score = 10; // 基础分
     
-    // 薅羊毛收入能力评分（赔付申请金额是额外收入）
+    // 平台补贴收入能力评分（赔付申请金额是额外收入）
     const claimIncomeRatio = (current.claim_amount_sum / Math.abs(current.payment_expense_sum)) * 100;
-    if (claimIncomeRatio > 2) score += 15; // 薅羊毛能力强
+    if (claimIncomeRatio > 2) score += 15; // 政策利用能力强
     else if (claimIncomeRatio > 1) score += 10;
     else if (claimIncomeRatio > 0.5) score += 7;
     else if (claimIncomeRatio > 0.1) score += 5;
     
-    // 薅羊毛收入增长趋势
+    // 平台补贴收入增长趋势
     if (last) {
       const claimChange = (current.claim_amount_sum - last.claim_amount_sum) / Math.abs(last.claim_amount_sum || 1) * 100;
-      if (claimChange > 50) score += 5; // 薅羊毛收入大增是好事
+      if (claimChange > 50) score += 5; // 平台补贴收入大增是好事
       else if (claimChange > 0) score += 3;
-      else if (claimChange < -50) score -= 2; // 薅羊毛机会减少
+      else if (claimChange < -50) score -= 2; // 补贴机会减少
     }
     
     // 业务稳定性评分
@@ -369,12 +378,12 @@ export class AIAnalysisLogic {
       }
     }
     
-    // 薅羊毛收入优化建议
+    // 平台补贴收入优化建议
     const claimIncomeRatio = (current.claim_amount_sum / current.month_profit) * 100;
     if (claimIncomeRatio > 15) {
-      suggestions.push(`🎯 薅羊毛收入占利润${claimIncomeRatio.toFixed(1)}%，建议继续挖掘类似机会扩大收入`);
+      suggestions.push(`🎯 平台补贴收入占利润${claimIncomeRatio.toFixed(1)}%，建议继续深挖政策红利扩大收入`);
     } else if (claimIncomeRatio < 2) {
-      suggestions.push(`💡 薅羊毛收入较少，建议研究平台政策寻找更多补贴机会`);
+      suggestions.push(`💡 平台补贴收入较少，建议研究平台政策寻找更多补贴机会`);
     }
     
     // 现金流建议
