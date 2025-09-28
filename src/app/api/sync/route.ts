@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     
     switch (type) {
       case 'daily':
-        result = await syncDailyData();
+        result = await syncDailyData(range || undefined);
         break;
       case 'monthly':
         result = await syncMonthlyData();

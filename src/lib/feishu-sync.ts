@@ -103,7 +103,7 @@ async function getFeishuTableData(tableId: string, accessToken: string): Promise
 // getFieldValue 函数现在从 @/config/field-mapping 导入
 
 // 同步每日数据（恢复简单有效的逻辑）
-export async function syncDailyData(): Promise<SyncLog> {
+export async function syncDailyData(range?: string): Promise<SyncLog> {
   const syncLog: SyncLog = {
     sync_type: 'daily',
     sync_status: 'failed',
@@ -112,16 +112,43 @@ export async function syncDailyData(): Promise<SyncLog> {
   };
   
   try {
-    console.log('[Sync] 开始同步每日数据...');
+    console.log(`[Sync] 开始同步每日数据... 范围: ${range || '全量'}`);
     
     // 1. 直接调用飞书API获取数据
     const accessToken = await getFeishuAccessToken();
     const feishuData = await getFeishuTableData(ENV_CONFIG.TABLE_BASE_DAILY, accessToken);
     
+    // 2. 根据range参数计算需要同步的记录数量
+    let maxRecords = feishuData.length; // 默认全量
+    
+    if (range) {
+      switch (range) {
+        case '7days':
+          maxRecords = Math.min(7, feishuData.length);
+          break;
+        case '15days':
+          maxRecords = Math.min(15, feishuData.length);
+          break;
+        case '30days':
+          maxRecords = Math.min(30, feishuData.length);
+          break;
+        case 'currentMonth':
+          // 当月数据：从月初到今天的天数
+          const today = new Date();
+          const dayOfMonth = today.getDate();
+          maxRecords = Math.min(dayOfMonth, feishuData.length);
+          break;
+        default:
+          maxRecords = feishuData.length;
+      }
+    }
+    
+    console.log(`[Sync] 将同步最近 ${maxRecords} 条记录 (总共 ${feishuData.length} 条可用)`);
+    
     // 2. 转换数据格式
     const dailyProfits: DailyProfit[] = [];
     
-    feishuData.forEach((record, index) => {
+    feishuData.slice(0, maxRecords).forEach((record, index) => {
       // 恢复昨天可用的简单逻辑：基于索引推算日期，但使用正确的字段名
       // 尝试多种字段名变体来匹配「每日每日利润汇总」
       const profitValue = getFieldValue(record, '每日每日利润汇总') || 
@@ -157,13 +184,23 @@ export async function syncDailyData(): Promise<SyncLog> {
       console.log(`[Sync] 处理每日数据: ${dailyProfit.date} = 利润¥${dailyProfit.daily_profit}, 汇总¥${dailyProfit.profit_summary} (索引${index})`);
     });
     
-    // 3. 批量插入到Supabase
-    for (const dailyProfit of dailyProfits) {
-      try {
-        await SupabaseService.upsertDailyProfit(dailyProfit);
-        syncLog.records_synced++;
-      } catch (error) {
-        console.error(`[Sync] 插入每日数据失败: ${dailyProfit.date}`, error);
+    // 3. 批量插入到Supabase - 性能优化版
+    try {
+      console.log(`[Sync] 准备批量插入 ${dailyProfits.length} 条每日数据`);
+      await SupabaseService.batchUpsertDailyProfits(dailyProfits);
+      syncLog.records_synced = dailyProfits.length;
+      console.log(`[Sync] 批量插入成功，共 ${syncLog.records_synced} 条记录`);
+    } catch (error) {
+      console.error('[Sync] 批量插入每日数据失败，回退到逐条插入:', error);
+      
+      // 批量插入失败时，回退到逐条插入
+      for (const dailyProfit of dailyProfits) {
+        try {
+          await SupabaseService.upsertDailyProfit(dailyProfit);
+          syncLog.records_synced++;
+        } catch (singleError) {
+          console.error(`[Sync] 插入每日数据失败: ${dailyProfit.date}`, singleError);
+        }
       }
     }
     

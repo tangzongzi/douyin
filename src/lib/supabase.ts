@@ -73,12 +73,23 @@ export interface SyncLog {
 // Supabase 数据操作函数
 export class SupabaseService {
   
-  // 获取每日数据
+  // 获取每日数据 - 优化版：只查询必要字段
   static async getDailyProfits(startDate?: string, endDate?: string) {
     const supabase = getSupabaseClient();
     let query = supabase
       .from('daily_profits')
-      .select('*')
+      .select(`
+        id,
+        date,
+        daily_profit,
+        profit_summary,
+        other_expense,
+        payment_expense,
+        withdraw_amount,
+        claim_amount,
+        created_at,
+        updated_at
+      `)
       .order('date', { ascending: false });
     
     if (startDate) query = query.gte('date', startDate);
@@ -94,12 +105,30 @@ export class SupabaseService {
     return data || [];
   }
   
-  // 获取月度汇总数据
+  // 获取月度汇总数据 - 优化版：只查询必要字段
   static async getMonthlySummary(limit: number = 12) {
     const supabase = getSupabaseClient();
     const { data, error } = await supabase
       .from('monthly_summary')
-      .select('*')
+      .select(`
+        id,
+        month,
+        daily_profit_sum,
+        month_profit,
+        net_cashflow,
+        claim_amount_sum,
+        pdd_service_fee,
+        douyin_service_fee,
+        payment_expense_sum,
+        other_expense_sum,
+        shipping_insurance,
+        hard_expense,
+        qianchuan,
+        deposit,
+        initial_fund,
+        created_at,
+        updated_at
+      `)
       .order('month', { ascending: false })
       .limit(limit);
     
@@ -124,6 +153,36 @@ export class SupabaseService {
     }
     
     return data;
+  }
+
+  // 批量插入或更新每日数据 - 性能优化版
+  static async batchUpsertDailyProfits(dailyProfits: DailyProfit[]) {
+    const supabase = getSupabaseClient();
+    
+    console.log(`[Supabase] 开始批量更新 ${dailyProfits.length} 条每日数据`);
+    
+    // 分批处理，每批100条记录
+    const batchSize = 100;
+    const results = [];
+    
+    for (let i = 0; i < dailyProfits.length; i += batchSize) {
+      const batch = dailyProfits.slice(i, i + batchSize);
+      console.log(`[Supabase] 处理批次 ${Math.floor(i/batchSize) + 1}/${Math.ceil(dailyProfits.length/batchSize)}`);
+      
+      const { data, error } = await supabase
+        .from('daily_profits')
+        .upsert(batch, { onConflict: 'date' });
+      
+      if (error) {
+        console.error(`批量更新每日数据失败 (批次 ${i}-${i + batch.length}):`, error);
+        throw error;
+      }
+      
+      results.push(...(data || []));
+    }
+    
+    console.log(`[Supabase] 批量更新完成，共处理 ${results.length} 条记录`);
+    return results;
   }
   
   // 插入或更新月度数据
