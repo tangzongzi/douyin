@@ -171,39 +171,108 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
           </Card>
         )}
 
-        {/* 简单分析结果 */}
+        {/* 简单分析结果 - 优化显示格式 */}
         {simple_analysis && (
-          <Card size="small" title="关键指标分析" style={{ marginBottom: '16px' }}>
+          <Card size="small" title="📊 关键指标分析" style={{ marginBottom: '16px' }}>
             {simple_analysis.positiveFactors.length > 0 && (
-              <div style={{ marginBottom: '12px' }}>
-                <Text strong style={{ color: '#52c41a' }}>✅ 积极因素：</Text>
-                <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
-                  {simple_analysis.positiveFactors.map((factor, index) => (
-                    <li key={index} style={{ color: '#52c41a', fontSize: '13px' }}>{factor}</li>
-                  ))}
-                </ul>
+              <div style={{ 
+                marginBottom: '16px',
+                padding: '12px',
+                background: 'linear-gradient(135deg, #f6ffed 0%, #f0f9ff 100%)',
+                borderRadius: '8px',
+                border: '1px solid #b7eb8f'
+              }}>
+                <Text strong style={{ color: '#389e0d', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
+                  ✅ 积极表现
+                </Text>
+                {simple_analysis.positiveFactors.map((factor, index) => (
+                  <div key={index} style={{ 
+                    marginBottom: '6px',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    color: '#2f5233',
+                    paddingLeft: '16px',
+                    position: 'relative'
+                  }}>
+                    <span style={{ 
+                      position: 'absolute', 
+                      left: '0', 
+                      color: '#52c41a',
+                      fontWeight: 'bold'
+                    }}>
+                      {index + 1}.
+                    </span>
+                    {factor}
+                  </div>
+                ))}
               </div>
             )}
             
             {simple_analysis.riskWarnings.length > 0 && (
-              <div style={{ marginBottom: '12px' }}>
-                <Text strong style={{ color: '#ff4d4f' }}>⚠️ 风险提醒：</Text>
-                <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
-                  {simple_analysis.riskWarnings.map((warning, index) => (
-                    <li key={index} style={{ color: '#ff4d4f', fontSize: '13px' }}>{warning}</li>
-                  ))}
-                </ul>
+              <div style={{ 
+                marginBottom: '16px',
+                padding: '12px',
+                background: 'linear-gradient(135deg, #fff2e8 0%, #fff1f0 100%)',
+                borderRadius: '8px',
+                border: '1px solid #ffccc7'
+              }}>
+                <Text strong style={{ color: '#cf1322', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
+                  ⚠️ 风险警示
+                </Text>
+                {simple_analysis.riskWarnings.map((warning, index) => (
+                  <div key={index} style={{ 
+                    marginBottom: '6px',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    color: '#5c2c2c',
+                    paddingLeft: '16px',
+                    position: 'relative'
+                  }}>
+                    <span style={{ 
+                      position: 'absolute', 
+                      left: '0', 
+                      color: '#ff4d4f',
+                      fontWeight: 'bold'
+                    }}>
+                      {index + 1}.
+                    </span>
+                    {warning}
+                  </div>
+                ))}
               </div>
             )}
             
             {simple_analysis.keyInsights.length > 0 && (
-              <div>
-                <Text strong style={{ color: '#1890ff' }}>💡 关键洞察：</Text>
-                <ul style={{ margin: '4px 0', paddingLeft: '20px' }}>
-                  {simple_analysis.keyInsights.map((insight, index) => (
-                    <li key={index} style={{ color: '#1890ff', fontSize: '13px' }}>{insight}</li>
-                  ))}
-                </ul>
+              <div style={{ 
+                marginBottom: '8px',
+                padding: '12px',
+                background: 'linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)',
+                borderRadius: '8px',
+                border: '1px solid #91d5ff'
+              }}>
+                <Text strong style={{ color: '#0958d9', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
+                  💡 深度洞察
+                </Text>
+                {simple_analysis.keyInsights.map((insight, index) => (
+                  <div key={index} style={{ 
+                    marginBottom: '6px',
+                    fontSize: '13px',
+                    lineHeight: '1.5',
+                    color: '#1d2d5c',
+                    paddingLeft: '16px',
+                    position: 'relative'
+                  }}>
+                    <span style={{ 
+                      position: 'absolute', 
+                      left: '0', 
+                      color: '#1890ff',
+                      fontWeight: 'bold'
+                    }}>
+                      {index + 1}.
+                    </span>
+                    {insight}
+                  </div>
+                ))}
               </div>
             )}
           </Card>

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseService } from '@/lib/supabase';
+import { SupabaseService, getSupabaseClient } from '@/lib/supabase';
 import { AIAnalysisLogic } from '@/lib/ai-analysis-logic';
 import { AIAnalysisRequest, MonthlyFinancialData } from '@/types/ai-analysis';
 import { AIAnalysisReport } from '@/lib/supabase';
@@ -59,30 +59,36 @@ export async function POST(request: NextRequest) {
     const simpleAnalysis = AIAnalysisLogic.generateSimpleAnalysis(analysisRequest);
     const deepAnalysis = AIAnalysisLogic.generateDeepAnalysis(analysisRequest);
     
-    // 5. 调用EdgeOne AI增强分析
+    // 5. 调用EdgeOne AI增强分析（本地环境暂时跳过）
     let aiEnhancedAnalysis = null;
-    try {
-      const aiPrompt = AIAnalysisLogic.prepareAIPrompt(analysisRequest);
-      
-      // 调用EdgeOne边缘AI函数
-      const aiResponse = await fetch('/edge-functions/ai-analysis', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: aiPrompt,
-          analysisType: 'both'
-        })
-      });
-      
-      if (aiResponse.ok) {
-        const aiResult = await aiResponse.json();
-        if (aiResult.success) {
-          aiEnhancedAnalysis = aiResult.data.analysis;
-          console.log('[AI Analysis] EdgeOne AI增强分析完成');
+    const isProduction = process.env.NODE_ENV === 'production';
+    
+    if (isProduction) {
+      try {
+        const aiPrompt = AIAnalysisLogic.prepareAIPrompt(analysisRequest);
+        
+        // 调用EdgeOne边缘AI函数（仅在生产环境）
+        const aiResponse = await fetch('/edge-functions/ai-analysis', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            prompt: aiPrompt,
+            analysisType: 'both'
+          })
+        });
+        
+        if (aiResponse.ok) {
+          const aiResult = await aiResponse.json();
+          if (aiResult.success) {
+            aiEnhancedAnalysis = aiResult.data.analysis;
+            console.log('[AI Analysis] EdgeOne AI增强分析完成');
+          }
         }
+      } catch (aiError) {
+        console.warn('[AI Analysis] EdgeOne AI调用失败，使用本地分析:', aiError);
       }
-    } catch (aiError) {
-      console.warn('[AI Analysis] EdgeOne AI调用失败，使用本地分析:', aiError);
+    } else {
+      console.log('[AI Analysis] 本地环境，跳过EdgeOne AI调用，使用本地分析');
     }
     
     // 6. 保存分析结果到数据库
