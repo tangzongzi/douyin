@@ -575,3 +575,73 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
     </ProCard>
   );
 }
+
+              icon={<RobotOutlined />}
+              onClick={() => generateAnalysis(false)}
+              loading={loading}
+            >
+              生成AI分析
+            </Button>
+          )}
+        </Space>
+      }
+      headerBordered
+      style={{ marginBottom: '24px' }}
+    >
+      {loading && (
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <Spin size="large" />
+          <div style={{ marginTop: '16px', color: '#666' }}>
+            正在分析财务数据，请稍候...
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <Alert
+          message="AI分析失败"
+          description={error}
+          type="error"
+          showIcon
+          action={
+            <Button size="small" onClick={() => generateAnalysis(false)}>
+              重试
+            </Button>
+          }
+        />
+      )}
+
+      {!loading && !error && analysisResult && renderAnalysisContent()}
+
+      {!loading && !error && !analysisResult && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '60px 40px',
+          color: 'rgba(0,0,0,0.45)'
+        }}>
+          <RobotOutlined style={{ 
+            fontSize: '64px', 
+            color: '#d9d9d9', 
+            marginBottom: '16px' 
+          }} />
+          <div style={{ 
+            fontSize: '16px', 
+            fontWeight: '500',
+            color: 'rgba(0,0,0,0.65)',
+            marginBottom: '8px'
+          }}>
+            该月份暂无AI分析报告
+          </div>
+          <div style={{ 
+            fontSize: '14px', 
+            color: 'rgba(0,0,0,0.45)',
+            lineHeight: '1.5'
+          }}>
+            点击"生成AI分析"按钮创建专业的财务智能分析报告<br/>
+            包含风险评估、优化建议和趋势预测
+          </div>
+        </div>
+      )}
+    </ProCard>
+  );
+}
