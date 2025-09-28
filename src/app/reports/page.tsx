@@ -531,17 +531,6 @@ export default function MonthlyReportsPage() {
             </Col>
           </Row>
 
-          {/* AI智能分析面板 */}
-          <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
-            <Col span={24}>
-              <AIAnalysisPanel 
-                selectedMonth={reportData.selectedMonth}
-                onAnalysisComplete={(result) => {
-                  console.log('AI分析完成:', result);
-                }}
-              />
-            </Col>
-          </Row>
 
           {/* 视图切换渲染 */}
           {viewMode === 'table' ? (
@@ -708,14 +697,13 @@ export default function MonthlyReportsPage() {
                   </ProCard>
                 </Col>
                 
-                {/* AI智能分析面板 - 替换支出结构饼图 */}
+                {/* 支出结构饼图 */}
                 <Col span={8}>
-                  <AIAnalysisPanel 
-                    selectedMonth={reportData.selectedMonth}
-                    onAnalysisComplete={(result) => {
-                      console.log('AI分析完成:', result);
-                    }}
-                  />
+                  <ProCard 
+                    title="本月支出结构"
+                    headerBordered
+                    style={{ height: '400px' }}
+                  >
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                          <Pie
