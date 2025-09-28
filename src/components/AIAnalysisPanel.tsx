@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Alert, Spin, Typography, Space, Tag, Progress, Divider } from 'antd';
-import { RobotOutlined, ReloadOutlined, FileTextOutlined, TrophyOutlined } from '@ant-design/icons';
+import { Button, Alert, Spin, Typography, Space, Tag, Progress, Row, Col, Statistic } from 'antd';
+import { ProCard } from '@ant-design/pro-components';
+import { RobotOutlined, ReloadOutlined, TrophyOutlined, WarningOutlined, BulbOutlined, RiseOutlined } from '@ant-design/icons';
 import { AIAnalysisReport } from '@/lib/supabase';
 
 const { Title, Text, Paragraph } = Typography;
@@ -111,200 +112,272 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
 
     return (
       <div>
-        {/* AI增强分析（如果有） */}
+        {/* AI增强分析（如果有） - ProCard风格 */}
         {ai_enhanced_text && (
-          <Card 
-            size="small" 
+          <ProCard 
             title={
               <Space>
-                <RobotOutlined style={{ color: '#1890ff' }} />
+                <RobotOutlined style={{ color: '#722ed1' }} />
                 <span>EdgeOne AI深度分析</span>
-                <Tag color="blue">DeepSeek-R1</Tag>
+                <Tag color="purple">DeepSeek-V3</Tag>
               </Space>
             }
+            bordered
+            headerBordered
             style={{ marginBottom: '16px' }}
           >
             <div style={{ 
               whiteSpace: 'pre-wrap', 
               lineHeight: 1.6,
-              fontSize: '14px'
+              fontSize: '14px',
+              color: 'rgba(0,0,0,0.85)',
+              padding: '8px 0'
             }}>
               {ai_enhanced_text}
             </div>
-          </Card>
+          </ProCard>
         )}
 
-        {/* 财务健康度评分 */}
+        {/* 财务健康度评分 - Ant Design Pro风格 */}
         {deep_analysis && (
-          <Card size="small" title="财务健康度评估" style={{ marginBottom: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-              {renderHealthScore(deep_analysis.healthScore, deep_analysis.healthLevel)}
-              <div style={{ flex: 1 }}>
-                <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                  <div>
-                    <Text strong>盈利能力：</Text>
-                    <Progress 
-                      percent={(deep_analysis.profitabilityScore / 30) * 100} 
-                      size="small" 
-                      format={() => `${deep_analysis.profitabilityScore}/30`}
-                    />
-                  </div>
-                  <div>
-                    <Text strong>风险控制：</Text>
-                    <Progress 
-                      percent={(deep_analysis.riskControlScore / 30) * 100} 
-                      size="small"
-                      format={() => `${deep_analysis.riskControlScore}/30`}
-                    />
-                  </div>
-                  <div>
-                    <Text strong>成本控制：</Text>
-                    <Progress 
-                      percent={(deep_analysis.costControlScore / 40) * 100} 
-                      size="small"
-                      format={() => `${deep_analysis.costControlScore}/40`}
-                    />
-                  </div>
-                </Space>
-              </div>
-            </div>
-          </Card>
-        )}
-
-        {/* 简单分析结果 - 优化显示格式 */}
-        {simple_analysis && (
-          <Card size="small" title="📊 关键指标分析" style={{ marginBottom: '16px' }}>
-            {simple_analysis.positiveFactors.length > 0 && (
-              <div style={{ 
-                marginBottom: '16px',
-                padding: '12px',
-                background: 'linear-gradient(135deg, #f6ffed 0%, #f0f9ff 100%)',
-                borderRadius: '8px',
-                border: '1px solid #b7eb8f'
-              }}>
-                <Text strong style={{ color: '#389e0d', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
-                  ✅ 积极表现
-                </Text>
-                {simple_analysis.positiveFactors.map((factor, index) => (
-                  <div key={index} style={{ 
-                    marginBottom: '6px',
-                    fontSize: '13px',
-                    lineHeight: '1.5',
-                    color: '#2f5233',
-                    paddingLeft: '16px',
-                    position: 'relative'
-                  }}>
-                    <span style={{ 
-                      position: 'absolute', 
-                      left: '0', 
-                      color: '#52c41a',
-                      fontWeight: 'bold'
-                    }}>
-                      {index + 1}.
-                    </span>
-                    {factor}
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {simple_analysis.riskWarnings.length > 0 && (
-              <div style={{ 
-                marginBottom: '16px',
-                padding: '12px',
-                background: 'linear-gradient(135deg, #fff2e8 0%, #fff1f0 100%)',
-                borderRadius: '8px',
-                border: '1px solid #ffccc7'
-              }}>
-                <Text strong style={{ color: '#cf1322', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
-                  ⚠️ 风险警示
-                </Text>
-                {simple_analysis.riskWarnings.map((warning, index) => (
-                  <div key={index} style={{ 
-                    marginBottom: '6px',
-                    fontSize: '13px',
-                    lineHeight: '1.5',
-                    color: '#5c2c2c',
-                    paddingLeft: '16px',
-                    position: 'relative'
-                  }}>
-                    <span style={{ 
-                      position: 'absolute', 
-                      left: '0', 
-                      color: '#ff4d4f',
-                      fontWeight: 'bold'
-                    }}>
-                      {index + 1}.
-                    </span>
-                    {warning}
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            {simple_analysis.keyInsights.length > 0 && (
-              <div style={{ 
-                marginBottom: '8px',
-                padding: '12px',
-                background: 'linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)',
-                borderRadius: '8px',
-                border: '1px solid #91d5ff'
-              }}>
-                <Text strong style={{ color: '#0958d9', fontSize: '14px', marginBottom: '8px', display: 'block' }}>
-                  💡 深度洞察
-                </Text>
-                {simple_analysis.keyInsights.map((insight, index) => (
-                  <div key={index} style={{ 
-                    marginBottom: '6px',
-                    fontSize: '13px',
-                    lineHeight: '1.5',
-                    color: '#1d2d5c',
-                    paddingLeft: '16px',
-                    position: 'relative'
-                  }}>
-                    <span style={{ 
-                      position: 'absolute', 
-                      left: '0', 
-                      color: '#1890ff',
-                      fontWeight: 'bold'
-                    }}>
-                      {index + 1}.
-                    </span>
-                    {insight}
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        )}
-
-        {/* 优化建议和预测 */}
-        {deep_analysis && (
-          <Card size="small" title="优化建议与预测">
-            {deep_analysis.optimizationSuggestions.length > 0 && (
-              <div style={{ marginBottom: '12px' }}>
-                <Text strong>🎯 优化建议：</Text>
-                <ol style={{ margin: '4px 0', paddingLeft: '20px' }}>
-                  {deep_analysis.optimizationSuggestions.map((suggestion, index) => (
-                    <li key={index} style={{ fontSize: '13px', marginBottom: '4px' }}>{suggestion}</li>
-                  ))}
-                </ol>
-              </div>
-            )}
-            
-            <div>
-              <Text strong>📈 下月预测：</Text>
-              <div style={{ marginTop: '8px', padding: '8px', background: '#f6ffed', borderRadius: '4px' }}>
-                <Text>
-                  预计净利润区间：¥{deep_analysis.nextMonthPrediction.profitRange[0].toLocaleString()} - 
-                  ¥{deep_analysis.nextMonthPrediction.profitRange[1].toLocaleString()}
-                </Text>
-                <div style={{ fontSize: '12px', color: '#666', marginTop: '4px' }}>
-                  {deep_analysis.nextMonthPrediction.keyFactors.join(' | ')}
+          <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+            <Col span={6}>
+              <ProCard>
+                <Statistic
+                  title="财务健康度"
+                  value={deep_analysis.healthScore}
+                  suffix="/100"
+                  valueStyle={{ 
+                    color: deep_analysis.healthScore >= 80 ? '#3f8600' : 
+                           deep_analysis.healthScore >= 60 ? '#1890ff' : 
+                           deep_analysis.healthScore >= 40 ? '#faad14' : '#cf1322'
+                  }}
+                  prefix={<TrophyOutlined />}
+                />
+                <div style={{ marginTop: '8px', textAlign: 'center' }}>
+                  <Tag color={
+                    deep_analysis.healthLevel === 'excellent' ? 'green' :
+                    deep_analysis.healthLevel === 'good' ? 'blue' :
+                    deep_analysis.healthLevel === 'fair' ? 'orange' : 'red'
+                  }>
+                    {deep_analysis.healthLevel === 'excellent' ? '优秀' :
+                     deep_analysis.healthLevel === 'good' ? '良好' :
+                     deep_analysis.healthLevel === 'fair' ? '一般' : '较差'}
+                  </Tag>
                 </div>
-              </div>
-            </div>
-          </Card>
+              </ProCard>
+            </Col>
+            <Col span={6}>
+              <ProCard>
+                <Statistic
+                  title="盈利能力"
+                  value={deep_analysis.profitabilityScore}
+                  suffix="/30"
+                  valueStyle={{ 
+                    color: deep_analysis.profitabilityScore >= 25 ? '#3f8600' : 
+                           deep_analysis.profitabilityScore >= 20 ? '#1890ff' : '#faad14'
+                  }}
+                  prefix={<RiseOutlined />}
+                />
+              </ProCard>
+            </Col>
+            <Col span={6}>
+              <ProCard>
+                <Statistic
+                  title="风险控制"
+                  value={deep_analysis.riskControlScore}
+                  suffix="/30"
+                  valueStyle={{ 
+                    color: deep_analysis.riskControlScore >= 25 ? '#3f8600' : 
+                           deep_analysis.riskControlScore >= 20 ? '#1890ff' : '#faad14'
+                  }}
+                  prefix={<WarningOutlined />}
+                />
+              </ProCard>
+            </Col>
+            <Col span={6}>
+              <ProCard>
+                <Statistic
+                  title="成本控制"
+                  value={deep_analysis.costControlScore}
+                  suffix="/40"
+                  valueStyle={{ 
+                    color: deep_analysis.costControlScore >= 35 ? '#3f8600' : 
+                           deep_analysis.costControlScore >= 30 ? '#1890ff' : '#faad14'
+                  }}
+                  prefix={<BulbOutlined />}
+                />
+              </ProCard>
+            </Col>
+          </Row>
+        )}
+
+        {/* 分析结果 - Ant Design Pro风格 */}
+        {simple_analysis && (
+          <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+            {/* 积极表现 */}
+            {simple_analysis.positiveFactors.length > 0 && (
+              <Col span={8}>
+                <ProCard 
+                  title={
+                    <Space>
+                      <RiseOutlined style={{ color: '#52c41a' }} />
+                      <span style={{ color: '#52c41a' }}>积极表现</span>
+                    </Space>
+                  }
+                  bordered
+                  headerBordered
+                  size="small"
+                >
+                  {simple_analysis.positiveFactors.map((factor, index) => (
+                    <div key={index} style={{ 
+                      marginBottom: '8px',
+                      fontSize: '13px',
+                      lineHeight: '1.5',
+                      color: 'rgba(0,0,0,0.85)'
+                    }}>
+                      <Text style={{ color: '#52c41a', fontWeight: '500' }}>
+                        {index + 1}.
+                      </Text>
+                      <span style={{ marginLeft: '8px' }}>{factor}</span>
+                    </div>
+                  ))}
+                </ProCard>
+              </Col>
+            )}
+            
+            {/* 风险警示 */}
+            {simple_analysis.riskWarnings.length > 0 && (
+              <Col span={8}>
+                <ProCard 
+                  title={
+                    <Space>
+                      <WarningOutlined style={{ color: '#ff4d4f' }} />
+                      <span style={{ color: '#ff4d4f' }}>风险警示</span>
+                    </Space>
+                  }
+                  bordered
+                  headerBordered
+                  size="small"
+                >
+                  {simple_analysis.riskWarnings.map((warning, index) => (
+                    <div key={index} style={{ 
+                      marginBottom: '8px',
+                      fontSize: '13px',
+                      lineHeight: '1.5',
+                      color: 'rgba(0,0,0,0.85)'
+                    }}>
+                      <Text style={{ color: '#ff4d4f', fontWeight: '500' }}>
+                        {index + 1}.
+                      </Text>
+                      <span style={{ marginLeft: '8px' }}>{warning}</span>
+                    </div>
+                  ))}
+                </ProCard>
+              </Col>
+            )}
+            
+            {/* 深度洞察 */}
+            {simple_analysis.keyInsights.length > 0 && (
+              <Col span={8}>
+                <ProCard 
+                  title={
+                    <Space>
+                      <BulbOutlined style={{ color: '#1890ff' }} />
+                      <span style={{ color: '#1890ff' }}>深度洞察</span>
+                    </Space>
+                  }
+                  bordered
+                  headerBordered
+                  size="small"
+                >
+                  {simple_analysis.keyInsights.map((insight, index) => (
+                    <div key={index} style={{ 
+                      marginBottom: '8px',
+                      fontSize: '13px',
+                      lineHeight: '1.5',
+                      color: 'rgba(0,0,0,0.85)'
+                    }}>
+                      <Text style={{ color: '#1890ff', fontWeight: '500' }}>
+                        {index + 1}.
+                      </Text>
+                      <span style={{ marginLeft: '8px' }}>{insight}</span>
+                    </div>
+                  ))}
+                </ProCard>
+              </Col>
+            )}
+          </Row>
+        )}
+
+        {/* 优化建议和预测 - ProCard风格 */}
+        {deep_analysis && (
+          <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+            {/* 优化建议 */}
+            {deep_analysis.optimizationSuggestions.length > 0 && (
+              <Col span={16}>
+                <ProCard 
+                  title={
+                    <Space>
+                      <BulbOutlined style={{ color: '#fa8c16' }} />
+                      <span>优化建议</span>
+                    </Space>
+                  }
+                  bordered
+                  headerBordered
+                  size="small"
+                >
+                  {deep_analysis.optimizationSuggestions.map((suggestion, index) => (
+                    <div key={index} style={{ 
+                      marginBottom: '12px',
+                      fontSize: '13px',
+                      lineHeight: '1.6',
+                      color: 'rgba(0,0,0,0.85)',
+                      padding: '8px 12px',
+                      background: '#fafafa',
+                      borderRadius: '6px',
+                      borderLeft: '3px solid #fa8c16'
+                    }}>
+                      <Text strong style={{ color: '#fa8c16' }}>
+                        建议{index + 1}：
+                      </Text>
+                      <span style={{ marginLeft: '8px' }}>{suggestion}</span>
+                    </div>
+                  ))}
+                </ProCard>
+              </Col>
+            )}
+            
+            {/* 下月预测 */}
+            <Col span={8}>
+              <ProCard 
+                title={
+                  <Space>
+                    <RiseOutlined style={{ color: '#1890ff' }} />
+                    <span>下月预测</span>
+                  </Space>
+                }
+                bordered
+                headerBordered
+                size="small"
+              >
+                <Statistic
+                  title="预计净利润区间"
+                  value={`${(deep_analysis.nextMonthPrediction.profitRange[0] / 1000).toFixed(0)}k-${(deep_analysis.nextMonthPrediction.profitRange[1] / 1000).toFixed(0)}k`}
+                  prefix="¥"
+                  valueStyle={{ color: '#1890ff', fontSize: '18px' }}
+                />
+                <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
+                  <Text type="secondary">预测依据：</Text>
+                  {deep_analysis.nextMonthPrediction.keyFactors.map((factor, index) => (
+                    <div key={index} style={{ marginTop: '4px' }}>
+                      • {factor}
+                    </div>
+                  ))}
+                </div>
+              </ProCard>
+            </Col>
+          </Row>
         )}
 
         {/* 分析信息 */}
@@ -324,16 +397,15 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
   };
 
   return (
-    <Card
+    <ProCard
       title={
-        <Space>
-          <RobotOutlined style={{ color: '#1890ff' }} />
-          <span>AI智能分析</span>
-          <Tag color="blue">{selectedMonth}</Tag>
-        </Space>
+        <span style={{ fontSize: '16px', fontWeight: '600' }}>
+          AI智能分析
+        </span>
       }
       extra={
         <Space>
+          <Tag color="blue">{selectedMonth}</Tag>
           {analysisResult && (
             <Button
               size="small"
@@ -357,6 +429,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
           )}
         </Space>
       }
+      headerBordered
       style={{ marginBottom: '24px' }}
     >
       {loading && (
@@ -387,16 +460,32 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
       {!loading && !error && !analysisResult && (
         <div style={{ 
           textAlign: 'center', 
-          padding: '40px',
-          color: '#666'
+          padding: '60px 40px',
+          color: 'rgba(0,0,0,0.45)'
         }}>
-          <RobotOutlined style={{ fontSize: '48px', color: '#d9d9d9', marginBottom: '16px' }} />
-          <div>该月份暂无AI分析报告</div>
-          <div style={{ fontSize: '12px', marginTop: '8px' }}>
-            点击"生成AI分析"按钮创建智能分析报告
+          <RobotOutlined style={{ 
+            fontSize: '64px', 
+            color: '#d9d9d9', 
+            marginBottom: '16px' 
+          }} />
+          <div style={{ 
+            fontSize: '16px', 
+            fontWeight: '500',
+            color: 'rgba(0,0,0,0.65)',
+            marginBottom: '8px'
+          }}>
+            该月份暂无AI分析报告
+          </div>
+          <div style={{ 
+            fontSize: '14px', 
+            color: 'rgba(0,0,0,0.45)',
+            lineHeight: '1.5'
+          }}>
+            点击"生成AI分析"按钮创建专业的财务智能分析报告<br/>
+            包含风险评估、优化建议和趋势预测
           </div>
         </div>
       )}
-    </Card>
+    </ProCard>
   );
 }
