@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SupabaseService, getSupabaseClient } from '@/lib/supabase';
+import { SupabaseService } from '@/lib/supabase';
 import { AIAnalysisLogic } from '@/lib/ai-analysis-logic';
 import { AIAnalysisRequest, MonthlyFinancialData } from '@/types/ai-analysis';
 import { AIAnalysisReport } from '@/lib/supabase';
@@ -177,7 +177,7 @@ export async function GET(request: NextRequest) {
 // 辅助函数：获取已有分析结果
 async function getExistingAnalysis(month: string): Promise<AIAnalysisReport | null> {
   try {
-    const supabase = getSupabaseClient();
+    const supabase = SupabaseService.getSupabaseClient();
     const { data, error } = await supabase
       .from('ai_analysis_reports')
       .select('*')
@@ -200,7 +200,7 @@ async function getExistingAnalysis(month: string): Promise<AIAnalysisReport | nu
 // 辅助函数：保存分析结果
 async function saveAnalysisResult(result: AIAnalysisReport): Promise<void> {
   try {
-    const supabase = getSupabaseClient();
+    const supabase = SupabaseService.getSupabaseClient();
     const { error } = await supabase
       .from('ai_analysis_reports')
       .upsert(result, { onConflict: 'month' });
@@ -219,7 +219,7 @@ async function saveAnalysisResult(result: AIAnalysisReport): Promise<void> {
 // 辅助函数：获取所有分析结果
 async function getAllAnalysisResults(): Promise<AIAnalysisReport[]> {
   try {
-    const supabase = getSupabaseClient();
+    const supabase = SupabaseService.getSupabaseClient();
     const { data, error } = await supabase
       .from('ai_analysis_reports')
       .select('*')

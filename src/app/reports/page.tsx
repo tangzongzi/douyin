@@ -708,13 +708,14 @@ export default function MonthlyReportsPage() {
                   </ProCard>
                 </Col>
                 
-                {/* 支出结构饼图 */}
+                {/* AI智能分析面板 - 替换支出结构饼图 */}
                 <Col span={8}>
-                  <ProCard 
-                    title="本月支出结构"
-                    headerBordered
-                    style={{ height: '400px' }}
-                  >
+                  <AIAnalysisPanel 
+                    selectedMonth={reportData.selectedMonth}
+                    onAnalysisComplete={(result) => {
+                      console.log('AI分析完成:', result);
+                    }}
+                  />
                     <ResponsiveContainer width="100%" height="100%">
                       <PieChart>
                          <Pie
