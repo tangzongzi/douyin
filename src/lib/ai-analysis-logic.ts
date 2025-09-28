@@ -78,7 +78,6 @@ export class AIAnalysisLogic {
 
       // 3. 多赞平台补贴分析（具体化说明）
       const claimChange = ((currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum) / Math.abs(lastMonthData.claim_amount_sum || 1)) * 100;
-      const claimIncomeRatio = (currentMonthData.claim_amount_sum / currentMonthData.month_profit) * 100;
       
       if (claimChange > 50) {
         positiveFactors.push(`💰 多赞平台补贴收入大增：从¥${lastMonthData.claim_amount_sum.toLocaleString()}增至¥${currentMonthData.claim_amount_sum.toLocaleString()}，新增收入¥${(currentMonthData.claim_amount_sum - lastMonthData.claim_amount_sum).toLocaleString()}`);
@@ -98,10 +97,8 @@ export class AIAnalysisLogic {
       }
 
       // 4. 营销投入效率分析
-      const qianchuanChange = ((Math.abs(currentMonthData.qianchuan) - Math.abs(lastMonthData.qianchuan)) / Math.abs(lastMonthData.qianchuan || 1)) * 100;
       if (currentMonthData.qianchuan > 0) {
         const qianchuanROI = currentProfit / Math.abs(currentMonthData.qianchuan);
-        const lastROI = lastMonthData.month_profit / Math.abs(lastMonthData.qianchuan || 1);
         
         // 具体ROI分析
         const investmentAmount = Math.abs(currentMonthData.qianchuan);
@@ -151,7 +148,6 @@ export class AIAnalysisLogic {
     }
 
     // 6. 成本效率具体分析
-    const profitMargin = (currentProfit / (currentProfit + totalCosts)) * 100;
     const dailyProfit = currentProfit / 30; // 日均利润
     
     // 具体利润水平说明
@@ -209,7 +205,7 @@ export class AIAnalysisLogic {
     const riskControlScore = this.calculateRiskControlScore(currentMonthData, lastMonthData);
     
     // 成本控制评分 (40分)
-    const costControlScore = this.calculateCostControlScore(currentMonthData, historicalData);
+    const costControlScore = this.calculateCostControlScore(currentMonthData);
     
     healthScore = Math.round((profitabilityScore + riskControlScore + costControlScore));
     
@@ -295,7 +291,7 @@ export class AIAnalysisLogic {
   /**
    * 计算成本控制评分
    */
-  private static calculateCostControlScore(current: MonthlyFinancialData, historical: MonthlyFinancialData[]): number {
+  private static calculateCostControlScore(current: MonthlyFinancialData): number {
     let score = 20; // 基础分
     
     // 成本效率

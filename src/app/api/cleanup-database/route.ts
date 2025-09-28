@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       console.log('[Cleanup] 准备删除多余字段...');
       
       // 使用原生SQL删除字段
-      const { data, error } = await supabase.rpc('exec_sql', {
+      const { error } = await supabase.rpc('exec_sql', {
         sql: 'ALTER TABLE public.monthly_summary DROP COLUMN IF EXISTS previous_month_profit;'
       });
       

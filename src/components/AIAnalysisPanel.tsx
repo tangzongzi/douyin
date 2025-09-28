@@ -1,12 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Button, Alert, Spin, Typography, Space, Tag, Progress, Row, Col, Statistic } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
 import { RobotOutlined, ReloadOutlined, TrophyOutlined, WarningOutlined, BulbOutlined, RiseOutlined } from '@ant-design/icons';
 import { AIAnalysisReport } from '@/lib/supabase';
 
-const { Title, Text, Paragraph } = Typography;
+const { Text } = Typography;
 
 interface AIAnalysisPanelProps {
   selectedMonth: string;
@@ -21,10 +21,10 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
   // 组件加载时检查是否已有分析结果
   useEffect(() => {
     checkExistingAnalysis();
-  }, [selectedMonth]);
+  }, [selectedMonth, checkExistingAnalysis]);
 
   // 检查已有分析结果
-  const checkExistingAnalysis = async () => {
+  const checkExistingAnalysis = useCallback(async () => {
     try {
       const response = await fetch(`/api/ai-analysis?month=${selectedMonth}`);
       const result = await response.json();
@@ -39,7 +39,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
       console.log('检查已有分析结果失败:', error);
       setAnalysisResult(null);
     }
-  };
+  }, [selectedMonth]);
 
   // 生成AI分析
   const generateAnalysis = async (force = false) => {
@@ -67,42 +67,6 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
     }
   };
 
-  // 渲染健康度评分
-  const renderHealthScore = (score: number, level: string) => {
-    const getColor = () => {
-      if (score >= 85) return '#52c41a';
-      if (score >= 70) return '#1890ff';
-      if (score >= 55) return '#faad14';
-      return '#ff4d4f';
-    };
-
-    const getLevelText = () => {
-      switch (level) {
-        case 'excellent': return '优秀';
-        case 'good': return '良好';
-        case 'fair': return '一般';
-        case 'poor': return '较差';
-        default: return level;
-      }
-    };
-
-    return (
-      <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-        <Progress
-          type="circle"
-          percent={score}
-          format={() => `${score}分`}
-          strokeColor={getColor()}
-          size={80}
-        />
-        <div style={{ marginTop: '8px' }}>
-          <Tag color={getColor()} style={{ fontSize: '14px', padding: '4px 12px' }}>
-            {getLevelText()}
-          </Tag>
-        </div>
-      </div>
-    );
-  };
 
   // 渲染分析内容
   const renderAnalysisContent = () => {
@@ -497,7 +461,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
             color: 'rgba(0,0,0,0.45)',
             lineHeight: '1.5'
           }}>
-            点击"生成AI分析"按钮创建专业的财务智能分析报告<br/>
+            点击&quot;生成AI分析&quot;按钮创建专业的财务智能分析报告<br/>
             包含风险评估、优化建议和趋势预测
           </div>
         </div>
