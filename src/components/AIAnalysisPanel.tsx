@@ -148,18 +148,14 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   value={deep_analysis.healthScore}
                   suffix="/100"
                   valueStyle={{ 
-                    color: deep_analysis.healthScore >= 80 ? '#3f8600' : 
-                           deep_analysis.healthScore >= 60 ? '#1890ff' : 
-                           deep_analysis.healthScore >= 40 ? '#faad14' : '#cf1322'
+                    color: '#1890ff',
+                    fontSize: '24px',
+                    fontWeight: '600'
                   }}
-                  prefix={<TrophyOutlined />}
+                  prefix={<TrophyOutlined style={{ color: '#1890ff' }} />}
                 />
                 <div style={{ marginTop: '8px', textAlign: 'center' }}>
-                  <Tag color={
-                    deep_analysis.healthLevel === 'excellent' ? 'green' :
-                    deep_analysis.healthLevel === 'good' ? 'blue' :
-                    deep_analysis.healthLevel === 'fair' ? 'orange' : 'red'
-                  }>
+                  <Tag color="blue">
                     {deep_analysis.healthLevel === 'excellent' ? '优秀' :
                      deep_analysis.healthLevel === 'good' ? '良好' :
                      deep_analysis.healthLevel === 'fair' ? '一般' : '较差'}
@@ -174,10 +170,11 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   value={deep_analysis.profitabilityScore}
                   suffix="/30"
                   valueStyle={{ 
-                    color: deep_analysis.profitabilityScore >= 25 ? '#3f8600' : 
-                           deep_analysis.profitabilityScore >= 20 ? '#1890ff' : '#faad14'
+                    color: '#1890ff',
+                    fontSize: '20px',
+                    fontWeight: '600'
                   }}
-                  prefix={<RiseOutlined />}
+                  prefix={<RiseOutlined style={{ color: '#1890ff' }} />}
                 />
               </ProCard>
             </Col>
@@ -188,10 +185,11 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   value={deep_analysis.riskControlScore}
                   suffix="/30"
                   valueStyle={{ 
-                    color: deep_analysis.riskControlScore >= 25 ? '#3f8600' : 
-                           deep_analysis.riskControlScore >= 20 ? '#1890ff' : '#faad14'
+                    color: '#1890ff',
+                    fontSize: '20px',
+                    fontWeight: '600'
                   }}
-                  prefix={<WarningOutlined />}
+                  prefix={<WarningOutlined style={{ color: '#1890ff' }} />}
                 />
               </ProCard>
             </Col>
@@ -202,10 +200,11 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   value={deep_analysis.costControlScore}
                   suffix="/40"
                   valueStyle={{ 
-                    color: deep_analysis.costControlScore >= 35 ? '#3f8600' : 
-                           deep_analysis.costControlScore >= 30 ? '#1890ff' : '#faad14'
+                    color: '#1890ff',
+                    fontSize: '20px',
+                    fontWeight: '600'
                   }}
-                  prefix={<BulbOutlined />}
+                  prefix={<BulbOutlined style={{ color: '#1890ff' }} />}
                 />
               </ProCard>
             </Col>
@@ -221,8 +220,8 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                 <ProCard 
                   title={
                     <Space>
-                      <RiseOutlined style={{ color: '#52c41a' }} />
-                      <span style={{ color: '#52c41a' }}>积极表现</span>
+                      <RiseOutlined style={{ color: '#1890ff' }} />
+                      <span>积极表现</span>
                     </Space>
                   }
                   bordered
@@ -236,7 +235,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                       lineHeight: '1.5',
                       color: 'rgba(0,0,0,0.85)'
                     }}>
-                      <Text style={{ color: '#52c41a', fontWeight: '500' }}>
+                      <Text style={{ color: '#1890ff', fontWeight: '500' }}>
                         {index + 1}.
                       </Text>
                       <span style={{ marginLeft: '8px' }}>{factor}</span>
@@ -252,8 +251,8 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                 <ProCard 
                   title={
                     <Space>
-                      <WarningOutlined style={{ color: '#ff4d4f' }} />
-                      <span style={{ color: '#ff4d4f' }}>风险警示</span>
+                      <WarningOutlined style={{ color: '#1890ff' }} />
+                      <span>风险警示</span>
                     </Space>
                   }
                   bordered
@@ -267,7 +266,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                       lineHeight: '1.5',
                       color: 'rgba(0,0,0,0.85)'
                     }}>
-                      <Text style={{ color: '#ff4d4f', fontWeight: '500' }}>
+                      <Text style={{ color: '#1890ff', fontWeight: '500' }}>
                         {index + 1}.
                       </Text>
                       <span style={{ marginLeft: '8px' }}>{warning}</span>
@@ -284,7 +283,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   title={
                     <Space>
                       <BulbOutlined style={{ color: '#1890ff' }} />
-                      <span style={{ color: '#1890ff' }}>深度洞察</span>
+                      <span>深度洞察</span>
                     </Space>
                   }
                   bordered
@@ -319,7 +318,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                 <ProCard 
                   title={
                     <Space>
-                      <BulbOutlined style={{ color: '#fa8c16' }} />
+                      <BulbOutlined style={{ color: '#1890ff' }} />
                       <span>优化建议</span>
                     </Space>
                   }
@@ -336,9 +335,9 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                       padding: '8px 12px',
                       background: '#fafafa',
                       borderRadius: '6px',
-                      borderLeft: '3px solid #fa8c16'
+                      borderLeft: '3px solid #1890ff'
                     }}>
-                      <Text strong style={{ color: '#fa8c16' }}>
+                      <Text strong style={{ color: '#1890ff' }}>
                         建议{index + 1}：
                       </Text>
                       <span style={{ marginLeft: '8px' }}>{suggestion}</span>
