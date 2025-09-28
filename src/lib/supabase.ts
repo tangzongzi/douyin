@@ -54,10 +54,8 @@ export interface MonthlySummary {
 export interface YearProfit {
   id?: number;
   year: string;
-  profit_with_deposit: number; // 含保证金利润
-  total_profit_with_deposit: number; // 含保证金总利润
-  profit_without_deposit: number; // 不含保证金利润
-  net_profit_without_deposit: number; // 不含保证金余利润
+  profit_with_deposit: number;     // 含保证金利润 (118612.03)
+  profit_without_deposit: number;  // 不含保证金余利润 (103601.99)
   created_at?: string;
   updated_at?: string;
 }

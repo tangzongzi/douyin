@@ -65,26 +65,20 @@ export const MONTHLY_FIELD_MAPPING = {
 } as const;
 
 // 年度利润表字段映射 (年度利润表)
-// 根据开发文档，年度利润表只有这4个核心字段
+// 根据最新飞书表格，年度利润表只有2个核心字段
 export const YEARLY_FIELD_MAPPING = {
-  // 年份字段 - 飞书中可能显示为"日期"或"年份"
-  '日期': 'year',                              // 飞书字段名：日期
+  // 年份字段 - 飞书中显示为"日期"
+  '日期': 'year',                              // 飞书字段名：日期（2025年）
   '年份': 'year',                              // 备选字段名：年份
   
-  // 含保证金利润 - 根据开发文档的字段名
-  '含保证金利润': 'profit_with_deposit',        // 开发文档标准字段名
-  '含保证金': 'profit_with_deposit',            // 飞书可能的简化字段名
+  // 含保证金利润 - 飞书实际字段名
+  '含保证金利润': 'profit_with_deposit',        // 飞书字段名：含保证金利润 (118612.03)
+  '含保证金': 'profit_with_deposit',            // 备选字段名
   
-  // 含保证金总利润 - 开发文档中的第二个字段
-  '含保证金总利润': 'total_profit_with_deposit', // 开发文档标准字段名
-  
-  // 不含保证金利润 - 开发文档中的第三个字段  
-  '不含保证金利润': 'profit_without_deposit',   // 开发文档标准字段名
-  '不含保证金总利润': 'profit_without_deposit', // 飞书可能的字段名变体
-  
-  // 不含保证金余利润 - 开发文档中的第四个字段
-  '不含保证金余利润': 'net_profit_without_deposit', // 开发文档标准字段名
-  '不含保证金剩余利润': 'net_profit_without_deposit', // 飞书可能的字段名变体
+  // 不含保证金余利润 - 飞书实际字段名  
+  '不含保证金余利润': 'profit_without_deposit', // 飞书字段名：不含保证金余利润 (103601.99)
+  '不含保证金剩余利润': 'profit_without_deposit', // 备选字段名
+  '不含保证金利润': 'profit_without_deposit',   // 备选字段名
 } as const;
 
 // 表格ID配置 (已确认)

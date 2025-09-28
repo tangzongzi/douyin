@@ -39,12 +39,22 @@ export async function GET(request: NextRequest) {
       // 从Supabase获取数据
       const data = await SupabaseService.getYearProfits(limit);
       
+      // 只返回优化后的2个核心字段
+      const optimizedData = data.map(item => ({
+        id: item.id,
+        year: item.year,
+        profit_with_deposit: item.profit_with_deposit,     // 含保证金利润
+        profit_without_deposit: item.profit_without_deposit, // 不含保证金余利润
+        created_at: item.created_at,
+        updated_at: item.updated_at
+      }));
+
       return NextResponse.json({
         success: true,
-        message: '获取年度利润数据成功',
-        data: data,
+        message: '获取年度利润数据成功（优化版）',
+        data: optimizedData,
         source: 'supabase',
-        count: data.length,
+        count: optimizedData.length,
         timestamp: new Date().toISOString()
       });
     }

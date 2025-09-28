@@ -346,21 +346,25 @@ export async function syncYearData(): Promise<SyncLog> {
       console.log(`[Sync Debug] 记录${index}的所有字段名:`, fieldNames);
       console.log(`[Sync Debug] 记录${index}的字段值:`, fields);
       
-      // 根据开发文档，年度利润表只有4个核心字段，直接使用getFieldValue进行匹配
+      // 根据最新飞书表格，年度利润表只有2个核心字段
+      const profitWithDeposit = getFieldValue(record, '含保证金利润') || getFieldValue(record, '含保证金');
+      const profitWithoutDeposit = getFieldValue(record, '不含保证金余利润') || getFieldValue(record, '不含保证金剩余利润') || getFieldValue(record, '不含保证金利润');
+      
       const yearProfit: YearProfit = {
         year: String(getFieldValue(record, '日期') || getFieldValue(record, '年份') || '2025').replace('年', ''), 
-        profit_with_deposit: getFieldValue(record, '含保证金利润') || getFieldValue(record, '含保证金'),
-        total_profit_with_deposit: getFieldValue(record, '含保证金总利润') || getFieldValue(record, '含保证金利润') || getFieldValue(record, '含保证金'),
-        profit_without_deposit: getFieldValue(record, '不含保证金利润') || getFieldValue(record, '不含保证金总利润'),
-        net_profit_without_deposit: getFieldValue(record, '不含保证金余利润') || getFieldValue(record, '不含保证金剩余利润'),
+        profit_with_deposit: profitWithDeposit,      // 含保证金利润 (118612.03)
+        profit_without_deposit: profitWithoutDeposit, // 不含保证金余利润 (103601.99)
       };
       
       yearProfits.push(yearProfit);
       console.log(`[Sync] 处理年度数据: ${yearProfit.year}`);
       console.log(`  - 含保证金利润: ¥${yearProfit.profit_with_deposit}`);
-      console.log(`  - 含保证金总利润: ¥${yearProfit.total_profit_with_deposit}`);
-      console.log(`  - 不含保证金利润: ¥${yearProfit.profit_without_deposit}`);
-      console.log(`  - 不含保证金余利润: ¥${yearProfit.net_profit_without_deposit}`);
+      console.log(`  - 不含保证金余利润: ¥${yearProfit.profit_without_deposit}`);
+      
+      // 调试：显示原始字段值
+      console.log(`[Sync Debug] 原始字段值:`);
+      console.log(`  - 含保证金利润字段: ${profitWithDeposit}`);
+      console.log(`  - 不含保证金余利润字段: ${profitWithoutDeposit}`);
     });
     
     // 4. 批量插入到Supabase
