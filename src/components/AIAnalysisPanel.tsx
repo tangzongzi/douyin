@@ -228,34 +228,37 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
           </Row>
         )}
 
-        {/* 分析结果 - Ant Design Pro风格 */}
+        {/* 分析结果 - 企业级专业风格 */}
         {simple_analysis && (
           <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
             {/* 积极表现 */}
             {simple_analysis.positiveFactors.length > 0 && (
               <Col span={8}>
                 <ProCard 
-                  title={
-                    <Space>
-                      <RiseOutlined style={{ color: '#1890ff' }} />
-                      <span>积极表现</span>
-                    </Space>
-                  }
+                  title="积极表现"
                   bordered
                   headerBordered
                   size="small"
+                  headStyle={{ 
+                    background: 'linear-gradient(135deg, #f6ffed 0%, #f0f9ff 100%)',
+                    borderBottom: '1px solid #b7eb8f'
+                  }}
                 >
                   {simple_analysis.positiveFactors.map((factor, index) => (
                     <div key={index} style={{ 
-                      marginBottom: '8px',
+                      marginBottom: '12px',
                       fontSize: '13px',
-                      lineHeight: '1.5',
-                      color: 'rgba(0,0,0,0.85)'
+                      lineHeight: '1.6',
+                      color: 'rgba(0,0,0,0.85)',
+                      padding: '8px 12px',
+                      background: '#fafafa',
+                      borderRadius: '6px',
+                      borderLeft: '3px solid #52c41a'
                     }}>
-                      <Text style={{ color: '#1890ff', fontWeight: '500' }}>
-                        {index + 1}.
+                      <Text strong style={{ color: '#52c41a', marginRight: '8px' }}>
+                        {index + 1}
                       </Text>
-                      <span style={{ marginLeft: '8px' }}>{factor}</span>
+                      <span>{factor.replace(/[💰📈📊🎯⚡🏆✨]/g, '')}</span>
                     </div>
                   ))}
                 </ProCard>
@@ -266,27 +269,30 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
             {simple_analysis.riskWarnings.length > 0 && (
               <Col span={8}>
                 <ProCard 
-                  title={
-                    <Space>
-                      <WarningOutlined style={{ color: '#1890ff' }} />
-                      <span>风险警示</span>
-                    </Space>
-                  }
+                  title="风险警示"
                   bordered
                   headerBordered
                   size="small"
+                  headStyle={{ 
+                    background: 'linear-gradient(135deg, #fff2e8 0%, #fff1f0 100%)',
+                    borderBottom: '1px solid #ffccc7'
+                  }}
                 >
                   {simple_analysis.riskWarnings.map((warning, index) => (
                     <div key={index} style={{ 
-                      marginBottom: '8px',
+                      marginBottom: '12px',
                       fontSize: '13px',
-                      lineHeight: '1.5',
-                      color: 'rgba(0,0,0,0.85)'
+                      lineHeight: '1.6',
+                      color: 'rgba(0,0,0,0.85)',
+                      padding: '8px 12px',
+                      background: '#fafafa',
+                      borderRadius: '6px',
+                      borderLeft: '3px solid #ff4d4f'
                     }}>
-                      <Text style={{ color: '#1890ff', fontWeight: '500' }}>
-                        {index + 1}.
+                      <Text strong style={{ color: '#ff4d4f', marginRight: '8px' }}>
+                        {index + 1}
                       </Text>
-                      <span style={{ marginLeft: '8px' }}>{warning}</span>
+                      <span>{warning.replace(/[⚠️📉🚨]/g, '')}</span>
                     </div>
                   ))}
                 </ProCard>
@@ -297,53 +303,16 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
             {simple_analysis.keyInsights.length > 0 && (
               <Col span={8}>
                 <ProCard 
-                  title={
-                    <Space>
-                      <BulbOutlined style={{ color: '#1890ff' }} />
-                      <span>深度洞察</span>
-                    </Space>
-                  }
+                  title="深度洞察"
                   bordered
                   headerBordered
                   size="small"
+                  headStyle={{ 
+                    background: 'linear-gradient(135deg, #e6f7ff 0%, #f0f5ff 100%)',
+                    borderBottom: '1px solid #91d5ff'
+                  }}
                 >
                   {simple_analysis.keyInsights.map((insight, index) => (
-                    <div key={index} style={{ 
-                      marginBottom: '8px',
-                      fontSize: '13px',
-                      lineHeight: '1.5',
-                      color: 'rgba(0,0,0,0.85)'
-                    }}>
-                      <Text style={{ color: '#1890ff', fontWeight: '500' }}>
-                        {index + 1}.
-                      </Text>
-                      <span style={{ marginLeft: '8px' }}>{insight}</span>
-                    </div>
-                  ))}
-                </ProCard>
-              </Col>
-            )}
-          </Row>
-        )}
-
-        {/* 优化建议和预测 - ProCard风格 */}
-        {deep_analysis && (
-          <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
-            {/* 优化建议 */}
-            {deep_analysis.optimizationSuggestions.length > 0 && (
-              <Col span={16}>
-                <ProCard 
-                  title={
-                    <Space>
-                      <BulbOutlined style={{ color: '#1890ff' }} />
-                      <span>优化建议</span>
-                    </Space>
-                  }
-                  bordered
-                  headerBordered
-                  size="small"
-                >
-                  {deep_analysis.optimizationSuggestions.map((suggestion, index) => (
                     <div key={index} style={{ 
                       marginBottom: '12px',
                       fontSize: '13px',
@@ -354,12 +323,76 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                       borderRadius: '6px',
                       borderLeft: '3px solid #1890ff'
                     }}>
-                      <Text strong style={{ color: '#1890ff' }}>
-                        建议{index + 1}：
+                      <Text strong style={{ color: '#1890ff', marginRight: '8px' }}>
+                        {index + 1}
                       </Text>
-                      <span style={{ marginLeft: '8px' }}>{suggestion}</span>
+                      <span>{insight.replace(/[💡🔍📊]/g, '')}</span>
                     </div>
                   ))}
+                </ProCard>
+              </Col>
+            )}
+          </Row>
+        )}
+
+        {/* 专业建议与预测 - 企业级风格 */}
+        {deep_analysis && (
+          <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
+            {/* 优化建议 */}
+            {deep_analysis.optimizationSuggestions.length > 0 && (
+              <Col span={16}>
+                <ProCard 
+                  title="专业优化建议"
+                  bordered
+                  headerBordered
+                  size="small"
+                  headStyle={{ 
+                    background: 'linear-gradient(135deg, #fffbe6 0%, #fff7e6 100%)',
+                    borderBottom: '1px solid #ffd666'
+                  }}
+                >
+                  <div style={{ padding: '8px 0' }}>
+                    {deep_analysis.optimizationSuggestions.map((suggestion, index) => (
+                      <div key={index} style={{ 
+                        marginBottom: '16px',
+                        fontSize: '14px',
+                        lineHeight: '1.7',
+                        color: 'rgba(0,0,0,0.85)'
+                      }}>
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'flex-start',
+                          gap: '12px'
+                        }}>
+                          <div style={{
+                            minWidth: '24px',
+                            height: '24px',
+                            background: '#fa8c16',
+                            borderRadius: '50%',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'white',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            marginTop: '2px'
+                          }}>
+                            {index + 1}
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <div style={{
+                              padding: '12px 16px',
+                              background: 'rgba(255,255,255,0.8)',
+                              borderRadius: '8px',
+                              border: '1px solid #f0f0f0'
+                            }}>
+                              {suggestion.replace(/[🎯📈💰🔍💡📊📉💸💳💧]/g, '')}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </ProCard>
               </Col>
             )}
@@ -367,29 +400,66 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
             {/* 下月预测 */}
             <Col span={8}>
               <ProCard 
-                title={
-                  <Space>
-                    <RiseOutlined style={{ color: '#1890ff' }} />
-                    <span>下月预测</span>
-                  </Space>
-                }
+                title="趋势预测"
                 bordered
                 headerBordered
                 size="small"
+                headStyle={{ 
+                  background: 'linear-gradient(135deg, #f0f5ff 0%, #e6f7ff 100%)',
+                  borderBottom: '1px solid #adc6ff'
+                }}
               >
-                <Statistic
-                  title="预计净利润区间"
-                  value={`${(deep_analysis.nextMonthPrediction.profitRange[0] / 1000).toFixed(0)}k-${(deep_analysis.nextMonthPrediction.profitRange[1] / 1000).toFixed(0)}k`}
-                  prefix="¥"
-                  valueStyle={{ color: '#1890ff', fontSize: '18px' }}
-                />
-                <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
-                  <Text type="secondary">预测依据：</Text>
-                  {deep_analysis.nextMonthPrediction.keyFactors.map((factor, index) => (
-                    <div key={index} style={{ marginTop: '4px' }}>
-                      • {factor}
+                <div style={{ textAlign: 'center', padding: '16px 0' }}>
+                  <div style={{ marginBottom: '16px' }}>
+                    <Text type="secondary" style={{ fontSize: '12px' }}>
+                      预计净利润区间
+                    </Text>
+                  </div>
+                  
+                  <div style={{ 
+                    fontSize: '24px',
+                    fontWeight: '700',
+                    color: '#1890ff',
+                    marginBottom: '8px'
+                  }}>
+                    ¥{(deep_analysis.nextMonthPrediction.profitRange[0] / 1000).toFixed(0)}k
+                  </div>
+                  
+                  <div style={{ 
+                    fontSize: '12px',
+                    color: '#999',
+                    marginBottom: '8px'
+                  }}>
+                    至
+                  </div>
+                  
+                  <div style={{ 
+                    fontSize: '24px',
+                    fontWeight: '700',
+                    color: '#1890ff',
+                    marginBottom: '20px'
+                  }}>
+                    ¥{(deep_analysis.nextMonthPrediction.profitRange[1] / 1000).toFixed(0)}k
+                  </div>
+                  
+                  <div style={{ 
+                    fontSize: '12px',
+                    color: '#666',
+                    lineHeight: '1.5',
+                    textAlign: 'left',
+                    padding: '12px',
+                    background: '#fafafa',
+                    borderRadius: '6px'
+                  }}>
+                    <div style={{ fontWeight: '600', marginBottom: '8px' }}>
+                      预测依据：
                     </div>
-                  ))}
+                    {deep_analysis.nextMonthPrediction.keyFactors.map((factor, index) => (
+                      <div key={index} style={{ marginBottom: '4px' }}>
+                        {index + 1}. {factor}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </ProCard>
             </Col>
