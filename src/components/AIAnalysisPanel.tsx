@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Button, Alert, Spin, Typography, Space, Tag, Progress, Row, Col, Statistic } from 'antd';
+import { Button, Alert, Spin, Typography, Space, Tag, Row, Col, Statistic } from 'antd';
 import { ProCard } from '@ant-design/pro-components';
 import { RobotOutlined, ReloadOutlined, TrophyOutlined, WarningOutlined, BulbOutlined, RiseOutlined } from '@ant-design/icons';
 import { AIAnalysisReport } from '@/lib/supabase';
@@ -39,7 +39,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
       console.log('检查已有分析结果失败:', error);
       setAnalysisResult(null);
     }
-  }, [selectedMonth]);
+  }, [selectedMonth, onAnalysisComplete]);
 
   // 生成AI分析
   const generateAnalysis = async (force = false) => {
