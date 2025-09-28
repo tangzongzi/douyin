@@ -537,12 +537,37 @@ export class AIAnalysisLogic {
       prompt += `- 利润波动情况：${historicalData.map(m => m.month_profit.toLocaleString()).join('元, ')}元\n\n`;
     }
     
-    prompt += `请提供：\n`;
-    prompt += `1. 财务健康度评估（评分0-100）\n`;
-    prompt += `2. 关键风险点识别\n`;
-    prompt += `3. 具体优化建议（不超过3条）\n`;
-    prompt += `4. 下月利润预测区间\n\n`;
-    prompt += `要求：分析要专业、简洁，重点关注实用性建议，字数控制在500字以内。`;
+    prompt += `【输出要求】\n`;
+    prompt += `请严格按照以下markdown格式输出专业财务分析报告：\n\n`;
+    prompt += `# 📊 ${currentMonthData.month}财务深度分析报告\n\n`;
+    prompt += `## 经营状况总评（X/100分 - 等级）\n\n`;
+    prompt += `### 月度表现亮点\n`;
+    prompt += `✓ **具体亮点1**：详细描述和数据支撑\n`;
+    prompt += `✓ **具体亮点2**：详细描述和数据支撑\n\n`;
+    prompt += `### 重点关注事项\n`;
+    prompt += `! **关注点1**：具体问题和影响分析\n`;
+    prompt += `! **关注点2**：具体问题和影响分析\n\n`;
+    prompt += `## 📈 历史趋势深度分析\n\n`;
+    prompt += `### ${historicalData.length}个月增长轨迹\n`;
+    prompt += `- **增长期**：具体时间段和增长数据\n`;
+    prompt += `- **调整期**：具体分析和原因\n\n`;
+    prompt += `### 多赞补贴收入分析\n`;
+    prompt += `- **历史表现**：峰值、平均值、当前状态\n`;
+    prompt += `- **影响评估**：对整体利润的具体影响\n\n`;
+    prompt += `### 千川投流策略评估\n`;
+    prompt += `- **投流表现**：具体ROI和效果分析\n\n`;
+    prompt += `## 💰 专业优化建议\n\n`;
+    prompt += `### 1. 建议标题（优先级：高/中/低）\n`;
+    prompt += `**现状**：具体现状描述\n`;
+    prompt += `**建议**：具体可执行的建议\n`;
+    prompt += `- 具体行动1\n`;
+    prompt += `- 具体行动2\n\n`;
+    prompt += `## 📊 下月目标设定\n\n`;
+    prompt += `### 利润目标：¥X-Y\n`;
+    prompt += `- 具体构成分析\n\n`;
+    prompt += `### 关键指标KPI\n`;
+    prompt += `- 具体可量化的KPI指标\n\n`;
+    prompt += `要求：严格按照以上格式，用具体金额数据，语言通俗易懂，字数600字左右。`;
     
     return prompt;
   }
