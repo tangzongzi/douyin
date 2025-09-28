@@ -429,76 +429,78 @@ export class AIAnalysisLogic {
   }
 
   /**
-   * 格式化分析结果为可读文本 - 深度优化版
+   * 格式化分析结果为标准模板格式
    */
-  static formatAnalysisToText(simple: SimpleAnalysis, deep: DeepAnalysis): string {
+  static formatAnalysisToText(simple: SimpleAnalysis, deep: DeepAnalysis, currentMonth: string): string {
     const healthLevelText = {
-      'excellent': '🏆 优秀',
-      'good': '✅ 良好', 
-      'fair': '⚠️ 一般',
-      'poor': '🚨 较差'
-    }[deep.healthLevel] || deep.healthLevel;
+      'excellent': '优秀',
+      'good': '良好', 
+      'fair': '一般',
+      'poor': '较差'
+    }[deep.healthLevel] || '一般';
     
-    let report = `# 📊 ${new Date().getMonth() + 1}月财务智能分析报告\n\n`;
+    let report = `# 📊 ${currentMonth}财务深度分析报告\n\n`;
     
-    // 财务健康度总览
-    report += `## 💡 财务健康度评估\n`;
-    report += `**综合评分：${deep.healthScore}/100分 (${healthLevelText})**\n\n`;
-    report += `| 评估维度 | 得分 | 状态 |\n`;
-    report += `|---------|------|------|\n`;
-    report += `| 💰 盈利能力 | ${deep.profitabilityScore}/30 | ${deep.profitabilityScore > 25 ? '优秀' : deep.profitabilityScore > 20 ? '良好' : deep.profitabilityScore > 15 ? '一般' : '需改进'} |\n`;
-    report += `| 🛡️ 风险控制 | ${deep.riskControlScore}/30 | ${deep.riskControlScore > 25 ? '优秀' : deep.riskControlScore > 20 ? '良好' : deep.riskControlScore > 15 ? '一般' : '需改进'} |\n`;
-    report += `| 🎯 成本控制 | ${deep.costControlScore}/40 | ${deep.costControlScore > 35 ? '优秀' : deep.costControlScore > 30 ? '良好' : deep.costControlScore > 25 ? '一般' : '需改进'} |\n\n`;
+    // 经营状况总评
+    report += `## 经营状况总评（${deep.healthScore}/100分 - ${healthLevelText}）\n\n`;
     
-    // 关键发现
-    if (simple.positiveFactors.length > 0 || simple.riskWarnings.length > 0) {
-      report += `## 🔍 关键发现\n\n`;
-      
-      if (simple.positiveFactors.length > 0) {
-        report += `### ✅ 积极表现\n`;
-        simple.positiveFactors.forEach((factor, index) => {
-          report += `${index + 1}. ${factor}\n`;
-        });
-        report += `\n`;
-      }
-      
-      if (simple.riskWarnings.length > 0) {
-        report += `### ⚠️ 风险警示\n`;
-        simple.riskWarnings.forEach((warning, index) => {
-          report += `${index + 1}. ${warning}\n`;
-        });
-        report += `\n`;
-      }
-      
-      if (simple.keyInsights.length > 0) {
-        report += `### 💡 深度洞察\n`;
-        simple.keyInsights.forEach((insight, index) => {
-          report += `${index + 1}. ${insight}\n`;
-        });
-        report += `\n`;
-      }
-    }
-    
-    // 优化建议
-    if (deep.optimizationSuggestions.length > 0) {
-      report += `## 🎯 专业建议\n\n`;
-      deep.optimizationSuggestions.forEach((suggestion, index) => {
-        report += `### ${index + 1}. ${suggestion}\n`;
+    // 月度表现亮点
+    if (simple.positiveFactors.length > 0) {
+      report += `### 月度表现亮点\n`;
+      simple.positiveFactors.forEach((factor) => {
+        const cleanFactor = factor.replace(/[💰📈📊🎯⚡🏆✨🛡️]/g, '').trim();
+        report += `✓ **${cleanFactor}**\n`;
       });
       report += `\n`;
     }
     
-    // 预测展望
-    report += `## 📈 下月预测\n\n`;
-    report += `**预计净利润区间：¥${deep.nextMonthPrediction.profitRange[0].toLocaleString()} - ¥${deep.nextMonthPrediction.profitRange[1].toLocaleString()}**\n\n`;
-    report += `**预测依据：**\n`;
-    deep.nextMonthPrediction.keyFactors.forEach((factor, index) => {
-      report += `${index + 1}. ${factor}\n`;
-    });
+    // 重点关注事项
+    if (simple.riskWarnings.length > 0) {
+      report += `### 重点关注事项\n`;
+      simple.riskWarnings.forEach((warning) => {
+        const cleanWarning = warning.replace(/[⚠️📉🚨]/g, '').trim();
+        report += `! **${cleanWarning}**\n`;
+      });
+      report += `\n`;
+    }
     
-    report += `\n---\n`;
-    report += `*报告生成时间：${new Date().toLocaleString('zh-CN')}*\n`;
-    report += `*分析引擎：本地智能算法 + EdgeOne AI增强*`;
+    // 历史趋势深度分析
+    report += `## 📈 历史趋势深度分析\n\n`;
+    if (simple.keyInsights.length > 0) {
+      simple.keyInsights.forEach((insight) => {
+        const cleanInsight = insight.replace(/[💡🔍📊]/g, '').trim();
+        report += `- **${cleanInsight}**\n`;
+      });
+      report += `\n`;
+    }
+    
+    // 专业优化建议
+    if (deep.optimizationSuggestions.length > 0) {
+      report += `## 💰 专业优化建议\n\n`;
+      deep.optimizationSuggestions.forEach((suggestion, index) => {
+        const cleanSuggestion = suggestion.replace(/[🎯📈💰🔍💡📊📉💸💳💧]/g, '').trim();
+        report += `### ${index + 1}. ${cleanSuggestion}（优先级：高）\n`;
+        report += `**现状**：当前状况分析\n`;
+        report += `**建议**：具体可执行的建议\n\n`;
+      });
+    }
+    
+    // 下月目标设定
+    report += `## 📊 下月目标设定\n\n`;
+    report += `### 利润目标：¥${deep.nextMonthPrediction.profitRange[0].toLocaleString()}-${deep.nextMonthPrediction.profitRange[1].toLocaleString()}\n`;
+    report += `- 基础经营利润：预计保持稳定\n`;
+    report += `- 千川投流贡献：根据ROI表现调整\n`;
+    report += `- 多赞补贴收入：关注政策机会\n\n`;
+    
+    report += `### 关键指标KPI\n`;
+    report += `- 利润率：提升至10%以上\n`;
+    report += `- 千川ROI：保持>10倍\n`;
+    report += `- 补贴收入：恢复至¥5,000+\n`;
+    report += `- 成本控制：优化支出结构\n\n`;
+    
+    report += `---\n`;
+    report += `**分析基础**：基于所有历史记录的数据驱动分析\n`;
+    report += `**生成时间**：${new Date().toLocaleString('zh-CN')}`;
 
     return report;
   }

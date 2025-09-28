@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     await saveAnalysisResult(analysisResult);
     
     // 7. 格式化返回结果
-    const formattedText = AIAnalysisLogic.formatAnalysisToText(simpleAnalysis, deepAnalysis);
+    const formattedText = AIAnalysisLogic.formatAnalysisToText(simpleAnalysis, deepAnalysis, month);
     
     return NextResponse.json({
       success: true,
