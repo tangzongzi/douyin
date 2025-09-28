@@ -6,6 +6,7 @@ import { ProCard } from '@ant-design/pro-components';
 import { FileTextOutlined, DownloadOutlined, PrinterOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import dayjs from 'dayjs';
+import AIAnalysisPanel from '@/components/AIAnalysisPanel';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -63,7 +64,7 @@ export default function MonthlyReportsPage() {
           item.month === dayjs(reportData.selectedMonth).subtract(1, 'month').format('YYYY-MM')
         );
         
-        // 按月份从小到大排序历史数据
+        // 按月份从小到大排序历史数据（2025-04, 2025-05, 2025-06...）
         const sortedHistoricalData = monthlyData
           .sort((a: MonthlyReportData, b: MonthlyReportData) => a.month.localeCompare(b.month))
           .slice(0, 6);
@@ -527,6 +528,18 @@ export default function MonthlyReportsPage() {
                   </div>
                 </div>
               </ProCard>
+            </Col>
+          </Row>
+
+          {/* AI智能分析面板 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+            <Col span={24}>
+              <AIAnalysisPanel 
+                selectedMonth={reportData.selectedMonth}
+                onAnalysisComplete={(result) => {
+                  console.log('AI分析完成:', result);
+                }}
+              />
             </Col>
           </Row>
 

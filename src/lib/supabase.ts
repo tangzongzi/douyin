@@ -60,6 +60,19 @@ export interface YearProfit {
   updated_at?: string;
 }
 
+export interface AIAnalysisReport {
+  id?: number;
+  month: string;
+  analysis_type: 'simple' | 'deep' | 'both';
+  simple_analysis?: Record<string, unknown>;
+  deep_analysis?: Record<string, unknown>;
+  ai_enhanced_text?: string;
+  generated_at: string;
+  data_snapshot: Record<string, unknown>;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface SyncLog {
   id?: number;
   sync_type: 'daily' | 'monthly' | 'yearly';
@@ -129,7 +142,7 @@ export class SupabaseService {
         created_at,
         updated_at
       `)
-      .order('month', { ascending: true })
+      .order('month', { ascending: false })
       .limit(limit);
     
     if (error) {
