@@ -329,6 +329,25 @@ export default function Dashboard() {
     await performSyncRequest(`/api/sync?type=${type}`, '强制完整同步');
   }, [performSyncRequest]);
 
+  // 执行支出数据同步
+  const handleSyncExpenses = useCallback(async (type: 'expenses' | 'deposits' | 'qianchuan' | 'annual') => {
+    const apiMap = {
+      'expenses': '/api/sync-expenses?type=all',
+      'deposits': '/api/sync-deposits?type=all',
+      'qianchuan': '/api/sync-qianchuan',
+      'annual': '/api/sync-annual'
+    };
+    
+    const nameMap = {
+      'expenses': '硬性支出数据',
+      'deposits': '保证金数据',
+      'qianchuan': '千川投流数据',
+      'annual': '年度总支出数据'
+    };
+    
+    await performSyncRequest(apiMap[type], `${nameMap[type]}同步`);
+  }, [performSyncRequest]);
+
   // 自动同步功能
   useEffect(() => {
     // 每3小时自动同步一次
@@ -1340,6 +1359,85 @@ export default function Dashboard() {
                   }}
                 >
                   高级管理
+                </Button>
+              </div>
+            </div>
+
+            {/* 支出数据同步按钮 - 新增区域 */}
+            <div style={{ marginBottom: '20px' }}>
+              <h4 style={{ 
+                margin: '0 0 12px 0',
+                fontSize: '14px',
+                fontWeight: '600',
+                color: 'rgba(0,0,0,0.85)'
+              }}>
+                支出数据同步
+              </h4>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: 'repeat(2, 1fr)', 
+                gap: '8px'
+              }}>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncExpenses('expenses')}
+                  loading={syncing}
+                  size="small"
+                  style={{
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontSize: '12px',
+                    fontWeight: '500'
+                  }}
+                >
+                  硬性支出
+                </Button>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncExpenses('deposits')}
+                  loading={syncing}
+                  size="small"
+                  style={{
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontSize: '12px',
+                    fontWeight: '500'
+                  }}
+                >
+                  保证金
+                </Button>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncExpenses('qianchuan')}
+                  loading={syncing}
+                  size="small"
+                  style={{
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontSize: '12px',
+                    fontWeight: '500'
+                  }}
+                >
+                  千川投流
+                </Button>
+                <Button 
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncExpenses('annual')}
+                  loading={syncing}
+                  size="small"
+                  style={{
+                    height: '32px',
+                    borderRadius: '6px',
+                    border: '1px solid rgba(0,0,0,0.15)',
+                    fontSize: '12px',
+                    fontWeight: '500'
+                  }}
+                >
+                  年度总支出
                 </Button>
               </div>
             </div>
