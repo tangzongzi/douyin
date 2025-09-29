@@ -619,7 +619,7 @@ export default function MonthlyReportsPage() {
                    <ProCard 
                      title={
                        <span style={{ fontSize: '16px', fontWeight: '600' }}>
-                         赔付金额明细 (按月排序)
+                         赔付金额明细 (按月份排序)
                        </span>
                      }
                      headerBordered
@@ -632,7 +632,7 @@ export default function MonthlyReportsPage() {
                            month: item.month,
                            claimAmount: item.claim_amount_sum
                          }))
-                         .sort((a, b) => b.claimAmount - a.claimAmount) // 按金额大到小排序
+                         .sort((a, b) => a.month.localeCompare(b.month)) // 按月份从小到大排序
                        }
                        columns={[
                          { 
