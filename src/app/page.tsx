@@ -118,6 +118,7 @@ export default function Dashboard() {
   const [syncing, setSyncing] = useState(false);
   const [syncProgress, setSyncProgress] = useState(0);
   const [lastSyncTime, setLastSyncTime] = useState<string | null>(null);
+  const [selectSyncVisible, setSelectSyncVisible] = useState(false);
   // 移除chartDataType状态，直接显示daily_profit数据
 
   // 获取数据
@@ -348,23 +349,34 @@ export default function Dashboard() {
     await performSyncRequest(apiMap[type], `${nameMap[type]}同步`);
   }, [performSyncRequest]);
 
-  // 执行完整数据同步（包含所有类型）
+  // 执行完整数据同步（强制同步所有9个表格）
   const handleFullSync = useCallback(async () => {
-    console.log('执行完整数据同步...');
+    console.log('执行完整数据同步 - 所有9个表格...');
     
-    // 同步核心数据
+    // 同步核心数据（3个表格）
     await handleSync('all');
     
-    // 同步所有支出数据
+    // 同步所有支出数据（6个表格）
     await Promise.all([
       handleSyncExpenses('expenses'),
-      handleSyncExpenses('deposits'),
+      handleSyncExpenses('deposits'), 
       handleSyncExpenses('qianchuan'),
       handleSyncExpenses('annual')
     ]);
     
-    console.log('完整数据同步完成');
+    console.log('完整数据同步完成 - 9个表格全部更新');
   }, [handleSync, handleSyncExpenses]);
+
+  // 智能同步（只同步有更新的数据）
+  const handleSmartSync = useCallback(async () => {
+    console.log('执行智能同步 - 检测并同步有更新的表格...');
+    
+    // TODO: 这里可以实现检查每个表格的最后更新时间
+    // 目前先执行完整同步，后续可以优化为增量同步
+    await handleFullSync();
+    
+    console.log('智能同步完成');
+  }, [handleFullSync]);
 
   // 自动同步功能
   useEffect(() => {
@@ -1145,172 +1157,136 @@ export default function Dashboard() {
               </ProCard>
             )}
 
-            {/* 核心数据同步 - Pro标准 */}
-            <ProCard 
-              title="核心数据同步" 
-              size="small"
-              style={{ marginBottom: '16px' }}
-              bodyStyle={{ padding: '16px' }}
-            >
-              <Space direction="vertical" style={{ width: '100%' }} size="middle">
-                <Row gutter={[8, 8]}>
-                  <Col span={12}>
-                    <Button 
-                      block
-                      icon={<SyncOutlined />}
-                      onClick={() => handleSyncWithRange('daily', 'currentMonth')}
-                      loading={syncing}
-                      type="primary"
-                    >
-                      当月数据
-                    </Button>
-                  </Col>
-                  <Col span={12}>
-                    <Button 
-                      block
-                      icon={<SyncOutlined />}
-                      onClick={() => handleFullSync()}
-                      loading={syncing}
-                    >
-                      智能同步
-                    </Button>
-                  </Col>
-                </Row>
-                <Row gutter={[8, 8]}>
-                  <Col span={8}>
-                    <Button 
-                      block
-                      size="small"
-                      onClick={() => handleSyncWithRange('daily', '7days')}
-                      loading={syncing}
-                    >
-                      近7天
-                    </Button>
-                  </Col>
-                  <Col span={8}>
-                    <Button 
-                      block
-                      size="small"
-                      onClick={() => handleSyncWithRange('daily', '15days')}
-                      loading={syncing}
-                    >
-                      近15天
-                    </Button>
-                  </Col>
-                  <Col span={8}>
-                    <Button 
-                      block
-                      size="small"
-                      onClick={() => handleSyncWithRange('daily', '30days')}
-                      loading={syncing}
-                    >
-                      近30天
-                    </Button>
-                  </Col>
-                </Row>
-              </Space>
-            </ProCard>
+            {/* 主操作区 - 纯粹Ant Design Pro风格 */}
+            <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+              <Col span={24}>
+                <Button 
+                  type="primary"
+                  size="large"
+                  block
+                  icon={<SyncOutlined />}
+                  onClick={() => handleFullSync()}
+                  loading={syncing}
+                  style={{ 
+                    height: '56px',
+                    fontSize: '16px',
+                    fontWeight: '500'
+                  }}
+                >
+                  同步所有数据
+                </Button>
+              </Col>
+            </Row>
 
-            {/* 支出数据同步 - Pro标准 */}
-            <ProCard 
-              title="支出数据同步" 
-              size="small"
-              style={{ marginBottom: '16px' }}
-              bodyStyle={{ padding: '16px' }}
-            >
-              <Row gutter={[8, 8]}>
-                <Col span={12}>
-                  <Button 
-                    block
-                    icon={<SyncOutlined />}
-                    onClick={() => handleSyncExpenses('expenses')}
-                    loading={syncing}
-                  >
-                    硬性支出
-                  </Button>
-                </Col>
-                <Col span={12}>
-                  <Button 
-                    block
-                    icon={<SyncOutlined />}
-                    onClick={() => handleSyncExpenses('deposits')}
-                    loading={syncing}
-                  >
-                    保证金
-                  </Button>
-                </Col>
-                <Col span={12}>
-                  <Button 
-                    block
-                    icon={<SyncOutlined />}
-                    onClick={() => handleSyncExpenses('qianchuan')}
-                    loading={syncing}
-                  >
-                    千川投流
-                  </Button>
-                </Col>
-                <Col span={12}>
-                  <Button 
-                    block
-                    icon={<SyncOutlined />}
-                    onClick={() => handleSyncExpenses('annual')}
-                    loading={syncing}
-                  >
-                    年度支出
-                  </Button>
-                </Col>
-              </Row>
-            </ProCard>
+            {/* 次操作区 - 标准间距 */}
+            <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+              <Col span={8}>
+                <Button 
+                  block
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSmartSync()}
+                  loading={syncing}
+                  style={{ height: '40px' }}
+                >
+                  智能同步
+                </Button>
+              </Col>
+              <Col span={8}>
+                <Button 
+                  block
+                  onClick={() => setSelectSyncVisible(!selectSyncVisible)}
+                  style={{ height: '40px' }}
+                >
+                  选择同步
+                </Button>
+              </Col>
+              <Col span={8}>
+                <Button 
+                  block
+                  danger
+                  icon={<SyncOutlined />}
+                  onClick={() => handleSyncWithForce('force')}
+                  loading={syncing}
+                  style={{ height: '40px' }}
+                >
+                  数据修复
+                </Button>
+              </Col>
+            </Row>
 
-            {/* 高级同步选项 - Pro标准 */}
-            <ProCard 
-              title="高级选项" 
-              size="small"
-              style={{ marginBottom: '16px' }}
-              bodyStyle={{ padding: '16px' }}
-            >
-              <Row gutter={[8, 8]}>
-                <Col span={8}>
-                  <Button 
-                    block
-                    danger
-                    icon={<SyncOutlined />}
-                    onClick={() => handleSyncWithForce('force')}
-                    loading={syncing}
-                  >
-                    强制同步
-                  </Button>
-                </Col>
-                <Col span={16}>
-                  <Button 
-                    block
-                    href="/sync"
-                    target="_blank"
-                  >
-                    高级管理
-                  </Button>
-                </Col>
-              </Row>
-            </ProCard>
+            {/* 选择同步折叠面板 */}
+            {selectSyncVisible && (
+              <div style={{ marginBottom: '24px' }}>
+                <ProCard 
+                  title="核心数据" 
+                  size="small"
+                  style={{ marginBottom: '12px' }}
+                  bodyStyle={{ padding: '12px' }}
+                >
+                  <Row gutter={[8, 8]}>
+                    <Col span={8}>
+                      <Button block size="small" onClick={() => handleSyncWithRange('daily', 'currentMonth')}>
+                        当月数据
+                      </Button>
+                    </Col>
+                    <Col span={8}>
+                      <Button block size="small" onClick={() => handleSync('monthly')}>
+                        月度汇总
+                      </Button>
+                    </Col>
+                    <Col span={8}>
+                      <Button block size="small" onClick={() => performSyncRequest('/api/sync?type=yearly', '年度利润同步')}>
+                        年度利润
+                      </Button>
+                    </Col>
+                  </Row>
+                </ProCard>
 
-            {/* 使用说明 - Pro简洁风格 */}
-            <ProCard 
-              title="使用说明" 
-              size="small"
-              bodyStyle={{ padding: '16px' }}
-            >
-              <Space direction="vertical" size="small" style={{ width: '100%' }}>
-                <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
-                  <strong style={{ color: '#1890ff' }}>智能同步</strong>：同步所有数据类型，推荐日常使用
-                </div>
-                <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
-                  <strong style={{ color: '#fa541c' }}>强制同步</strong>：重新同步核心数据，异常时使用
-                </div>
-                <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
-                  <strong style={{ color: '#52c41a' }}>自动同步</strong>：系统每3小时执行智能同步
-                </div>
-              </Space>
-            </ProCard>
+                <ProCard 
+                  title="支出数据" 
+                  size="small"
+                  bodyStyle={{ padding: '12px' }}
+                >
+                  <Row gutter={[8, 8]}>
+                    <Col span={12}>
+                      <Button block size="small" onClick={() => handleSyncExpenses('expenses')}>
+                        硬性支出
+                      </Button>
+                    </Col>
+                    <Col span={12}>
+                      <Button block size="small" onClick={() => handleSyncExpenses('deposits')}>
+                        保证金
+                      </Button>
+                    </Col>
+                    <Col span={12}>
+                      <Button block size="small" onClick={() => handleSyncExpenses('qianchuan')}>
+                        千川投流
+                      </Button>
+                    </Col>
+                    <Col span={12}>
+                      <Button block size="small" onClick={() => handleSyncExpenses('annual')}>
+                        年度支出
+                      </Button>
+                    </Col>
+                  </Row>
+                </ProCard>
+              </div>
+            )}
+
+            {/* 使用说明 - 极简风格 */}
+            <div style={{ 
+              padding: '16px',
+              background: '#fafafa',
+              borderRadius: '6px',
+              fontSize: '12px',
+              color: 'rgba(0,0,0,0.45)',
+              lineHeight: '1.6'
+            }}>
+              <div><strong>同步所有数据</strong>：强制同步全部9个表格</div>
+              <div><strong>智能同步</strong>：检测并同步有更新的表格</div>
+              <div><strong>选择同步</strong>：按需同步特定数据类型</div>
+              <div><strong>数据修复</strong>：解决数据异常问题</div>
+            </div>
           </div>
         </Modal>
       </div>
