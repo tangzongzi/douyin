@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@ant-design/pro-components": "^2.8.10",
+    "antd": "^5.27.4",
+    "axios": "^1.12.2",
+    "dayjs": "^1.11.18",
+    "recharts": "^3.2.1"
+  }
+}
