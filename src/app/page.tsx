@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Spin, message, Row, Col, Modal, Button, Progress } from 'antd';
+import { Spin, message, Row, Col, Modal, Button, Progress, Space } from 'antd';
 import { ProCard, StatisticCard } from '@ant-design/pro-components';
 import { SyncOutlined, SettingOutlined, FileTextOutlined } from '@ant-design/icons';
 // 移除飞书API导入，改用Supabase API
@@ -1012,19 +1012,15 @@ export default function Dashboard() {
         </Row>
 
 
-        {/* 数据同步管理Modal - Pro级别优化 */}
+        {/* 数据同步管理Modal - Ant Design Pro标准 */}
         <Modal
           title={
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '12px',
-              padding: '8px 0'
-            }}>
+            <Space size="middle">
               <div style={{
-                padding: '8px',
-                background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
-                borderRadius: '8px',
+                width: '32px',
+                height: '32px',
+                background: '#1890ff',
+                borderRadius: '6px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
@@ -1032,466 +1028,271 @@ export default function Dashboard() {
                 <SyncOutlined style={{ color: 'white', fontSize: '16px' }} />
               </div>
               <div>
-                <h3 style={{ 
-                  margin: 0, 
-                  fontSize: '18px', 
+                <div style={{ 
+                  fontSize: '16px', 
                   fontWeight: '600',
-                  color: 'rgba(0,0,0,0.88)'
+                  color: 'rgba(0,0,0,0.88)',
+                  lineHeight: '22px'
                 }}>
-              数据同步管理
-                </h3>
-                <p style={{ 
-                  margin: 0, 
-                  fontSize: '13px', 
+                  数据同步管理
+                </div>
+                <div style={{ 
+                  fontSize: '12px', 
                   color: 'rgba(0,0,0,0.45)',
-                  fontWeight: '400'
+                  lineHeight: '16px'
                 }}>
-                  智能同步飞书数据到本地数据库
-                </p>
+                  飞书数据智能同步
+                </div>
               </div>
-            </div>
+            </Space>
           }
           open={syncModalVisible}
           onCancel={() => setSyncModalVisible(false)}
           footer={null}
-          width={580}
+          width={640}
           styles={{
             header: { 
-              borderBottom: '1px solid rgba(0,0,0,0.06)',
-              paddingBottom: '12px',
-              marginBottom: '16px'
+              borderBottom: '1px solid #f0f0f0',
+              paddingBottom: '16px'
             },
             body: { 
-              padding: '16px 24px 24px 24px' 
+              padding: '24px' 
             }
-          }}
-          style={{
-            borderRadius: '12px'
           }}
         >
           <div>
-            {/* 同步状态显示 - 优化版 */}
-            <div style={{ 
-              marginBottom: '20px',
-              padding: '16px',
-              background: 'linear-gradient(135deg, rgba(24,144,255,0.04) 0%, rgba(19,194,194,0.04) 100%)',
-              borderRadius: '8px',
-              border: '1px solid rgba(24,144,255,0.08)'
-            }}>
-              <h4 style={{ 
-                margin: '0 0 12px 0',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: 'rgba(0,0,0,0.85)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                <div style={{
-                  width: '6px',
-                  height: '6px',
-                  borderRadius: '50%',
-                  background: '#52c41a',
-                  animation: 'pulse 2s infinite'
-                }}></div>
-                同步状态
-              </h4>
-              
-              <div style={{ 
-                display: 'flex', 
-                gap: '12px',
-                flexWrap: 'wrap'
-              }}>
-                <div style={{
-                  flex: '1',
-                  minWidth: '150px',
-                  padding: '12px 16px',
-                  background: 'rgba(255,255,255,0.9)',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(0,0,0,0.06)',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: 'rgba(0,0,0,0.45)',
-                    marginBottom: '6px',
-                    fontWeight: '500'
-                  }}>
-                    上次同步时间
-                  </div>
-                  <div style={{ 
-                    fontSize: '14px',
-                    color: '#1890ff',
-                    fontWeight: '600',
-                    wordBreak: 'keep-all'
-                  }}>
-                    {lastSyncTime || '从未同步'}
-                  </div>
-                </div>
+            {/* 同步状态 - Pro标准 */}
+            <ProCard 
+              size="small" 
+              style={{ marginBottom: '24px' }}
+              bodyStyle={{ padding: '16px' }}
+            >
+              <Row gutter={[16, 16]} align="middle">
+                <Col flex="auto">
+                  <Space size="small">
+                    <div style={{
+                      width: '6px',
+                      height: '6px',
+                      borderRadius: '50%',
+                      background: '#52c41a'
+                    }}></div>
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>同步状态</span>
+                  </Space>
+                </Col>
+                <Col>
+                  <Space size="middle">
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>上次同步</div>
+                      <div style={{ fontSize: '14px', color: '#1890ff', fontWeight: '500' }}>
+                        {lastSyncTime || '从未同步'}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{ fontSize: '12px', color: 'rgba(0,0,0,0.45)' }}>自动同步</div>
+                      <div style={{ fontSize: '14px', color: '#52c41a', fontWeight: '500' }}>
+                        每3小时
+                      </div>
+                    </div>
+                  </Space>
+                </Col>
+              </Row>
+            </ProCard>
 
-                <div style={{
-                  flex: '1',
-                  minWidth: '150px',
-                  padding: '12px 16px',
-                  background: 'rgba(255,255,255,0.9)',
-                  borderRadius: '8px',
-                  border: '1px solid rgba(0,0,0,0.06)',
-                  textAlign: 'center'
-                }}>
-                  <div style={{ 
-                    fontSize: '12px', 
-                    color: 'rgba(0,0,0,0.45)',
-                    marginBottom: '6px',
-                    fontWeight: '500'
-                  }}>
-                    自动同步
-                  </div>
-                  <div style={{ 
-                    fontSize: '14px',
-                    color: '#52c41a',
-                    fontWeight: '600'
-                  }}>
-                    每3小时执行
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 同步进度 - 优化版 */}
+            {/* 同步进度 - Pro标准 */}
             {syncing && (
-              <div style={{ 
-                marginBottom: '20px',
-                padding: '16px',
-                background: 'linear-gradient(135deg, rgba(16,142,233,0.04) 0%, rgba(135,208,104,0.04) 100%)',
-                borderRadius: '8px',
-                border: '1px solid rgba(16,142,233,0.08)'
-              }}>
-                <h4 style={{ 
-                  margin: '0 0 12px 0',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  color: 'rgba(0,0,0,0.85)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}>
-                  <SyncOutlined style={{ color: '#1890ff', fontSize: '14px' }} spin />
-                  同步进度
-                </h4>
-                <Progress 
-                  percent={syncProgress} 
-                  status="active"
-                  strokeColor={{ 
-                    '0%': '#1890ff', 
-                    '50%': '#13c2c2',
-                    '100%': '#52c41a' 
-                  }}
-                  strokeWidth={6}
-                  style={{ marginBottom: '6px' }}
-                />
-                <div style={{
-                  fontSize: '12px',
-                  color: 'rgba(0,0,0,0.45)',
-                  textAlign: 'center'
-                }}>
-                  正在同步数据，请稍候...
-                </div>
-              </div>
+              <ProCard 
+                size="small" 
+                style={{ marginBottom: '24px' }}
+                bodyStyle={{ padding: '16px' }}
+              >
+                <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                  <Space size="small">
+                    <SyncOutlined style={{ color: '#1890ff', fontSize: '14px' }} spin />
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>同步进度</span>
+                  </Space>
+                  <Progress 
+                    percent={syncProgress} 
+                    status="active"
+                    strokeColor="#1890ff"
+                    size="small"
+                  />
+                  <div style={{
+                    fontSize: '12px',
+                    color: 'rgba(0,0,0,0.45)',
+                    textAlign: 'center'
+                  }}>
+                    正在同步数据，请稍候...
+                  </div>
+                </Space>
+              </ProCard>
             )}
 
-            {/* 快速同步按钮 - 重新设计 */}
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ 
-                margin: '0 0 12px 0',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: 'rgba(0,0,0,0.85)'
-              }}>
-                快速同步
-              </h4>
-              
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 1fr)', 
-                gap: '10px'
-              }}>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncWithRange('daily', '7days')}
-                  loading={syncing}
-                  style={{
-                    height: '36px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '500'
-                  }}
-                >
-                  近7天
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncWithRange('daily', '15days')}
-                  loading={syncing}
-                  style={{
-                    height: '36px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '500'
-                  }}
-                >
-                  近15天
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncWithRange('daily', '30days')}
-                  loading={syncing}
-                  style={{
-                    height: '36px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '500'
-                  }}
-                >
-                  近30天
-                </Button>
-                <Button 
-                  type="primary"
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncWithRange('daily', 'currentMonth')}
-                  loading={syncing}
-                  style={{
-                    height: '36px',
-                    borderRadius: '6px',
-                    background: 'linear-gradient(135deg, #1890ff 0%, #13c2c2 100%)',
-                    border: 'none',
-                    boxShadow: '0 4px 12px rgba(24,144,255,0.3)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '600'
-                  }}
-                >
-                  当月数据
-                </Button>
-              </div>
-            </div>
+            {/* 核心数据同步 - Pro标准 */}
+            <ProCard 
+              title="核心数据同步" 
+              size="small"
+              style={{ marginBottom: '16px' }}
+              bodyStyle={{ padding: '16px' }}
+            >
+              <Space direction="vertical" style={{ width: '100%' }} size="middle">
+                <Row gutter={[8, 8]}>
+                  <Col span={12}>
+                    <Button 
+                      block
+                      icon={<SyncOutlined />}
+                      onClick={() => handleSyncWithRange('daily', 'currentMonth')}
+                      loading={syncing}
+                      type="primary"
+                    >
+                      当月数据
+                    </Button>
+                  </Col>
+                  <Col span={12}>
+                    <Button 
+                      block
+                      icon={<SyncOutlined />}
+                      onClick={() => handleSync('all')}
+                      loading={syncing}
+                    >
+                      智能同步
+                    </Button>
+                  </Col>
+                </Row>
+                <Row gutter={[8, 8]}>
+                  <Col span={8}>
+                    <Button 
+                      block
+                      size="small"
+                      onClick={() => handleSyncWithRange('daily', '7days')}
+                      loading={syncing}
+                    >
+                      近7天
+                    </Button>
+                  </Col>
+                  <Col span={8}>
+                    <Button 
+                      block
+                      size="small"
+                      onClick={() => handleSyncWithRange('daily', '15days')}
+                      loading={syncing}
+                    >
+                      近15天
+                    </Button>
+                  </Col>
+                  <Col span={8}>
+                    <Button 
+                      block
+                      size="small"
+                      onClick={() => handleSyncWithRange('daily', '30days')}
+                      loading={syncing}
+                    >
+                      近30天
+                    </Button>
+                  </Col>
+                </Row>
+              </Space>
+            </ProCard>
 
-            {/* 完整同步按钮 - 重新设计 */}
-            <div>
-              <h4 style={{ 
-                margin: '0 0 12px 0',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: 'rgba(0,0,0,0.85)'
-              }}>
-                完整同步
-              </h4>
-              
-              <div style={{ 
-                display: 'flex', 
-                gap: '10px',
-                flexWrap: 'wrap'
-              }}>
-                <Button 
-                  type="primary"
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSync('all')}
-                  loading={syncing}
-                  style={{
-                    flex: '1',
-                    minWidth: '100px',
-                    height: '40px',
-                    borderRadius: '6px',
-                    background: 'linear-gradient(135deg, #52c41a 0%, #389e0d 100%)',
-                    border: 'none',
-                    boxShadow: '0 2px 8px rgba(82,196,26,0.2)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '600',
-                    fontSize: '14px'
-                  }}
-                >
-                  智能同步
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncWithForce('force')}
-                  loading={syncing}
-                  danger
-                  style={{
-                    flex: '1',
-                    minWidth: '100px',
-                    height: '40px',
-                    borderRadius: '6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '600',
-                    fontSize: '14px'
-                  }}
-                >
-                  强制同步
-                </Button>
-                <Button 
-                  href="/sync"
-                  target="_blank"
-                  style={{
-                    flex: '1',
-                    minWidth: '100px',
-                    height: '40px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontWeight: '500',
-                    fontSize: '14px'
-                  }}
-                >
-                  高级管理
-                </Button>
-              </div>
-            </div>
+            {/* 支出数据同步 - Pro标准 */}
+            <ProCard 
+              title="支出数据同步" 
+              size="small"
+              style={{ marginBottom: '16px' }}
+              bodyStyle={{ padding: '16px' }}
+            >
+              <Row gutter={[8, 8]}>
+                <Col span={12}>
+                  <Button 
+                    block
+                    icon={<SyncOutlined />}
+                    onClick={() => handleSyncExpenses('expenses')}
+                    loading={syncing}
+                  >
+                    硬性支出
+                  </Button>
+                </Col>
+                <Col span={12}>
+                  <Button 
+                    block
+                    icon={<SyncOutlined />}
+                    onClick={() => handleSyncExpenses('deposits')}
+                    loading={syncing}
+                  >
+                    保证金
+                  </Button>
+                </Col>
+                <Col span={12}>
+                  <Button 
+                    block
+                    icon={<SyncOutlined />}
+                    onClick={() => handleSyncExpenses('qianchuan')}
+                    loading={syncing}
+                  >
+                    千川投流
+                  </Button>
+                </Col>
+                <Col span={12}>
+                  <Button 
+                    block
+                    icon={<SyncOutlined />}
+                    onClick={() => handleSyncExpenses('annual')}
+                    loading={syncing}
+                  >
+                    年度支出
+                  </Button>
+                </Col>
+              </Row>
+            </ProCard>
 
-            {/* 支出数据同步按钮 - 新增区域 */}
-            <div style={{ marginBottom: '20px' }}>
-              <h4 style={{ 
-                margin: '0 0 12px 0',
-                fontSize: '14px',
-                fontWeight: '600',
-                color: 'rgba(0,0,0,0.85)'
-              }}>
-                支出数据同步
-              </h4>
-              
-              <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(2, 1fr)', 
-                gap: '8px'
-              }}>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncExpenses('expenses')}
-                  loading={syncing}
-                  size="small"
-                  style={{
-                    height: '32px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    fontSize: '12px',
-                    fontWeight: '500'
-                  }}
-                >
-                  硬性支出
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncExpenses('deposits')}
-                  loading={syncing}
-                  size="small"
-                  style={{
-                    height: '32px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    fontSize: '12px',
-                    fontWeight: '500'
-                  }}
-                >
-                  保证金
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncExpenses('qianchuan')}
-                  loading={syncing}
-                  size="small"
-                  style={{
-                    height: '32px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    fontSize: '12px',
-                    fontWeight: '500'
-                  }}
-                >
-                  千川投流
-                </Button>
-                <Button 
-                  icon={<SyncOutlined />}
-                  onClick={() => handleSyncExpenses('annual')}
-                  loading={syncing}
-                  size="small"
-                  style={{
-                    height: '32px',
-                    borderRadius: '6px',
-                    border: '1px solid rgba(0,0,0,0.15)',
-                    fontSize: '12px',
-                    fontWeight: '500'
-                  }}
-                >
-                  年度总支出
-                </Button>
-              </div>
-            </div>
+            {/* 高级同步选项 - Pro标准 */}
+            <ProCard 
+              title="高级选项" 
+              size="small"
+              style={{ marginBottom: '16px' }}
+              bodyStyle={{ padding: '16px' }}
+            >
+              <Row gutter={[8, 8]}>
+                <Col span={8}>
+                  <Button 
+                    block
+                    danger
+                    icon={<SyncOutlined />}
+                    onClick={() => handleSyncWithForce('force')}
+                    loading={syncing}
+                  >
+                    强制同步
+                  </Button>
+                </Col>
+                <Col span={16}>
+                  <Button 
+                    block
+                    href="/sync"
+                    target="_blank"
+                  >
+                    高级管理
+                  </Button>
+                </Col>
+              </Row>
+            </ProCard>
 
-            <div style={{ 
-              marginTop: '20px', 
-              padding: '16px', 
-              background: 'linear-gradient(135deg, rgba(250,250,250,0.8) 0%, rgba(246,248,250,0.8) 100%)', 
-              borderRadius: '12px',
-              border: '1px solid rgba(0,0,0,0.06)'
-            }}>
-              <div style={{
-                display: 'flex',
-                alignItems: 'flex-start',
-                gap: '10px',
-                marginBottom: '12px'
-              }}>
-                <div style={{
-                  padding: '6px',
-                  background: 'linear-gradient(135deg, #722ed1 0%, #eb2f96 100%)',
-                  borderRadius: '6px',
-                  color: 'white',
-                  fontSize: '12px',
-                  fontWeight: '600'
-                }}>
-                  💡
+            {/* 使用说明 - Pro简洁风格 */}
+            <ProCard 
+              title="使用说明" 
+              size="small"
+              bodyStyle={{ padding: '16px' }}
+            >
+              <Space direction="vertical" size="small" style={{ width: '100%' }}>
+                <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
+                  <strong style={{ color: '#1890ff' }}>智能同步</strong>：推荐日常使用，自动识别新数据
                 </div>
-                <div>
-                  <h5 style={{
-                    margin: '0 0 8px 0',
-                    fontSize: '14px',
-                    fontWeight: '600',
-                    color: 'rgba(0,0,0,0.85)'
-                  }}>
-                    使用说明
-                  </h5>
-                  <div style={{
-                    fontSize: '13px',
-                    color: 'rgba(0,0,0,0.65)',
-                    lineHeight: '1.6'
-                  }}>
-                    <div style={{ marginBottom: '8px' }}>
-                      <span style={{ fontWeight: '600', color: '#1890ff' }}>智能同步</span>：自动识别新数据，避免重复同步，推荐日常使用
-                    </div>
-                    <div style={{ marginBottom: '8px' }}>
-                      <span style={{ fontWeight: '600', color: '#fa541c' }}>强制同步</span>：完全重新同步所有数据，数据异常时使用
-                    </div>
-                    <div>
-                      <span style={{ fontWeight: '600', color: '#52c41a' }}>自动同步</span>：系统每3小时自动执行智能同步
-                    </div>
-                  </div>
+                <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
+                  <strong style={{ color: '#fa541c' }}>强制同步</strong>：数据异常时使用，完全重新同步
                 </div>
-              </div>
-            </div>
+                <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
+                  <strong style={{ color: '#52c41a' }}>自动同步</strong>：系统每3小时自动执行
+                </div>
+              </Space>
+            </ProCard>
           </div>
         </Modal>
       </div>
