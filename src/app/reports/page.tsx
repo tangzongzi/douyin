@@ -6,6 +6,7 @@ import { ProCard } from '@ant-design/pro-components';
 import { FileTextOutlined, DownloadOutlined, PrinterOutlined, BarChartOutlined, TableOutlined } from '@ant-design/icons';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import dayjs from 'dayjs';
+import AIAnalysisPanel from '@/components/AIAnalysisPanel';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -530,6 +531,18 @@ export default function MonthlyReportsPage() {
             </Col>
           </Row>
 
+
+          {/* AI 智能分析面板 */}
+          <Row gutter={[16, 16]} style={{ marginBottom: '24px' }}>
+            <Col span={24}>
+              <AIAnalysisPanel 
+                selectedMonth={reportData.selectedMonth} 
+                onAnalysisComplete={(result) => {
+                  console.log('AI分析完成:', result);
+                }}
+              />
+            </Col>
+          </Row>
 
           {/* 视图切换渲染 */}
           {viewMode === 'table' ? (

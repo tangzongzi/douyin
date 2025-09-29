@@ -75,8 +75,23 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
     const { simple_analysis, deep_analysis, ai_enhanced_text } = analysisResult;
     
     // 类型断言，确保类型安全
-    const simpleAnalysis = simple_analysis as Record<string, unknown>;
-    const deepAnalysis = deep_analysis as Record<string, unknown>;
+    const simpleAnalysis = simple_analysis as {
+      positiveFactors: string[];
+      riskWarnings: string[];
+      keyInsights: string[];
+    };
+    const deepAnalysis = deep_analysis as {
+      healthLevel: string;
+      healthScore: number;
+      profitabilityScore: number;
+      riskControlScore: number;
+      costControlScore: number;
+      optimizationSuggestions: string[];
+      nextMonthPrediction: {
+        profitRange: [number, number];
+        keyFactors: string[];
+      };
+    };
 
     return (
       <div>
@@ -126,7 +141,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   prefix={<TrophyOutlined style={{ color: '#1890ff' }} />}
                 />
                 <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                  综合评分：{(deepAnalysis as any).healthScore}/100分
+                  综合评分：{deepAnalysis.healthScore}/100分
                 </div>
               </ProCard>
             </Col>

@@ -176,7 +176,7 @@ export class SupabaseService {
     
     // 分批处理，每批100条记录
     const batchSize = 100;
-    const results = [];
+    const results: DailyProfit[] = [];
     
     for (let i = 0; i < dailyProfits.length; i += batchSize) {
       const batch = dailyProfits.slice(i, i + batchSize);
