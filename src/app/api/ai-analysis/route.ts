@@ -95,10 +95,10 @@ export async function POST(request: NextRequest) {
     const analysisResult: AIAnalysisReport = {
       month,
       analysis_type: 'both',
-      simple_analysis: simpleAnalysis,
-      deep_analysis: deepAnalysis,
+      simple_analysis: simpleAnalysis as unknown as Record<string, unknown>,
+      deep_analysis: deepAnalysis as unknown as Record<string, unknown>,
       generated_at: new Date().toISOString(),
-      data_snapshot: currentMonthData as MonthlyFinancialData,
+      data_snapshot: currentMonthData as unknown as Record<string, unknown>,
       ai_enhanced_text: aiEnhancedAnalysis // 新增AI增强分析
     };
     

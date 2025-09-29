@@ -18,11 +18,6 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
   const [analysisResult, setAnalysisResult] = useState<AIAnalysisReport | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // 组件加载时检查是否已有分析结果
-  useEffect(() => {
-    checkExistingAnalysis();
-  }, [selectedMonth, checkExistingAnalysis]);
-
   // 检查已有分析结果
   const checkExistingAnalysis = useCallback(async () => {
     try {
@@ -40,6 +35,11 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
       setAnalysisResult(null);
     }
   }, [selectedMonth, onAnalysisComplete]);
+
+  // 组件加载时检查是否已有分析结果
+  useEffect(() => {
+    checkExistingAnalysis();
+  }, [checkExistingAnalysis]);
 
   // 生成AI分析
   const generateAnalysis = async (force = false) => {
@@ -73,6 +73,10 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
     if (!analysisResult) return null;
 
     const { simple_analysis, deep_analysis, ai_enhanced_text } = analysisResult;
+    
+    // 类型断言，确保类型安全
+    const simpleAnalysis = simple_analysis as Record<string, unknown>;
+    const deepAnalysis = deep_analysis as Record<string, unknown>;
 
     return (
       <div>
@@ -103,16 +107,16 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
         )}
 
         {/* 财务健康度评分 - Ant Design Pro风格 */}
-        {deep_analysis && (
+        {deepAnalysis && (
           <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
             <Col span={6}>
               <ProCard>
                 <Statistic
                   title="财务健康度"
                   value={
-                    deep_analysis.healthLevel === 'excellent' ? '优秀经营' :
-                    deep_analysis.healthLevel === 'good' ? '良好状态' :
-                    deep_analysis.healthLevel === 'fair' ? '一般水平' : '需要改进'
+                    deepAnalysis.healthLevel === 'excellent' ? '优秀经营' :
+                    deepAnalysis.healthLevel === 'good' ? '良好状态' :
+                    deepAnalysis.healthLevel === 'fair' ? '一般水平' : '需要改进'
                   }
                   valueStyle={{ 
                     color: '#1890ff',
@@ -122,7 +126,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   prefix={<TrophyOutlined style={{ color: '#1890ff' }} />}
                 />
                 <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                  综合评分：{deep_analysis.healthScore}/100分
+                  综合评分：{(deepAnalysis as any).healthScore}/100分
                 </div>
               </ProCard>
             </Col>
@@ -131,9 +135,9 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                 <Statistic
                   title="盈利水平"
                   value={
-                    deep_analysis.profitabilityScore >= 25 ? '盈利优秀' :
-                    deep_analysis.profitabilityScore >= 20 ? '盈利良好' :
-                    deep_analysis.profitabilityScore >= 15 ? '盈利一般' : '需要提升'
+                    deepAnalysis.profitabilityScore >= 25 ? '盈利优秀' :
+                    deepAnalysis.profitabilityScore >= 20 ? '盈利良好' :
+                    deepAnalysis.profitabilityScore >= 15 ? '盈利一般' : '需要提升'
                   }
                   valueStyle={{ 
                     color: '#1890ff',
@@ -143,7 +147,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   prefix={<RiseOutlined style={{ color: '#1890ff' }} />}
                 />
                 <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                  评估得分：{deep_analysis.profitabilityScore}/30分
+                  评估得分：{deepAnalysis.profitabilityScore}/30分
                 </div>
               </ProCard>
             </Col>
@@ -152,9 +156,9 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                 <Statistic
                   title="补贴能力"
                   value={
-                    deep_analysis.riskControlScore >= 25 ? '获取优秀' :
-                    deep_analysis.riskControlScore >= 20 ? '获取良好' :
-                    deep_analysis.riskControlScore >= 15 ? '获取一般' : '有待提升'
+                    deepAnalysis.riskControlScore >= 25 ? '获取优秀' :
+                    deepAnalysis.riskControlScore >= 20 ? '获取良好' :
+                    deepAnalysis.riskControlScore >= 15 ? '获取一般' : '有待提升'
                   }
                   valueStyle={{ 
                     color: '#1890ff',
@@ -164,7 +168,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   prefix={<WarningOutlined style={{ color: '#1890ff' }} />}
                 />
                 <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                  能力评分：{deep_analysis.riskControlScore}/30分
+                  能力评分：{deepAnalysis.riskControlScore}/30分
                 </div>
               </ProCard>
             </Col>
@@ -173,9 +177,9 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                 <Statistic
                   title="成本控制"
                   value={
-                    deep_analysis.costControlScore >= 35 ? '控制优秀' :
-                    deep_analysis.costControlScore >= 30 ? '控制良好' :
-                    deep_analysis.costControlScore >= 25 ? '控制一般' : '需要优化'
+                    deepAnalysis.costControlScore >= 35 ? '控制优秀' :
+                    deepAnalysis.costControlScore >= 30 ? '控制良好' :
+                    deepAnalysis.costControlScore >= 25 ? '控制一般' : '需要优化'
                   }
                   valueStyle={{ 
                     color: '#1890ff',
@@ -185,7 +189,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   prefix={<BulbOutlined style={{ color: '#1890ff' }} />}
                 />
                 <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
-                  控制评分：{deep_analysis.costControlScore}/40分
+                  控制评分：{deepAnalysis.costControlScore}/40分
                 </div>
               </ProCard>
             </Col>
@@ -193,10 +197,10 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
         )}
 
         {/* 分析结果 - Ant Design Pro风格 */}
-        {simple_analysis && (
+        {simpleAnalysis && (
           <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
             {/* 积极表现 */}
-            {simple_analysis.positiveFactors.length > 0 && (
+            {simpleAnalysis.positiveFactors.length > 0 && (
               <Col span={8}>
                 <ProCard 
                   title={
@@ -209,7 +213,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   headerBordered
                   size="small"
                 >
-                  {simple_analysis.positiveFactors.map((factor, index) => (
+                  {simpleAnalysis.positiveFactors.map((factor, index) => (
                     <div key={index} style={{ 
                       marginBottom: '8px',
                       fontSize: '13px',
@@ -227,7 +231,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
             )}
             
             {/* 风险警示 */}
-            {simple_analysis.riskWarnings.length > 0 && (
+            {simpleAnalysis.riskWarnings.length > 0 && (
               <Col span={8}>
                 <ProCard 
                   title={
@@ -240,7 +244,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   headerBordered
                   size="small"
                 >
-                  {simple_analysis.riskWarnings.map((warning, index) => (
+                  {simpleAnalysis.riskWarnings.map((warning, index) => (
                     <div key={index} style={{ 
                       marginBottom: '8px',
                       fontSize: '13px',
@@ -258,7 +262,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
             )}
             
             {/* 深度洞察 */}
-            {simple_analysis.keyInsights.length > 0 && (
+            {simpleAnalysis.keyInsights.length > 0 && (
               <Col span={8}>
                 <ProCard 
                   title={
@@ -271,7 +275,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   headerBordered
                   size="small"
                 >
-                  {simple_analysis.keyInsights.map((insight, index) => (
+                  {simpleAnalysis.keyInsights.map((insight, index) => (
                     <div key={index} style={{ 
                       marginBottom: '8px',
                       fontSize: '13px',
@@ -291,10 +295,10 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
         )}
 
         {/* 优化建议和预测 - ProCard风格 */}
-        {deep_analysis && (
+        {deepAnalysis && (
           <Row gutter={[16, 16]} style={{ marginBottom: '16px' }}>
             {/* 优化建议 */}
-            {deep_analysis.optimizationSuggestions.length > 0 && (
+            {deepAnalysis.optimizationSuggestions.length > 0 && (
               <Col span={16}>
                 <ProCard 
                   title={
@@ -307,7 +311,7 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
                   headerBordered
                   size="small"
                 >
-                  {deep_analysis.optimizationSuggestions.map((suggestion, index) => (
+                  {deepAnalysis.optimizationSuggestions.map((suggestion, index) => (
                     <div key={index} style={{ 
                       marginBottom: '12px',
                       fontSize: '13px',
@@ -343,13 +347,13 @@ export default function AIAnalysisPanel({ selectedMonth, onAnalysisComplete }: A
               >
                 <Statistic
                   title="预计净利润区间"
-                  value={`${(deep_analysis.nextMonthPrediction.profitRange[0] / 1000).toFixed(0)}k-${(deep_analysis.nextMonthPrediction.profitRange[1] / 1000).toFixed(0)}k`}
+                  value={`${(deepAnalysis.nextMonthPrediction.profitRange[0] / 1000).toFixed(0)}k-${(deepAnalysis.nextMonthPrediction.profitRange[1] / 1000).toFixed(0)}k`}
                   prefix="¥"
                   valueStyle={{ color: '#1890ff', fontSize: '18px' }}
                 />
                 <div style={{ marginTop: '12px', fontSize: '12px', color: '#666' }}>
                   <Text type="secondary">预测依据：</Text>
-                  {deep_analysis.nextMonthPrediction.keyFactors.map((factor, index) => (
+                  {deepAnalysis.nextMonthPrediction.keyFactors.map((factor, index) => (
                     <div key={index} style={{ marginTop: '4px' }}>
                       • {factor}
                     </div>
