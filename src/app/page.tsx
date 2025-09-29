@@ -348,17 +348,35 @@ export default function Dashboard() {
     await performSyncRequest(apiMap[type], `${nameMap[type]}同步`);
   }, [performSyncRequest]);
 
+  // 执行完整数据同步（包含所有类型）
+  const handleFullSync = useCallback(async () => {
+    console.log('执行完整数据同步...');
+    
+    // 同步核心数据
+    await handleSync('all');
+    
+    // 同步所有支出数据
+    await Promise.all([
+      handleSyncExpenses('expenses'),
+      handleSyncExpenses('deposits'),
+      handleSyncExpenses('qianchuan'),
+      handleSyncExpenses('annual')
+    ]);
+    
+    console.log('完整数据同步完成');
+  }, [handleSync, handleSyncExpenses]);
+
   // 自动同步功能
   useEffect(() => {
     // 每3小时自动同步一次
     const autoSyncInterval = setInterval(() => {
-      console.log('执行自动同步...');
-      handleSync('all');
+      console.log('执行自动完整同步...');
+      handleFullSync();
     }, 3 * 60 * 60 * 1000); // 3小时 = 3 * 60 * 60 * 1000毫秒
 
     // 组件卸载时清除定时器
     return () => clearInterval(autoSyncInterval);
-  }, [handleSync]);
+  }, [handleFullSync]);
 
   // 检查上次同步时间
   useEffect(() => {
@@ -1151,7 +1169,7 @@ export default function Dashboard() {
                     <Button 
                       block
                       icon={<SyncOutlined />}
-                      onClick={() => handleSync('all')}
+                      onClick={() => handleFullSync()}
                       loading={syncing}
                     >
                       智能同步
@@ -1283,13 +1301,13 @@ export default function Dashboard() {
             >
               <Space direction="vertical" size="small" style={{ width: '100%' }}>
                 <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
-                  <strong style={{ color: '#1890ff' }}>智能同步</strong>：推荐日常使用，自动识别新数据
+                  <strong style={{ color: '#1890ff' }}>智能同步</strong>：同步所有数据类型，推荐日常使用
                 </div>
                 <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
-                  <strong style={{ color: '#fa541c' }}>强制同步</strong>：数据异常时使用，完全重新同步
+                  <strong style={{ color: '#fa541c' }}>强制同步</strong>：重新同步核心数据，异常时使用
                 </div>
                 <div style={{ fontSize: '13px', color: 'rgba(0,0,0,0.65)', lineHeight: '1.5' }}>
-                  <strong style={{ color: '#52c41a' }}>自动同步</strong>：系统每3小时自动执行
+                  <strong style={{ color: '#52c41a' }}>自动同步</strong>：系统每3小时执行智能同步
                 </div>
               </Space>
             </ProCard>
